@@ -1,0 +1,167 @@
+/* 상단 헤더 */
+.social-detail-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.social-detail-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.social-detail-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.social-detail-page .home-link {
+    text-decoration: none;
+}
+
+
+/* 프로필 */
+.social-detail-page .profile-date-box {
+	color: white;
+	height: 55px;
+	width: 330px;
+    font-size: 19px;
+    font-weight: normal;
+    margin-top: 5px;
+    margin-left: 18px;
+}
+
+.social-detail-page .social-profile-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.social-detail-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.social-detail-page .social-id {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: -3px;
+    margin-left: 60px;
+}
+
+.social-detail-page .social-date {
+    color: white;
+    font-weight: normal;
+    font-size: 15px;
+    width: 295px;
+    margin-left: 60px;
+    margin-top: 3px;
+}
+
+
+/* 동영상 재생 */
+.social-detail-page .video-play {
+    width: 390px;
+    height: 443px;
+}
+
+.social-detail-page video {
+    width: 294px;
+    height: 431px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 9px;
+    margin-left: 48px;
+    z-index: 1;
+}
+
+/* 동영상 재생 버튼 */
+.social-detail-page .play-pause-button {
+    position: absolute;
+    font-size: 30px;
+    color: white;
+    margin-left: -42px;
+    margin-top: 20px;
+    z-index: 2;
+}
+
+/* 하트, 댓글 */
+.heart-comment-box {
+    position: absolute;
+    width: 85px;
+    margin-top: -20px;
+    margin-left: 152px;
+    z-index: 2;
+}
+
+.heart-icon {
+    font-size: 35px;
+    color: #ec633f;
+}
+
+.comment-icon {
+    font-size: 35px;
+    color: #3f9dec;
+    margin-left: 15px;
+}
+
+
+/* 해시태그 */
+.social-detail-page .hashtag-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 60px;
+    width: 354px;
+    margin-left: 18px;
+    margin-top: 15px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.social-detail-page p.hashtag {
+    height: 20px;
+    width: auto;
+    background-color: white;
+    border-radius: 15px;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+/* 요약 */
+.social-detail-page .summary-box {
+    height: 80px;
+    width: 354px;
+    margin-left: 18px;
+    margin-bottom: 16.5px;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.social-detail-page .summary {
+    text-align: center;
+    color: white;
+    white-space: pre-wrap;
+}

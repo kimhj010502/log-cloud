@@ -1,0 +1,188 @@
+/* 상단 헤더 */
+.header-box {
+    position: relative;
+    text-align: center;
+}
+
+.comment-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.comment-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.home-link {
+    text-decoration: none;
+}
+
+/* 날짜 */
+.comment-page .detail-date {
+    float: left;
+	color: white;
+	height: 30px;
+	width: 330px;
+    font-size: 19px;
+    font-weight: normal;
+    margin-top: -3px;
+    margin-left: 18px;
+}
+
+.comment-page .detail-icon {
+    color: white;
+    height: 23px;
+    width: 23px;
+    font-size: 23px;
+    float: left;
+}
+
+/* 댓글 + 좋아요 창 */
+.comment-page .comments-like-box {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 15px 15px 0px 0px;
+    width: 390px;
+    height: 625px;
+    margin-bottom: -17px;
+    border-bottom: none;
+    z-index: 1;
+}
+
+/* 좋아요 목록 */
+.likelist-box {
+    width: 370px;
+    height: 50px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.likelist-box .like-link {
+    text-decoration: none;
+}
+
+.comment-page .heart-icon {
+    float: left;
+    font-size: 35px;
+    color: #ec633f;
+    margin-top: 7.5px;
+    margin-left: 5px;
+}
+
+.comment-page .like-id {
+    width: 320px;
+    height: 48px;
+    margin-left: 50px;
+}
+
+.comment-page .like-id p {
+    color: white;
+    margin-top: 2px;
+    padding-top: 6px;
+}
+
+/* 댓글 */
+.comments-box {
+    display: inline-block;
+    width: 380px;
+    height: 470px;
+    margin-left: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.comment-box {
+    width: 370px;
+    margin-left: 10px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    white-space: pre-wrap;
+}
+
+.comment-page .comment-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 7px;
+}
+
+.comment-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.comment-page .comment-id {
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: -3px;
+    margin-left: 60px;
+}
+
+.comment-page .comment-value {
+    color: white;
+    font-weight: normal;
+    font-size: 15px;
+    width: 295px;
+    margin-left: 60px;
+    margin-top: 5px;
+}
+
+/* 댓글 작성하기 */
+.add-comment-box {
+    width: 350px;
+    height: 50px;
+    margin-left: 20px;
+    margin-top: 18px;
+}
+
+.comment-textarea {
+    position: absolute;
+    float: left;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    border-radius: 10px 0px 0px 10px;
+    height: 30px;
+    width: 245px;
+    z-index: 2;
+    font-size: 15px;
+    padding-top: 13px;
+    padding-left: 10px;
+    margin-left: 15px;
+}
+
+/* 댓글 post */
+.post-comment {
+    position: absolute;
+    float: left;
+    text-align: center;
+    color: black;
+    background-color: white;
+    border: 2px solid white;
+    border-radius: 0px 10px 10px 0px;
+    width: 60px;
+    height: 45px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 45px;
+    margin-left: 272px;
+    cursor: pointer;
+    z-index: 1;
+}

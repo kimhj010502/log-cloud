@@ -1,0 +1,111 @@
+/* 상단 헤더 */
+.header-box {
+    position: relative;
+    text-align: center;
+}
+
+.like-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.like-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.home-link {
+    text-decoration: none;
+}
+
+/* 날짜 */
+.like-page .detail-date {
+    float: left;
+	color: white;
+	height: 30px;
+	width: 330px;
+    font-size: 19px;
+    font-weight: normal;
+    margin-top: -3px;
+    margin-left: 18px;
+}
+
+.like-page .detail-icon {
+    color: white;
+    height: 23px;
+    width: 23px;
+    font-size: 23px;
+    float: left;
+}
+
+/* 댓글 + 좋아요 창 */
+.like-page .comments-like-box {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 15px 15px 0px 0px;
+    width: 390px;
+    height: 625px;
+    margin-bottom: -17px;
+    border-bottom: none;
+}
+
+.like-page h3 {
+    color: white;
+    margin-left: 20px;
+}
+
+/* 좋아요 */
+.likes-box {
+    display: inline-block;
+    width: 380px;
+    height: 540px;
+    margin-left: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.like-box {
+    width: 370px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+}
+
+.like-page .like-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 7px;
+}
+
+.like-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.like-page .like-id {
+    color: white;
+    font-weight: bold;
+    height: 40px;
+    font-size: 18px;
+    margin-left: 60px;
+    padding-top: 7px;
+    line-height: 40px;
+}
+

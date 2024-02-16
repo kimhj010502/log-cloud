@@ -1,0 +1,213 @@
+.search-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* 검색할 것 */
+.search-page .what-box {
+    width: 312px;
+    height: 45px;
+    margin-top: 40px;
+    margin-left: 39px;
+    border-radius: 15px;
+    border: 1px solid white;
+}
+
+.search-page .what-component {
+    float: left;
+    color: white;
+    width: 25%;
+    height: 45px;
+    border-left: 1px solid white;
+    text-align: center;
+    line-height: 45px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.search-page .what-component.selected {
+    color: black;
+    background-color: white;
+    font-weight: bold;
+}
+
+/* 검색 범위 */
+.search-page .scope-box {
+    width: 312px;
+    height: 45px;
+    margin-top: 30px;
+    margin-left: 39px;
+    border-radius: 15px;
+    border: 1px solid white;
+}
+
+.search-page .scope-component {
+    float: left;
+    color: white;
+    width: 104px;
+    height: 45px;
+    border-left: 1px solid white;
+    text-align: center;
+    line-height: 45px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.search-page .scope-component.selected {
+    color: black;
+    background-color: white;
+    font-weight: bold;
+}
+
+/* 검색 날짜 */
+.search-page .period-box {
+    width: 312px;
+    height: 45px;
+    margin-top: 30px;
+    margin-left: 39px;
+    border-radius: 15px;
+    border: 1px solid white;
+}
+
+.react-datepicker__input-container input {
+    width: 270px !important;
+    height: 43px !important;
+    background-color: black !important;
+    color: white !important;
+    line-height: 43px !important;
+    border: none !important;
+    border-radius: 15px !important;
+    font-size: 18px !important;
+    padding-left: 40px !important;
+}
+
+.react-datepicker__input-container input::placeholder {
+    padding-left: 82px !important;
+}
+
+.react-datepicker__input-container button {
+    margin-right: 10px !important;
+}
+
+.react-datepicker__close-icon::after {
+    background-color: white !important;
+    color: black !important;
+    font-size: 15px !important;
+}
+
+
+/* 달력 */
+.react-datepicker {
+    border-radius: 15px !important;
+}
+
+.react-datepicker__header {
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.react-datepicker-popper {
+    left: 50% !important;
+    transform: translateX(-50%) translateY(305px) !important;
+}
+
+.react-datepicker__triangle {
+    top: auto !important;
+    bottom: 100% !important;
+    transform: rotate(180deg) translateY(0px) !important;
+}
+
+.react-datepicker__day:hover, .react-datepicker__month-text:hover, .react-datepicker__quarter-text:hover, .react-datepicker__year-text:hover {
+    border-radius: 30px !important;
+}
+
+.react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--in-range), .react-datepicker__month-text--in-selecting-range:not(.react-datepicker__day--in-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--in-range), .react-datepicker__quarter-text--in-selecting-range:not(.react-datepicker__day--in-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--in-range), .react-datepicker__year-text--in-selecting-range:not(.react-datepicker__day--in-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--in-range) {
+    background-color: lightgray !important;
+    color: black !important;
+    border-radius: 30px !important;
+}
+
+.react-datepicker__day--keyboard-selected, .react-datepicker__month-text--keyboard-selected, .react-datepicker__quarter-text--keyboard-selected, .react-datepicker__year-text--keyboard-selected {
+    background-color: lightgray !important;
+    color: black !important;
+    border-radius: 30px !important;
+}
+
+.react-datepicker__day--keyboard-selected:hover, .react-datepicker__month-text--keyboard-selected:hover, .react-datepicker__quarter-text--keyboard-selected:hover, .react-datepicker__year-text--keyboard-selected:hover {
+    background-color: gray !important;
+    border-radius: 30px !important;
+}
+
+.react-datepicker__day--selected:hover, .react-datepicker__day--in-selecting-range:hover, .react-datepicker__day--in-range:hover, .react-datepicker__month-text--selected:hover, .react-datepicker__month-text--in-selecting-range:hover, .react-datepicker__month-text--in-range:hover, .react-datepicker__quarter-text--selected:hover, .react-datepicker__quarter-text--in-selecting-range:hover, .react-datepicker__quarter-text--in-range:hover, .react-datepicker__year-text--selected:hover, .react-datepicker__year-text--in-selecting-range:hover, .react-datepicker__year-text--in-range:hover {
+    background-color: lightgray !important;
+    border-radius: 30px !important;
+}
+
+.react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--selected, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--selected, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--in-range {
+    background-color: gray !important;
+    border-radius: 30px !important;
+    color: white !important;
+}
+
+
+/* 키워드 입력 */
+.search-page .keyword-box {
+    width: 312px;
+    height: 45px;
+    margin-top: 30px;
+    margin-left: 39px;
+    border-radius: 15px;
+    border: 1px solid white;
+}
+
+.search-page .keyword {
+    float: left;
+    width: 80px;
+    height: 45px;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    background-color: white;
+    line-height: 45px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.search-page .keyword-textinput {
+    float: left;
+    width: 219px;
+    height: 43px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background-color: black;
+    color: white;
+    line-height: 43px;
+    border: none;
+    font-size: 18px;
+}
+
+
+
+/* SEARCH 버튼 */
+.search-button {
+    margin-top: 162.5px;
+    margin-bottom: 162.5px;
+    text-align: center;
+}
+
+.search-link {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+
+
+
+
+
+

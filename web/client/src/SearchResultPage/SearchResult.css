@@ -1,0 +1,138 @@
+/* 상단 헤더 */
+.search-result-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.search-result-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.search-result-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.search-result-page .search-link {
+    text-decoration: none;
+}
+
+
+/* 선택한 값 */
+.search-result-page .value-box {
+    color: white;
+    font-size: 17px;
+    width: 372px;
+    height: 40px;
+    border-radius: 15px;
+    border: 1px solid white;
+    margin-left: 9px;
+    margin-bottom: 65px;
+}
+
+.search-result-page .value-component-what {
+    width: 69px;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 3px;
+    padding-right: 3px;
+    float: left;
+    border-right: 1px solid white;
+    text-align: center;
+}
+
+.search-result-page .value-component-scope {
+    width: 68px;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 3px;
+    padding-right: 3px;
+    float: left;
+    border-right: 1px solid white;
+    text-align: center;
+}
+
+.search-result-page .value-component-date {
+    width: 215px;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 3px;
+    padding-right: 3px;
+    float: left;
+    border-right: 1px solid white;
+    text-align: center;
+}
+
+.search-result-page .value-keyword {
+    display: inline-block;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    font-size: 17px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 15px;
+    margin-top: 12px;
+}
+
+
+/* 검색 결과 피드 */
+.search-result-page .results-box {
+    display: inline-block;
+    width: 390px;
+    height: 541px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* 피드 한 개*/
+.search-result-page .social-link {
+    text-decoration: none;
+}
+
+.search-result-page .result-box {
+    width: 370px;
+    height: 560px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.search-result-page .result-date {
+    color: white;
+    font-weight: normal;
+    font-size: 15px;
+    width: 295px;
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+
+
+/* 썸네일 이미지 */
+.search-result-page .result-img {
+    width: 370px;
+    height: 490px;
+}
+
+.search-result-page .cover-img {
+    width: 325px;
+    height: 476px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-left: 20px;
+    margin-top: 5px;
+    z-index: 1;
+}

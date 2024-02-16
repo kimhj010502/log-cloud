@@ -1,0 +1,13 @@
+* {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+body {
+	justify-content: center;
+    align-items: center;
+	height: 800px;
+	width: 390px;
+	margin: 0 auto;
+	background-color: black;
+	border: solid yellow 1px;
+}

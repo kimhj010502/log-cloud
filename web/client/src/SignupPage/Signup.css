@@ -1,0 +1,146 @@
+/* 상단 헤더 */
+.signup-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.signup-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.signup-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.signup-page .home-link {
+    text-decoration: none;
+}
+
+.signup-page h2 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+}
+
+.signup-page h3 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+}
+
+
+.signup-box {
+    margin-top: 100px;
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+.signup-box h2 {
+    margin-bottom: 40px;
+}
+
+.signup-page .text-box {
+    width: 390px;
+    height: 45px;
+    margin-top: 20px;
+}
+
+.signup-label {
+    float: left;
+    text-align: right;
+    color: white;
+    width: 100px;
+    font-size: 20px;
+    margin-left: 30px;
+    margin-top: 7px;
+    font-weight: bold;
+    white-space: pre-wrap;
+}
+
+input {
+    font-size: 14px;
+    padding-left: 10px;
+    resize: none;
+}
+
+.confirm-password {
+    font-size: 17px;
+    margin-top: 0px;
+}
+
+.signup-textinput {
+    float: right;
+    margin-right: 40px;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    border-radius: 10px;
+    height: 30px;
+    width: 170px;
+    line-height: 30px;
+}
+
+.username-textinput {
+    position: absolute;
+    float: left;
+    margin-left: -96px;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    border-radius: 10px 0px 0px 10px;
+    height: 30px;
+    width: 115px;
+    line-height: 30px;
+    z-index: 2;
+}
+
+/* 아이디 체크 */
+.check-username {
+    position: absolute;
+    float: left;
+    color: black;
+    background-color: white;
+    border: 2px solid white;
+    border-radius: 0px 10px 10px 0px;
+    width: 55px;
+    height: 32px;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 32px;
+    margin-left: 291px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 1;
+}
+
+/* SIGNUP 버튼 */
+.signup-page .signup-button {
+    margin-top: 50px;
+    margin-bottom: 100px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.signup-page .signup-link {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    text-decoration: none; /* 밑줄 제거 */
+    cursor: pointer;
+}

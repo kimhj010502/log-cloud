@@ -1,0 +1,189 @@
+.app-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    z-index: 2;
+}
+
+/* 달력 */
+.calendarBox {
+    color: white;
+}
+
+.calendar {
+    z-index: 1;
+}
+
+.month {
+    display: inline-block;
+	position: relative;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    z-index: 2;
+}
+
+.month h2 {
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0px;
+    margin-left: 0px;
+}
+
+.calendarBox table {
+    border-collapse: collapse;
+    border: none;
+    width: 100%;
+}
+
+thead {
+    position: relative;
+    z-index: 2;
+}
+
+.calendarBox th {
+    position: relative;
+    z-index: 2;
+    border: none;
+    height: 30px;
+    padding: 8px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.calendarBox td {
+    position: relative;
+    height: 80px;
+    width: 55px;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.calendar-img {
+    position: relative;
+    height: 80px;
+    width: 40px;
+    padding: 3px;
+    border-radius: 12px;
+    opacity: 100%;
+    margin: auto;
+}
+
+.calendar-date-box {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin-top: -60px;
+    margin-left: 14px;
+    border-radius: 15px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.calendar-date {
+    position: relative;
+    margin: auto;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+/* 오늘 날짜 배경색 지정 */
+.today {
+    background-color: white;
+    color: black;
+}
+
+.day {
+    opacity: 100%;
+    color: white;
+}
+
+
+
+/* 카메라 버튼 */
+.camera {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.camera-button {
+    margin-top: 16px;
+    margin-bottom: 17px;
+    height: 70px;
+    width: 70px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 내비게이션 바 */
+.navigation {
+    position: relative;
+    margin-top: 15px;
+    z-index: 2;
+    height: 61px;
+    background-color: black;
+
+
+    position: fixed;
+    bottom: 0;
+    box-sizing:border-box;
+}
+
+.icon {
+    color: rgba(255, 255, 255, 0.6);
+    height: 50px;
+    width: 50px;
+    font-size: 35px;
+    float: left;
+    margin-top: 3px;
+    margin-left: 17px;
+    margin-right: 12px;
+}
+
+.icon-select {
+    color: white;
+    height: 50px;
+    width: 50px;
+    font-size: 35px;
+    float: left;
+    margin-top: 3px;
+    margin-left: 17px;
+    margin-right: 12px;
+}
+
+
+.profile {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 12px;
+    margin-right: 17px;
+    opacity: 60%
+}
+
+.profile-select {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 12px;
+    margin-right: 17px;
+}
+
+.profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}

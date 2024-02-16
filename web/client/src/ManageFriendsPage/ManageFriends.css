@@ -1,0 +1,240 @@
+/* 상단 헤더 */
+.manage-friends-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.manage-friends-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.manage-friends-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.manage-friends-page .profile-link {
+    text-decoration: none;
+}
+
+
+/* search box */
+.manage-friends-page .search-friends-box {
+    width: 330px;
+    height: 40px;
+    border-radius: 15px;
+    border: 1px solid white;
+    margin-top: 40px;
+    margin-left: 30px;
+    margin-bottom: 40px;
+}
+
+.manage-friends-page .search-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px 0px 0px 13px;
+    margin-top: 0px;
+    color: black;
+    font-size: 30px;
+    line-height: 50px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.manage-friends-page .search-friends {
+    float: left;
+    color: white;
+    background-color: black;
+    border: none;
+    font-size: 17px;
+    font-weight: bold;
+    height: 38px;
+    width: 269px;
+    line-height: 38px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 0px 15px 15px 0px;
+    margin-top: -40px;
+    margin-left: 40px;
+}
+
+/* pending friends */
+.pending-requests-box {
+    width: 330px;
+    height: 180px;
+    margin-left: 30px;
+    background-color: white;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.pending-requests-header {
+    font-size: 22px;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.requests-box {
+    display: inline-block;
+    width: 320px;
+    height: 130px;
+    margin-left: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.request-box {
+    width: 300px;
+    height: 50px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+}
+
+.manage-friends-page .request-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.manage-friends-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.manage-friends-page .request-id {
+    float: left;
+    height: 50px;
+    line-height: 50px;
+    color: black;
+    font-weight: bold;
+    font-size: 19.5px;
+}
+
+.manage-friends-page .accept-box {
+    float: right;
+    display: flex;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 50px;
+}
+
+.manage-friends-page .accept-button {
+    color: rgb(51, 51, 214);
+    cursor: pointer;
+}
+
+.manage-friends-page .middle-line {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.manage-friends-page .decline-button {
+    color: rgb(255, 70, 70);
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.manage-friends-page .no-request {
+    color: black;
+    font-size: 18px;
+    line-height: 110px;
+}
+
+/* my friends */
+.my-friends-box {
+    width: 330px;
+    height: 335px;
+    margin-left: 30px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.my-friends-header {
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: gray;
+}
+
+.friends-box {
+    display: inline-block;
+    width: 320px;
+    height: 285px;
+    margin-left: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.friend-box {
+    width: 300px;
+    height: 50px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+}
+
+.manage-friends-page .friend-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.manage-friends-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.manage-friends-page .friend-id {
+    float: left;
+    height: 50px;
+    line-height: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 19.5px;
+}
+
+.manage-friends-page .delete-button {
+    color: gray;
+    font-size: 30px;
+    line-height: 50px;
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.manage-friends-page .no-friend {
+    color: gray;
+    font-size: 18px;
+    line-height: 70px;
+}

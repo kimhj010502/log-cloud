@@ -1,0 +1,169 @@
+.save-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    z-index: 2;
+}
+
+/* 상단 버튼, 날짜 */
+.save-page .date-box {
+	position: relative;
+	height: 80px;
+	align-items: center;
+    justify-content: center;
+}
+
+.save-page .left-button {
+	position: relative;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 28px;
+	margin-left: 5px;
+	z-index: 2;
+}
+
+.save-page .date-box h2 {
+	position: relative;
+	color: white;
+	height: 30px;
+	width: 390px;
+    font-size: 25px;
+	margin-top: -35px;
+    font-weight: normal;
+	text-align: center;
+	z-index: 1;
+}
+
+/* 동영상 미리보기 */
+.save-page .video-preview {
+    position: relative;
+    width: 390px;
+    height: 410px;
+}
+
+.save-page video {
+    width: 234px;
+    height: 354px;
+    object-fit: cover;
+    border-radius: 30px;
+    margin-top: 28px;
+    margin-left: 78px;
+    z-index: 1;
+}
+
+/* 동영상 재생 버튼 */
+.save-page .play-pause-button {
+    position: absolute;
+    font-size: 50px;
+    color: white;
+    margin-left: -142px;
+    margin-top: 190px;
+    z-index: 2;
+}
+
+
+
+/* 해시태그 */
+.save-page .hashtag-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 60px;
+    width: 354px;
+    margin-left: 18px;
+    margin-top: -10px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.save-page p.hashtag {
+    height: 20px;
+    width: auto;
+    background-color: white;
+    border-radius: 15px;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+/* 요약 */
+.save-page .summary-box {
+    height: 100px;
+    width: 354px;
+    margin-left: 18px;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.save-page .summary {
+    text-align: center;
+    color: white;
+    white-space: pre-wrap;
+}
+
+/* 공개 범위 */
+.scope-box {
+    height: 30px;
+    width: 130px;
+    margin-left: 130px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.scope-icon {
+    color: white;
+    height: 25px;
+    width: 25px;
+    font-size: 25px;
+    float: left;
+}
+
+.scope-label {
+    float: left;
+    color: white;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+
+/* EDIT 버튼 */
+.save-page .edit-button {
+    float: left;
+    margin-top: 10px;
+    width: 100px;
+    margin-left: 80px;
+    text-align: center;
+}
+
+.save-page .edit-link {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+/* SAVE 버튼 */
+.save-page .save-button {
+    float: left;
+    margin-top: 10px;
+    width: 100px;
+    margin-left: 30px;
+    text-align: center;
+}
+
+.save-page .save-link {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    text-decoration: none; /* 밑줄 제거 */
+}

@@ -1,0 +1,24 @@
+# Ignore virtual environment
+venv/
+
+# Ignore IDE files
+.idea/
+
+.DS_Store
+
+#Ignore .bin files
+*.bin
+
+*.ipynb_checkpoints
+
+checkpoint-1000/
+checkpoint-2000/
+
+model.safetensors
+
+web/flask-server/config.py
+web/flask-server/generate_key.py
+web/flask-server/sql_test.py
+web/flask-server/sftp.py
+web/flask-server/ssh_test.py
+web/flask-server/ssh_test_copy.py

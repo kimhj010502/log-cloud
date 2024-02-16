@@ -1,0 +1,138 @@
+/* 상단 헤더 */
+.analysis-page {
+    overflow-x: hidden;
+}
+.analysis-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.analysis-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* 월 선택 */
+.analysis-page .year-month-box .year-month {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.analysis-page .year-month-box .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 1px;
+	z-index: 2;
+}
+
+.analysis-page .year-month-box .right-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: -40px;
+    margin-left: 330px;
+	z-index: 2;
+}
+
+.analysis-page .month-log {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    font-size: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* 해시태그 */
+.analysis-page .top5-hashtag-box {
+    width: 360px;
+    height: 230px;
+    margin-left: 12px;
+    border: 3px solid white;
+    border-radius: 15px;
+    color: white;
+}
+
+.analysis-page .hashtag-label {
+    float: left;
+    width: 160px;
+    height: 230px;
+    text-align: center;
+    line-height: 230px;
+    font-size: 18px;
+}
+
+.analysis-page .hashtag-box {
+    height: 220px;
+    margin-top: 10px;
+}
+
+.analysis-page .hashtag-container {
+    width: 190px;
+    height: 30px;
+    text-align: center;
+    float: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.analysis-page .hashtag {
+    display: inline-block;
+    height: 20px;
+    width: auto;
+    background-color: white;
+    border-radius: 15px;
+    color: black;
+    padding: 3px 8px;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    margin: auto;
+}
+
+
+/* BGM 감정 분석 */
+.analysis-page .emotion-label {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    margin-top: 29px;
+}
+
+.analysis-page .emotion-graph-box {
+    width: 470px;
+    height: 300px;
+    margin-top: -20px;
+    margin-left: -10px;
+}
+
+.analysis-page .emotion-graph {
+    width: 400px;
+    height: 250px;
+    border: 1px solid blue;
+}

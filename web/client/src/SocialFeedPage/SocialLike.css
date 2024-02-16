@@ -1,0 +1,140 @@
+/* 상단 헤더 */
+.social-like-page .header-box {
+    position: relative;
+    text-align: center;
+}
+
+.social-like-page h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.social-like-page .left-button {
+	position: absolute;
+    color: white;
+	height: 30px;
+    width: 60px;
+    font-size: 25px;
+	margin-top: 7px;
+	margin-left: -195px;
+	z-index: 2;
+}
+
+.social-like-page .home-link {
+    text-decoration: none;
+}
+
+
+
+/* 프로필 */
+.social-like-page .profile-date-box {
+	color: white;
+	height: 55px;
+	width: 330px;
+    font-size: 19px;
+    font-weight: normal;
+    margin-top: 5px;
+    margin-left: 18px;
+}
+
+.social-like-page .social-profile-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.social-like-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.social-like-page .social-id {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: -3px;
+    margin-left: 60px;
+}
+
+.social-like-page .social-date {
+    color: white;
+    font-weight: normal;
+    font-size: 15px;
+    width: 295px;
+    margin-left: 60px;
+    margin-top: 3px;
+}
+
+
+/* 댓글 + 좋아요 창 */
+.social-like-page .comments-like-box {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 15px 15px 0px 0px;
+    width: 390px;
+    height: 611px;
+    margin-top: 5px;
+    margin-bottom: -17px;
+    border-bottom: none;
+}
+
+.social-like-page h3 {
+    color: white;
+    margin-left: 20px;
+}
+
+/* 좋아요 */
+.social-like-page .likes-box {
+    display: inline-block;
+    width: 380px;
+    height: 525px;
+    margin-left: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.social-like-page .like-box {
+    width: 370px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+}
+
+.social-like-page .like-img {
+    height: 40px;
+    width: 40px;
+    border-radius: 30px;
+    overflow: hidden;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+    margin-top: 7px;
+}
+
+.social-like-page .profile-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.social-like-page .like-id {
+    color: white;
+    font-weight: bold;
+    height: 40px;
+    font-size: 18px;
+    margin-left: 60px;
+    padding-top: 7px;
+    line-height: 40px;
+}
+
