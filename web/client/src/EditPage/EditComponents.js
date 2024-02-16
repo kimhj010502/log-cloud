@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { ArrowLeftOutlined, PlusCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 
@@ -22,29 +22,44 @@ export function LogDate(handleButtonClick) {
     )
 }
 
-export function EditHashTag({ value }) {
+export function EditHashTag({ index, value, onRemove }) {
     return (
         <div className='hashtag-box'>
             <p className="hashtag">#{value}</p>
-            <MinusCircleFilled className='remove-hashtag'/>
+            <MinusCircleFilled className='remove-hashtag' onClick={() => onRemove(index)} />
         </div>
     )
 }
 
-export function AddHashTag() {
+export function AddHashTag({ newHashtag, setNewHashtag, onAdd }) {
+    const handleSetNewHashtag = (e) => {
+        setNewHashtag(e.target.value);
+    };
+
     return (
-        //onclick 추가하기
         <div className='add-hashtag-box'>
-            <PlusCircleFilled className='add-hashtag'/>
-            <p>해시태그 추가하기</p>
+            <PlusCircleFilled className='add-hashtag' onClick={() => onAdd(newHashtag)}/>
+            <p className='add-hashtag-tag'>#</p>
+            <input type='text' className='add-hashtag-input' value={newHashtag} onChange={(e) => handleSetNewHashtag(e)} placeholder='해시태그 추가하기'></input>
         </div>
     )
 }
 
-export function EditSummary({ value }) {
+export function EditSummary({ prevSummary }) {
+    const [currentSummary, setCurrentSummary] = useState(prevSummary);
+
+    useEffect(() => {
+        setCurrentSummary(prevSummary);
+    }, [prevSummary]);
+    
+    const handleSetCurrentSummary = (e) => {
+        setCurrentSummary(e.target.value);
+    };
+
+
     return (
         <div className="summary-box">
-            <textarea value={value} className="summary" />
+            <textarea value={currentSummary} onChange={(e) => handleSetCurrentSummary(e)} className="summary" />
         </div>
     )
 }

@@ -17,7 +17,7 @@ function ManageFriendsPage() {
 
                 <ManageFriendsHeader />
 
-                <SearchFriends />
+                <SearchFriends searchedfriendName={null}/>
 
                 <PendingRequests />
 

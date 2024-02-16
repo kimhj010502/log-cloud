@@ -9,5 +9,9 @@ body {
 	width: 390px;
 	margin: 0 auto;
 	background-color: black;
-	border: solid yellow 1px;
+	/* border: solid yellow 1px; */
+}
+
+*:focus {
+	outline: none;
 }

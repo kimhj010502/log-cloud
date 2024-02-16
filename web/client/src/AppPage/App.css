@@ -116,7 +116,7 @@ thead {
 
 .camera-button {
     margin-top: 16px;
-    margin-bottom: 17px;
+    margin-bottom: 100px;
     height: 70px;
     width: 70px;
     border-radius: 50px;
@@ -126,12 +126,10 @@ thead {
 
 /* 내비게이션 바 */
 .navigation {
-    position: relative;
     margin-top: 15px;
     z-index: 2;
     height: 61px;
     background-color: black;
-
 
     position: fixed;
     bottom: 0;

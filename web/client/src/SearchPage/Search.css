@@ -74,14 +74,15 @@
 }
 
 .react-datepicker__input-container input {
-    width: 270px !important;
-    height: 43px !important;
+    width: 260px !important;
+    height: 35px !important;
     background-color: black !important;
     color: white !important;
-    line-height: 43px !important;
+    line-height: 35px !important;
     border: none !important;
     border-radius: 15px !important;
     font-size: 18px !important;
+    padding-top: 5px !important;
     padding-left: 40px !important;
 }
 
@@ -91,6 +92,8 @@
 
 .react-datepicker__input-container button {
     margin-right: 10px !important;
+    padding-top: 2px !important;
+    padding-bottom: 0px !important;
 }
 
 .react-datepicker__close-icon::after {
@@ -178,13 +181,15 @@
 
 .search-page .keyword-textinput {
     float: left;
-    width: 219px;
-    height: 43px;
+    width: 210px;
+    height: 38px;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
     background-color: black;
     color: white;
-    line-height: 43px;
+    line-height: 38px;
+    padding-top: 4px;
+    padding-bottom: 0px;
     border: none;
     font-size: 18px;
 }

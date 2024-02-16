@@ -14,10 +14,10 @@ export function ManageFriendsHeader() {
     )
 }
 
-export function SearchFriends() {
-    const [friendName, setFriendName] = useState(null);
+export function SearchFriends({ searchedfriendName }) {
+    const [friendName, setFriendName] = useState(searchedfriendName);
     
-    const handlesetFriendName = (e) => {
+    const handleSetFriendName = (e) => {
         setFriendName(e.target.value);
     };
 
@@ -26,7 +26,7 @@ export function SearchFriends() {
             <Link to={'/search-friends'} state={{ friendName: friendName }} >
                 <SearchOutlined className='search-icon' />
             </Link>
-            <input value={friendName} onChange={(e) => handlesetFriendName(e)} placeholder='add or search friends' className='search-friends'></input>
+            <input value={friendName} onChange={(e) => handleSetFriendName(e)} placeholder='add or search friends' className='search-friends'></input>
         </div>
     )
 }

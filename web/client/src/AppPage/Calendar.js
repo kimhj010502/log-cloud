@@ -57,7 +57,8 @@ export function CalendarYearMonth({year, month, videos}) {
 
     let weeks = Math.ceil(remainingDays / 7);
 
-    // videos format: [{'date': 8, 'coverImage': '.'}, {'date': 9, 'coverImage': '.'}]
+    //  format: [{'date': 8, 'coverImage': '.'}, {'date': 9, 'coverImage': '.'}]
+    // videos format: [{'date': 8, 'coverImage': '.', 'videoId':'~~'}, ..]
     console.log("calendar year month:", videos);
 
     return (
@@ -75,32 +76,27 @@ export function CalendarYearMonth({year, month, videos}) {
                     const logEntry = videos.find(video => video.date === day);
 
                     return (
-                        
                         <td key={colIndex}>
-                            <Link to={'/feed'}>
-                                {logEntry ? (
+                            {logEntry ? (
+                                <Link to={{ pathname: '/feed'}}
+                                    state={{ videoId: logEntry.videoId }}
+                                      preventScrollReset={true} >
                                     <CalendarImg url={logEntry.coverImage} />
-                                ) : (
+                                </Link>
+                            ) : (
+                                <Link to={'/'}>
                                     <img className="calendar-img" src="black.png" alt="calendar img"/>
-                                )}
-                                {isToday ? (
-                                <div className="calendar-date-box today">
-                                    <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
-                                </div>
-                                ) : (
-                                <div className="calendar-date-box day">
-                                    <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
-                                </div>
-                                )}
-                            </Link>
+                                </Link>
+                            )}
+                            <div className={`calendar-date-box ${isToday ? 'today' : 'day'}`}>
+                                <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
+                            </div>
                         </td>
                     );
-
                     })}
                 </tr>
                 ))}
             </tbody>
-
             </table>
         </div>
     );

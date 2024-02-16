@@ -154,6 +154,7 @@ def get_log_overview_of_month():
 			video_info_list.append({
 				'date': day_of_month,
 				'coverImage': video.cover_image,
+				'videoId': video.video_id,
 			})
 		# print(video_info_list)
 		return jsonify(video_info_list)
@@ -162,22 +163,34 @@ def get_log_overview_of_month():
 
 
 
-@app.route("/logdetail")
+@app.route("/logdetail", methods=['POST'])
 def logDetail():
-	return {"date": "Friday, December 9, 2023",
-			"coverImg": "/route/to/image",
-			"hashtags": ["이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
-			"summary": "이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 가족 여행으로 시칠리아에 왔어요. 여름의 이탈리아는 매우 더워요. 해변에서 하루종일 수영했어요.",
-			"privacy": "private",
-			"location": "Sicily, Italy",
-			"emotion": "happy"}
+	video_id = request.json['videoId']
+	
+	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
+
+	if video_detail:
+		print("Video URL:", video_detail.video_url)
+		print("Summary:", video_detail.summary)
+		print("Emotion:", video_detail.emotion)
+		print("Hashtag:", video_detail.hashtag.split(', '))
+		print("Date:", video_detail.date)
+	else:
+		print("Video detail not found.")
+	
+	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
+			"coverImg": video_detail.cover_image,
+			"hashtags": video_detail.hashtag.split(', '),
+			"summary": video_detail.summary,
+			"privacy": video_detail.share,
+			"emotion": video_detail.emotion}
 
 
 @app.route("/generateDetails")
 def generateDetails():
 	return {"date": "Friday, December 9, 2023",
 			"coverImg": "/route/to/image",
-			"hashtags": ["이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
+			"hashtags": ["😍", "이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
 			"summary": "이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 가족 여행으로 시칠리아에 왔어요. 여름의 이탈리아는 매우 더워요. 해변에서 하루종일 수영했어요.",
 			"privacy": "전체 공개",
 			"location": "Sicily, Italy",

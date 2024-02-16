@@ -23,7 +23,7 @@ function SearchFriendsPage() {
 
                 <SearchFriendsHeader />
 
-                <SearchFriends />
+                <SearchFriends searchedfriendName={friendName} />
 
                 <SearchingMyFriends />
 

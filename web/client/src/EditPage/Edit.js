@@ -16,7 +16,6 @@ function Edit() {
             })
     }, []);
 
-
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)
 
@@ -32,6 +31,30 @@ function Edit() {
         setIsVisible(!isVisible)
     }
 
+
+    //해시태그 삭제
+    const [hashtags, setHashtags] = useState(data.hashtags);
+    
+    useEffect(() => {
+        setHashtags(data.hashtags)
+    }, [data]);
+    
+    const onRemove = (index) => {
+        const newHashtags = [...hashtags.slice(0, index), ...hashtags.slice(index + 1)]
+        setHashtags(newHashtags)
+    }
+
+
+    //해시태그 추가
+    const [newHashtag, setNewHashtag] = useState();
+
+    const onAdd = (newHashtag) => {
+        const newHashtags = [...hashtags, newHashtag]
+        setHashtags(newHashtags)
+        setNewHashtag('')
+    }
+
+    
     return (
         <AnimatePresence>
         {isVisible && (
@@ -46,14 +69,16 @@ function Edit() {
                 {LogDate(handleButtonClick)}
 
                 <div className="hashtag-container">
-                    {data.hashtags && data.hashtags.map((tag, index) => (
-                        <EditHashTag key={index} value={ tag } />
+                    {hashtags && hashtags.map((tag, index) => (
+                        index !== 0 ? (
+                            <EditHashTag index={index} value={tag} onRemove={onRemove} />
+                        ) : null
                     ))}
                 </div>
 
-                <AddHashTag />
+                <AddHashTag newHashtag={newHashtag} setNewHashtag={setNewHashtag} onAdd={onAdd} />
 
-                <EditSummary value={data.summary} />
+                <EditSummary prevSummary={data.summary} />
                 
                 <UpdateButton />
 

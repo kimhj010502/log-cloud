@@ -3,11 +3,8 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { ResponsiveLine } from '@nivo/line'
 
 
-export function Analysis() {
-    let date = new Date()
-    const [currentYear, setCurrentYear] = useState(date.getFullYear())
-    const [currentMonth, setCurrentMonth] = useState(date.getMonth())
-
+export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth }) {
+    
     const handleClickLeft = () => {
         const newMonth = currentMonth - 1
         setCurrentMonth(newMonth < 0 ? 11 : newMonth)

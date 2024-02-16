@@ -14,6 +14,10 @@ function numberToMonth(number) {
 
 
 function AnalysisPage() {
+    let date = new Date()
+    const [currentYear, setCurrentYear] = useState(date.getFullYear())
+    const [currentMonth, setCurrentMonth] = useState(date.getMonth())
+
     const [data, setData] = useState([{}])
     useEffect(() => {
         fetch("/analysisReport"). then(
@@ -41,7 +45,7 @@ function AnalysisPage() {
                     transition={{ duration: 0.5 }}
                     >
                     
-                    <Analysis />
+                    <Analysis currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>
 
                     </motion.div>
                 </AnimatePresence>

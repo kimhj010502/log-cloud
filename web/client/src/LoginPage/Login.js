@@ -4,10 +4,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
 
 function LoginPage() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Fetch authentication status from the backend
+        fetch('/check_authentication')
+            .then(response => response.json())
+            .then(data => {
+                if (data.authenticated){
+                    navigate("/");
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authentication:', error);
+            });
+    }, []);
+
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    const navigate = useNavigate();
 
     const handleSetUsername = (e) => {
         setUsername(e.target.value);
@@ -26,7 +41,7 @@ function LoginPage() {
           const timeoutId = setTimeout(() => {
             setIsVisible(false);
           }, 1000);
-    
+
           return () => clearTimeout(timeoutId);
         }
       }, [isVisible, prevURL]);
@@ -49,11 +64,11 @@ function LoginPage() {
                 },
                 body: JSON.stringify({ username: username, password: password }),
             });
-            console.log(username, password);
+            // console.log(username, password);
 
             if (response.ok) {
-                const data = await response.json();
-                if (data.message === 'Login successful') {
+                // const data = await response.json();
+                if (response.status === 200) {
                     navigate("/", { replace: true });
                 }
             } else if (response.status === 401) {

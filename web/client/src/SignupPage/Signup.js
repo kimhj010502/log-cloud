@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate  } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeftOutlined } from '@ant-design/icons'
 import './Signup.css'
 
 function SignupPage() {
@@ -12,6 +11,20 @@ function SignupPage() {
     const [password2, setPassword2] = useState("");
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Fetch authentication status from the backend
+        fetch('/check_authentication')
+            .then(response => response.json())
+            .then(data => {
+                if (data.authenticated){
+                    navigate("/");
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authentication:', error);
+            });
+    }, []);
 
     const handleSetEmail = (e) => {
         setEmail(e.target.value);
@@ -37,11 +50,15 @@ function SignupPage() {
     }
 
     const handleCheckAvailability = async() => {
+        console.log(username);
         const response = await fetch(`/check_username_availability?username=${username}`);
         const data = await response.json();
+        console.log(data);
         if (data.available === true) {
             setIsUsernameAvailable(true);
             alert("Username available!");
+        } else {
+            alert("Unavailable username");
         }
     };
 
@@ -73,7 +90,6 @@ function SignupPage() {
                 });
 
                 if (response.ok) {
-                    // history.push('/login');
                     navigate("/login");
                 } else {
                     alert('Sign Up failed :(');
@@ -83,10 +99,6 @@ function SignupPage() {
             }
         }
 
-    };
-
-    const handleGoBack = () => {
-        navigate("/login");
     };
 
 
@@ -99,14 +111,7 @@ function SignupPage() {
             exit={{ opacity: 0, when: "afterChildren" }}
             transition={{ duration: 0.5 }}
             >
-            
-            
-            <div className='header-box'>
-                <ArrowLeftOutlined className="left-button" onClick={handleGoBack}/>
-
-                <h1>log your memory</h1>
-            </div>
-
+            <h1>log your memory</h1>
 
             <div className='signup-box'>
                 <h2>Create Account</h2>
@@ -118,7 +123,7 @@ function SignupPage() {
 
                 <div className='text-box'>
                     <div className='signup-label'>username</div>
-                    <input value={username} onChange={(e) => handleSetUsername(e)} className='username-textinput'></input>
+                    <input value={username} onChange={(e) => handleSetUsername(e)} className='signup-textinput'></input>
                     <div className='check-username' onClick={handleCheckAvailability}>check</div>
                 </div>
 

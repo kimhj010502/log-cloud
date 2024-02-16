@@ -59,14 +59,17 @@
     border: none;
     font-size: 17px;
     font-weight: bold;
-    height: 38px;
+    height: 32px;
     width: 269px;
-    line-height: 38px;
+    line-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 0px;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 0px 15px 15px 0px;
     margin-top: -40px;
     margin-left: 40px;
+    
 }
 
 /* pending friends */

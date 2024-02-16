@@ -7,6 +7,7 @@ import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
 
 //이번 달 달력
 export function Calendar() {
+
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
@@ -19,6 +20,13 @@ export function Calendar() {
 
     let userCreatedMonth;
     let userCreatedYear;
+
+    // const location = useLocation();
+    // const { year, month } = location.state;
+    // if (year !== undefined && month !== undefined) {
+    //     setCurrentYear(year);
+    //     setCurrentMonth(month);
+    // }
 
     async function getUserInfo() {
         try {
@@ -54,14 +62,13 @@ export function Calendar() {
                 body: JSON.stringify({username: user.username, month: currentMonth, year: currentYear}),
             });
 
-            // response format: [{'date': 8, 'coverImage': '.'}, {'date': 9, 'coverImage': '.'}]
+            // response format: [{'date': 8, 'coverImage': '.', 'videoId':'~~'}, ..]
             if (response.ok) {
                 if (response.status === 200) {
                     const data = await response.json();
                     data.forEach(entry => {
                         setVideos(data);
-                        // console.log("Day of month:", entry.date);
-                        // console.log("Cover image:", entry.coverImage);
+                        // console.log("VIDEO ID:", entry.videoId);
                     });
                 }
             } else if (response.status === 404){
