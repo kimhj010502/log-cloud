@@ -1,11 +1,24 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
+import { getUserInfo } from '../AppPage/AppComponents'
 
-
-export function ProfileImg({ img_src }) {
+export function ProfileImg({img_src}) {
+    const [user, setUser] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = React.useRef(null);
+
+    useEffect(() => {
+        async function fetchUserData() {
+            try {
+                const userInfo = await getUserInfo();
+                setUser(userInfo);
+            } catch (error) {
+                console.error('Error fetching user info for profile page:', error);
+            }
+        }
+        fetchUserData();
+    }, []);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -18,23 +31,31 @@ export function ProfileImg({ img_src }) {
         }
     }, [fileInputRef]);
 
+
     return (
         <div className='profile-box'>
-            <div className="profile-img-box">
-                <img className="profile-img" src={img_src} alt="profile img"/>
-            </div>
+            {user ? (
+                <>
+                    <div className="profile-img-box">
+                        <img className="profile-img" src={img_src} alt="profile img"/>
+                    </div>
 
-            <div className="change-button-box">
-                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
-                <CameraFilled className='change-button' onClick={handleFileIconClick}/>
-            </div>
+                    <div className="change-button-box">
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange}
+                               style={{display: 'none'}}/>
+                        <CameraFilled className='change-button' onClick={handleFileIconClick}/>
+                    </div>
 
-            <div className='detail-box'>
-                <div className='username'>username</div>
-                <div className='since-when'>logging since 2023</div>
-            </div>
+                    <div className='detail-box'>
+                        <div className='username'>{user.username}</div>
+                        <div className='since-when'>logging since {new Date(user.createdAt).getFullYear()}</div>
+                    </div>
+                </>
+            ) : (
+                <div>Loading user information...</div>
+            )}
         </div>
-    )
+    );
 }
 
 async function handleLogout() {

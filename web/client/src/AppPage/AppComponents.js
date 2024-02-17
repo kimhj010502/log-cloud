@@ -4,6 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
 
+export async function getUserInfo() {
+    try {
+        const response = await fetch('/@me', {
+            method: 'GET',
+            credentials: 'include',
+        });
+        if (!response.ok) {
+            console.log('Network response was not ok');
+        }
+        const data = await response.json();
+        return {username: data.username, createdAt: data.createdAt};
+    } catch (error) {
+        console.error('Error fetching username:', error);
+        return null;
+    }
+}
 
 //이번 달 달력
 export function Calendar() {
@@ -27,23 +43,6 @@ export function Calendar() {
     //     setCurrentYear(year);
     //     setCurrentMonth(month);
     // }
-
-    async function getUserInfo() {
-        try {
-            const response = await fetch('/@me', {
-                method: 'GET',
-                credentials: 'include',
-            });
-            if (!response.ok) {
-                console.log('Network response was not ok');
-            }
-            const data = await response.json();
-            return {username: data.username, createdAt: data.createdAt};
-        } catch (error) {
-            console.error('Error fetching username:', error);
-            return null;
-        }
-    }
 
     async function loadCalendarView(currentMonth, currentYear) {
 
