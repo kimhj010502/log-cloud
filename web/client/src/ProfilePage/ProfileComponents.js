@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 
 
@@ -82,27 +82,29 @@ export function ProfileButtons({ isClicked, setIsClicked }) {
     )
 }
 
+
 export function DeleteAccount({ isClicked, setIsClicked }) {
     const handleDeleteAccountClick = () => {
         setIsClicked(false)
     };
 
+    const navigate = useNavigate();
+
     async function deleteUser() {
         try {
-            const response = await fetch('/logout', {
-                method: 'GET',
+            const response = await fetch('/delete_account', {
+                method: 'POST',
                 credentials: 'include',
             });
-            if (!response.ok) {
-                console.log('Network response was not ok');
+            if (response.ok) {
+                alert("Account deleted successfully");
+                navigate("/");
+            } else {
+                alert("Failed to delete account");
             }
-            const data = await response.json();
-            return {username: data.username, createdAt: data.createdAt};
         } catch (error) {
-            console.error('Error fetching username:', error);
-            return null;
+            console.error('Error while deleting account:', error);
         }
-
     }
 
     return (

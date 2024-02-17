@@ -10,6 +10,7 @@ import pymysql
 from datetime import datetime
 
 from sqlalchemy import extract, asc
+from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
@@ -76,24 +77,42 @@ def register_user():
 		print(f"Error in signup: {str(e)}")
 
 
-@app.route('/delete_account')
+@app.route('/delete_account', methods=['POST'])
 def remove_registered_user():
 	user_id = session.get("user_id")
 	
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
 	
-	# fetch user data by username(from session)
 	user = User.query.filter_by(username=user_id).first()
 	
-	# remove all videos associated with the account
+	if not user:
+		return jsonify({"error": "User not found"}), 404
 	
-	
-	return jsonify({
-		"username": user.username,
-		"email": user.email,
-		"createdAt": user.created_at
-	})
+	try:
+		with db.session.begin_nested():
+			# Delete user's videos from video_info table
+			video_info_to_delete = videoInfo.query.filter_by(username=user.username).delete()
+			
+			# Delete user's video logs from video_log table
+			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
+			
+			# Delete user from social_network table (both username1 and username2)
+			social_network_to_delete = socialNetwork.query.filter((socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
+		
+			# + additional deletion operation: remove all comments associated with the account
+			# + additional deletion operation: remove all likes associated with the account
+			
+			# Delete user from user_account table
+			db.session.delete(user)
+			
+		db.session.commit()
+		session.clear()
+		return jsonify({"message": "Account deleted successfully"}), 200
+			
+	except IntegrityError:
+		db.session.rollback()  # Rollback in case of an error
+		return jsonify({"error": "Database error"}), 500
 
 
 @app.route('/login', methods=['POST'])
