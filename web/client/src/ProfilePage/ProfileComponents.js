@@ -37,6 +37,27 @@ export function ProfileImg({ img_src }) {
     )
 }
 
+async function handleLogout() {
+    try {
+        const response = await fetch('/logout', {
+            method: 'GET',
+            credentials: 'include',
+        });
+        if (!response.ok) {
+            console.log('Network response was not ok');
+        }
+        else {
+            const data = await response.json();
+            // console.log('Logging out...');
+            console.log(data);
+            // return {username: data.username, createdAt: data.createdAt};
+        }
+
+    } catch (error) {
+        console.error('Error while logging out:', error);
+    }
+}
+
 export function ProfileButtons({ isClicked, setIsClicked }) {
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
@@ -44,15 +65,15 @@ export function ProfileButtons({ isClicked, setIsClicked }) {
 
     return (
         <div className='buttons-box'>
-            <Link to={'/manage-friends'} class="profile-link">
+            <Link to={'/manage-friends'} className="profile-link">
                 <div className='profile-button'>manage friends</div>
             </Link>
 
-            <Link to={'/change-password'} class='profile-link'>
+            <Link to={'/change-password'} className='profile-link'>
                 <div className='profile-button'>change password</div>
             </Link>
 
-            <Link to={'/login'} class='profile-link'>
+            <Link to={'/login'} onClick={handleLogout} className='profile-link'>
                 <div className='profile-button'>log out</div>
             </Link>
 
@@ -66,10 +87,28 @@ export function DeleteAccount({ isClicked, setIsClicked }) {
         setIsClicked(false)
     };
 
+    async function deleteUser() {
+        try {
+            const response = await fetch('/logout', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (!response.ok) {
+                console.log('Network response was not ok');
+            }
+            const data = await response.json();
+            return {username: data.username, createdAt: data.createdAt};
+        } catch (error) {
+            console.error('Error fetching username:', error);
+            return null;
+        }
+
+    }
+
     return (
         <div className='delete-account-popup'>
             <div className='popup-label'>are you sure you want to<br/>delete your accout?</div>
-            <div className='popup-delete-button'>DELETE ACCOUNT</div>
+            <div className='popup-delete-button' onClick={deleteUser}>DELETE ACCOUNT</div>
             <div className='popup-cancel-button' onClick={handleDeleteAccountClick}>CANCEL</div>
         </div>
     )

@@ -76,6 +76,26 @@ def register_user():
 		print(f"Error in signup: {str(e)}")
 
 
+@app.route('/delete_account')
+def remove_registered_user():
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	# fetch user data by username(from session)
+	user = User.query.filter_by(username=user_id).first()
+	
+	# remove all videos associated with the account
+	
+	
+	return jsonify({
+		"username": user.username,
+		"email": user.email,
+		"createdAt": user.created_at
+	})
+
+
 @app.route('/login', methods=['POST'])
 def login_user():
 	username = request.json['username']
@@ -101,14 +121,14 @@ def login_user():
 	return jsonify({'username': user.username, 'email': user.email})
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout_user():
 	user_id = session.get("user_id")
 	if user_id:
 		session.clear()
-		return redirect(url_for('login'))
+		return jsonify({"msg": "Successful user logout"}), 200
 	else:
-		return redirect(url_for('login'))
+		return jsonify({"error": "Unauthorized"}), 401
 	
 
 @app.route("/@me")
