@@ -36,7 +36,7 @@ function ChangePasswordPage() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    oldPassword: currentPassword,
+                    currentPassword: currentPassword,
                     newPassword: newPassword1
                 })
             });

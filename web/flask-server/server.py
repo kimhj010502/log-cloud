@@ -81,7 +81,7 @@ def register_user():
 def change_user_password():
 	user_id = session.get("user_id")
 	try:
-		old_password = request.json['oldPassword']
+		current_password = request.json['currentPassword']
 		new_password = request.json['newPassword']
 		
 		user = User.query.filter_by(username=user_id).first()
@@ -89,9 +89,9 @@ def change_user_password():
 		if not user:
 			return jsonify({"error": "User not found"}), 404
 		
-		# Check if the old password matches the current password
-		if not bcrypt.check_password_hash(user.password, old_password):
-			return jsonify({"error": "Old password is incorrect"}), 401
+		# Check if the current password matches
+		if not bcrypt.check_password_hash(user.password, current_password):
+			return jsonify({"error": "Current password is incorrect"}), 401
 		
 		hashed_password = bcrypt.generate_password_hash(new_password)
 		
