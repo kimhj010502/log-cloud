@@ -77,6 +77,34 @@ def register_user():
 		print(f"Error in signup: {str(e)}")
 
 
+@app.route('/change_password', methods=['POST'])
+def change_user_password():
+	user_id = session.get("user_id")
+	try:
+		old_password = request.json['oldPassword']
+		new_password = request.json['newPassword']
+		
+		user = User.query.filter_by(username=user_id).first()
+		
+		if not user:
+			return jsonify({"error": "User not found"}), 404
+		
+		# Check if the old password matches the current password
+		if not bcrypt.check_password_hash(user.password, old_password):
+			return jsonify({"error": "Old password is incorrect"}), 401
+		
+		hashed_password = bcrypt.generate_password_hash(new_password)
+		
+		# Update user's password in the database
+		user.password = hashed_password
+		db.session.commit()
+		
+		return jsonify({"message": "Password updated successfully"}), 200
+	
+	except Exception as e:
+		print(f"Error in changing password: {str(e)}")
+		return jsonify({"message": "Unauthorized"}), 401
+
 @app.route('/delete_account', methods=['POST'])
 def remove_registered_user():
 	user_id = session.get("user_id")
@@ -208,6 +236,7 @@ def logDetail():
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
 
+	# error handling needed in case summary/emotion/hashtag doesn't exist
 	if video_detail:
 		print("Video URL:", video_detail.video_url)
 		print("Summary:", video_detail.summary)

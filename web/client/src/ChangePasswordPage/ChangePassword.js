@@ -23,6 +23,34 @@ function ChangePasswordPage() {
     };
 
     const handleSave = async() => {
+        if (newPassword1 !== newPassword2) {
+            alert("New passwords do not match");
+            return;
+        }
+
+        try {
+            const response = await fetch('/change_password', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    oldPassword: currentPassword,
+                    newPassword: newPassword1
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message);
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error);
+            }
+        } catch (error) {
+            console.error('Error while changing password:', error);
+            alert('Error occurred while changing password. Please try again later.');
+        }
     }
 
     return (
@@ -73,6 +101,7 @@ function ChangePasswordPage() {
 }
 
 function SaveButton({ handleSave }) {
+
     return (
         <div className="save-button">
             <div onClick={handleSave} className="save-link">
