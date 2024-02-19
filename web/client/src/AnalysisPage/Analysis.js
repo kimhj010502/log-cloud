@@ -4,12 +4,23 @@ import { Navigation } from '../AppPage/AppComponents'
 import { Analysis } from "./AnalysisComponents";
 import './Analysis.css';
 
-function numberToMonth(number) {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[number - 1] || 'Invalid month';
+
+async function fetchData(currentYear, currentMonth) {
+    try {
+        const response = await fetch('/analysisReport', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentYear, currentMonth }),
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Sending data', error);
+        throw error;
+    }
 }
 
 
@@ -17,17 +28,19 @@ function AnalysisPage() {
     let date = new Date()
     const [currentYear, setCurrentYear] = useState(date.getFullYear())
     const [currentMonth, setCurrentMonth] = useState(date.getMonth())
-
     const [data, setData] = useState([{}])
+
     useEffect(() => {
-        fetch("/analysisReport"). then(
-            res => res.json()
-        ). then(
-            data => {
-                setData(data)
-                console.log(data)
+        fetchData(currentYear, currentMonth)
+            .then(data => {
+                setData(data);
+                console.log(data);
             })
-    }, []);
+            .catch(error => {
+                console.error('Error fetching data', error);
+            });
+    }, [currentYear, currentMonth]);
+
 
     return (
         <div className="analysis-page">
@@ -45,8 +58,7 @@ function AnalysisPage() {
                     transition={{ duration: 0.5 }}
                     >
                     
-                    <Analysis currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>
-
+                    <Analysis currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} num={data.num} hashtag={data.hashtags} loved={data.loved} excited={data.excited} good={data.good} neutral={data.neutral} unhappy={data.unhappy} angry={data.angry} tired={data.tired}/>
                     </motion.div>
                 </AnimatePresence>
             )}
