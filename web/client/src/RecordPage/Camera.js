@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { PictureOutlined, SyncOutlined } from '@ant-design/icons'
+import { Link, useNavigate } from 'react-router-dom'
+import { PictureOutlined, PictureFilled, SyncOutlined } from '@ant-design/icons'
 import Webcam from 'react-webcam';
 
 
@@ -79,12 +79,13 @@ export function CameraRecord() {
         [setRecordedChunks]
     );
   
+
     const handleStopRecordClick = React.useCallback(() => {
         mediaRecorderRef.current.stop();
         setRecording(false);
     }, [mediaRecorderRef, webcamRef, setRecording]);
   
-    
+
 
     //동영상 업로드 (갤러리)
     const [selectedVideo, setSelectedVideo] = useState(null);
@@ -93,6 +94,11 @@ export function CameraRecord() {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedVideo(file);
+
+        const uploadButton = document.querySelector('.upload-button .upload-link div');
+        if (uploadButton) {
+            uploadButton.click();
+        }
     };
 
     const handleFileIconClick = React.useCallback(() => {
@@ -125,6 +131,7 @@ export function CameraRecord() {
                         console.log('Error during video upload:');
                     }
                 });
+
             } 
             catch (error) {
                 console.error('Error during video upload:', error);
@@ -182,7 +189,14 @@ export function CameraRecord() {
 
         <div className="camera-navigator">
             <input type="file" accept="video/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
-            <PictureOutlined className="gallery" onClick={handleFileIconClick}/>
+            
+            {selectedVideo === null && (
+                <PictureOutlined className="gallery" onClick={handleFileIconClick}/>
+            )}
+
+            { selectedVideo !== null && (
+                <PictureFilled className="gallery" onClick={handleFileIconClick}/>
+            )}
 
             {recording ? (
                 <div className="camera-button" onClick={handleStopRecordClick}>

@@ -175,7 +175,7 @@ export function Navigation() {
 
     return (
         <div className="navigation">
-            <hr/>
+            <hr />
             <Link to={'/'}>
                 {isHome && (
                     <HomeOutlined className="icon-select"/>

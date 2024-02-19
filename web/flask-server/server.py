@@ -31,6 +31,17 @@ with app.app_context():
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
+# SCP 연결 설정
+ssh_client = paramiko.SSHClient()
+ssh_client.load_system_host_keys()
+ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+# SSH 서버 정보
+ssh_host = SSH_HOST
+ssh_port = SSH_PORT
+ssh_username = SSH_USERNAME
+ssh_password = SSH_PASSWORD
+
 
 @app.route('/record', methods=['POST'])
 def upload_video():
@@ -39,28 +50,17 @@ def upload_video():
 	print(request.files)
 	try:
 		if 'video' in request.files:
-			# SCP 연결 설정
-			ssh_client = paramiko.SSHClient()
-			ssh_client.load_system_host_keys()
-			ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-			# SSH 서버 정보
-			ssh_host = SSH_HOST
-			ssh_port = SSH_PORT
-			ssh_username = SSH_USERNAME
-			ssh_password = SSH_PASSWORD
-
 			# 파일 경로
 			video_file = request.files['video']
 
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경)
-			local_video_path = 'web/temp/video.mp4' 
+			local_video_path = 'web/temp/video.mp4'
 
 			# 파일 저장
 			video_file.save(local_video_path)
 
 			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
-			remote_video_path = 'D:/log/video.mp4'
+			remote_video_path = 'D:/log/video/video.mp4'
 
 			# SCP 연결
 			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
@@ -70,7 +70,7 @@ def upload_video():
 				sftp.put(local_video_path, remote_video_path)
 			
 			#임시 파일 삭제
-			os.remove('web/temp/video.mp4') 
+			os.remove('web/temp/video.mp4')
 
 			# SSH 연결 종료
 			ssh_client.close()

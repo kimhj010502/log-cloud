@@ -205,7 +205,7 @@ export function SelectEmotion() {
 export function NextButton() {
     return (
         <div className="next-button">
-            <Link to={'/save'} state={{ prevURL: '/upload' }} class="next-link">
+            <Link to={'/save'} state={{ prevURL: '/upload' }} className="next-link">
                 <div>NEXT</div>
             </Link>
         </div>

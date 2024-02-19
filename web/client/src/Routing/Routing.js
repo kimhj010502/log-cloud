@@ -15,7 +15,6 @@ import Analysis from "../AnalysisPage/Analysis";
 
 import Profile from '../ProfilePage/Profile'
 import ManageFriends from '../ManageFriendsPage/ManageFriends'
-import SearchFriends from '../SearchFriendsPage/SearchFriends'
 import ChangePassword from '../ChangePasswordPage/ChangePassword'
 
 import Login from '../LoginPage/Login'
@@ -46,7 +45,6 @@ function Routing() {
 
                     <Route path='profile' element={<Profile />} />
                     <Route path='manage-friends' element={<ManageFriends />} />
-                    <Route path='search-friends' element={<SearchFriends />} />
                     <Route path='change-password' element={<ChangePassword />} />
 
                     <Route path='login' element={<Login />} />

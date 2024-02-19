@@ -74,7 +74,7 @@ function MonthAnalysis({ year, month, num, hashtag, loved, excited, good, neutra
         }
     ]
 
-
+    const max_num = Math.max(loved, excited, good, neutral, unhappy, angry, tired)
 
     return (
         <>
@@ -82,7 +82,7 @@ function MonthAnalysis({ year, month, num, hashtag, loved, excited, good, neutra
             <Top5Hashtag year={year} month={month} hashtag={hashtag} />
 
             <div className='emotion-label'>감정 분석</div>
-            <EmotionGraph data={data} />
+            <EmotionGraph data={data} max_num={max_num}/>
         </> 
     )
 }
@@ -112,9 +112,7 @@ function HashTag({ value }) {
     )
 }
 
-
-function EmotionGraph({ data }) {
-
+function EmotionGraph({ data, max_num }) {
     const theme = {
         axis: {
             ticks: {
@@ -134,8 +132,6 @@ function EmotionGraph({ data }) {
             }
         }
     }
-
-    
 
     return (
         <div className='emotion-graph-box'>
@@ -166,7 +162,7 @@ function EmotionGraph({ data }) {
             axisLeft={{
                 orient: 'left',
                 tickSize: 5,
-                tickValues: 5,
+                tickValues: max_num,
                 tickPadding: 5,
                 tickRotation: 0,
                 legend: '',  // y축 왼쪽에 표시될 단위입니다.
