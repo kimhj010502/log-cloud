@@ -3,7 +3,7 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { ResponsiveLine } from '@nivo/line'
 
 
-export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth }) {
+export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth, num, hashtag, loved, excited, good, neutral, unhappy, angry, tired }) {
     
     const handleClickLeft = () => {
         const newMonth = currentMonth - 1
@@ -20,8 +20,6 @@ export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrent
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let currentMonthName = monthNames[currentMonth];
 
-    const num = 8
-
     return (
         <div className='analysis-box'>
             <div className="year-month-box">
@@ -32,13 +30,13 @@ export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrent
                 <RightOutlined className='right-button' onClick={handleClickRight}/>
             </div>
 
-            <MonthAnalysis year={currentYear} month={currentMonth + 1} num={num} />
+            <MonthAnalysis year={currentYear} month={currentMonth + 1} num={num} hashtag={hashtag} loved={loved} excited={excited} good={good} neutral={neutral} unhappy={unhappy} angry={angry} tired={tired}/>
         </div>
         
     )
 }
 
-function MonthAnalysis({ year, month, num }) {
+function MonthAnalysis({ year, month, num, hashtag, loved, excited, good, neutral, unhappy, angry, tired }) {
     const data = [
         {
             "id": "japan",
@@ -46,31 +44,31 @@ function MonthAnalysis({ year, month, num }) {
             "data": [
             {
                 "x": "🥰",
-                "y": 7
+                "y": loved
             },
             {
                 "x": "😆",
-                "y": 5
+                "y": excited
             },
             {
                 "x": "🙂",
-                "y": 3
+                "y": good
             },
             {
                 "x": "😐",
-                "y": 6
+                "y": neutral
             },
             {
                 "x": "🙁",
-                "y": 3
+                "y": unhappy
             },
             {
                 "x": "😠",
-                "y": 1
+                "y": angry
             },
             {
                 "x": "😵",
-                "y": 2
+                "y": tired
             }
             ]
         }
@@ -81,7 +79,7 @@ function MonthAnalysis({ year, month, num }) {
     return (
         <>
             <div className='month-log'>{year}년 {month}월에는 총 {num}개의 일기를 작성했어요 ✏️</div>
-            <Top5Hashtag year={year} month={month} />
+            <Top5Hashtag year={year} month={month} hashtag={hashtag} />
 
             <div className='emotion-label'>감정 분석</div>
             <EmotionGraph data={data} />
@@ -89,19 +87,18 @@ function MonthAnalysis({ year, month, num }) {
     )
 }
 
-function Top5Hashtag({ year, month }) {
-    /* year년 month월 데이터 가져오기 */
-    return (
+function Top5Hashtag({ hashtag }) {
+
+    return(
         <div className='top5-hashtag-box'>
             <div className='hashtag-label'>TOP 5 해시태그</div>
 
-            {/* 반복문으로 바꾸기 */}
             <div className='hashtag-box'>
-                <HashTag key='0' value='여행' />
-                <HashTag key='1' value='네덜란드네덜란드네덜란드' />
-                <HashTag key='2' value='벨기에' />
-                <HashTag key='3' value='해변' />
-                <HashTag key='4' value='고양이' />
+                <HashTag key='0' value={hashtag? hashtag[0] : null} />
+                <HashTag key='1' value={hashtag? hashtag[1] : null} />
+                <HashTag key='2' value={hashtag? hashtag[2] : null} />
+                <HashTag key='3' value={hashtag? hashtag[3] : null} />
+                <HashTag key='4' value={hashtag? hashtag[4] : null} />
             </div>
         </div>
     )

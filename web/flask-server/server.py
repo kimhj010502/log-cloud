@@ -8,8 +8,10 @@ from flask_cors import CORS
 from flask_session import Session
 import pymysql
 from datetime import datetime
+import pandas as pd
 
 from sqlalchemy import extract, asc
+from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
@@ -134,6 +136,72 @@ def register_user():
 		print(f"Error in signup: {str(e)}")
 
 
+@app.route('/change_password', methods=['POST'])
+def change_user_password():
+	user_id = session.get("user_id")
+	try:
+		current_password = request.json['currentPassword']
+		new_password = request.json['newPassword']
+		
+		user = User.query.filter_by(username=user_id).first()
+		
+		if not user:
+			return jsonify({"error": "User not found"}), 404
+		
+		# Check if the current password matches
+		if not bcrypt.check_password_hash(user.password, current_password):
+			return jsonify({"error": "Current password is incorrect"}), 401
+		
+		hashed_password = bcrypt.generate_password_hash(new_password)
+		
+		# Update user's password in the database
+		user.password = hashed_password
+		db.session.commit()
+		
+		return jsonify({"message": "Password updated successfully"}), 200
+	
+	except Exception as e:
+		print(f"Error in changing password: {str(e)}")
+		return jsonify({"message": "Unauthorized"}), 401
+
+@app.route('/delete_account', methods=['POST'])
+def remove_registered_user():
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	user = User.query.filter_by(username=user_id).first()
+	
+	if not user:
+		return jsonify({"error": "User not found"}), 404
+	
+	try:
+		with db.session.begin_nested():
+			# Delete user's videos from video_info table
+			video_info_to_delete = videoInfo.query.filter_by(username=user.username).delete()
+			
+			# Delete user's video logs from video_log table
+			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
+			
+			# Delete user from social_network table (both username1 and username2)
+			social_network_to_delete = socialNetwork.query.filter((socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
+		
+			# + additional deletion operation: remove all comments associated with the account
+			# + additional deletion operation: remove all likes associated with the account
+			
+			# Delete user from user_account table
+			db.session.delete(user)
+			
+		db.session.commit()
+		session.clear()
+		return jsonify({"message": "Account deleted successfully"}), 200
+			
+	except IntegrityError:
+		db.session.rollback()  # Rollback in case of an error
+		return jsonify({"error": "Database error"}), 500
+
+
 @app.route('/login', methods=['POST'])
 def login_user():
 	username = request.json['username']
@@ -159,14 +227,14 @@ def login_user():
 	return jsonify({'username': user.username, 'email': user.email})
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout_user():
 	user_id = session.get("user_id")
 	if user_id:
 		session.clear()
-		return redirect(url_for('login'))
+		return jsonify({"msg": "Successful user logout"}), 200
 	else:
-		return redirect(url_for('login'))
+		return jsonify({"error": "Unauthorized"}), 401
 	
 
 @app.route("/@me")
@@ -227,6 +295,7 @@ def logDetail():
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
 
+	# error handling needed in case summary/emotion/hashtag doesn't exist
 	if video_detail:
 		print("Video URL:", video_detail.video_url)
 		print("Summary:", video_detail.summary)
@@ -263,18 +332,66 @@ def socialDetail():
 			"profileUsername": "username"}
 
 
-@app.route("/analysisReport")
+@app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport():
-	return {"year": 2023,
-			"month": 12,
-			"logCount": 20,
-			"hashtags": ["여행", "네덜란드", "벨기에", "해변", "고양이"],
-			"emotion": {"happy": 6,
-						"love": 5,
-						"gratitude": 2,
-						"sad": 3,
-						"worry": 4,
-						"angry": 0}}
+	user_id = session.get('user_id')
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	user = User.query.filter_by(username=user_id).first()
+	
+	if not user:
+		return jsonify({"error": "User not found"}), 404
+	year = request.json['currentYear']
+	month = request.json['currentMonth']
+
+	start_date = datetime(year, month+1, 1)
+	end_date = (datetime(year, month+2, 1) if (month != 11) else datetime(year, 1, 1))
+
+	num = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).count()
+	hashtag = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).with_entities(videoInfo.hashtag).all()
+	emotion = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).with_entities(videoInfo.emotion).all()
+
+	# Top5 Hashtag
+	hashtag_list = []
+	for tag in hashtag:
+		tag_pre = tag[0].replace(' ','').split("#")
+		hashtag_list += [x for x in tag_pre if x]
+
+	top5_tag = pd.Series(hashtag_list).value_counts()[:5].index.to_list()
+	
+	# count emotions
+	emotion_list = []
+	for i in emotion:
+		emotion_list.append(i[0])
+
+	count_emotion = pd.Series(emotion_list).value_counts()
+	
+	def get_emotion_counts(x):
+		try:
+			return count_emotion[x]
+		except:
+			return 0
+	
+	loved = int(get_emotion_counts(0))
+	excited = int(get_emotion_counts(1))
+	good = int(get_emotion_counts(2))
+	neutral = int(get_emotion_counts(3))
+	unhappy = int(get_emotion_counts(4))
+	angry = int(get_emotion_counts(5))
+	tired = int(get_emotion_counts(6))
+	
+	data = {"num": num,
+			"hashtags": top5_tag,
+			"loved": loved,
+			"excited": excited,
+			"good": good,
+			"neutral": neutral,
+			"unhappy": unhappy,
+			"angry": angry,
+			"tired": tired}
+	
+	return jsonify(data)
 
 
 if __name__ == "__main__":

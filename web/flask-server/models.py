@@ -29,7 +29,7 @@ class videoInfo(db.Model):
 class videoLog(db.Model):
 	__tablename__ = "video_log"
 	username = db.Column(db.String(32), nullable=False)
-	videoId = db.Column(db.String(45), nullable=False, unique=True, primary_key=True)
+	video_id = db.Column(db.String(45), nullable=False, unique=True, primary_key=True)
 	like_list = db.Column(db.JSON, nullable=True)
 	comment_list = db.Column(db.JSON, nullable=True)
 

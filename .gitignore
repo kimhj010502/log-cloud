@@ -14,6 +14,10 @@ venv/
 checkpoint-1000/
 checkpoint-2000/
 
+dump.rdb
+
+__pycache__/
+
 model.safetensors
 
 web/flask-server/config.py
