@@ -109,8 +109,12 @@
 
 /* UPLOAD 버튼 */
 .upload-button {
-    margin-top: -25px;
-    text-align: center;
+	float: left;
+    margin-top: -70px;
+	margin-left: 120px;
+	width: 150px;
+	height: 60px;
+	text-align: center;
 }
 
 .upload-link {

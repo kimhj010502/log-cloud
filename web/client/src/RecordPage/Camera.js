@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { PictureOutlined, SyncOutlined } from '@ant-design/icons'
 import Webcam from 'react-webcam';
-
-
 
 
 //카메라 화면
@@ -12,6 +11,26 @@ const FACING_MODE_ENVIRONMENT = "environment";
 const videoConstraints = {
     facingMode: FACING_MODE_USER
 };
+
+//접속 기기 및 브라우저 확인
+export function checkBrowser() {
+    // 안드로이드 모바일 기기인 경우 webm 지정
+    if (/Android/i.test(navigator.userAgent)) {
+        return ['android', 'webm']
+    }
+    // ios 모바일 기기인 경우 mp4 지정
+    else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        return ['ios', 'mp4']
+    }
+    // Windows 의 Chrome 브라우저인 경우 webm 지정
+    else if (navigator.userAgent.indexOf("Chrome") > -1) {
+        return ['chrome', 'webm']
+    }
+    // Mac OS 의 Safari 브라우저인 경우 mp4 지정
+    else if (navigator.userAgent.indexOf("Safari") > -1) {
+        return ['safari', 'mp4']
+    }
+}
 
 export function CameraRecord() {
     //카메라 전환
@@ -27,6 +46,12 @@ export function CameraRecord() {
     }, []);
 
 
+    let [name, videoType] = ['', '']
+    useEffect(() => {
+        [name, videoType] = checkBrowser()
+    }, [])
+
+
     //영상 녹화
     const webcamRef = React.useRef(null);
     const mediaRecorderRef = React.useRef(null);
@@ -36,7 +61,7 @@ export function CameraRecord() {
     const handleStartRecordClick = React.useCallback(() => {
         setRecording(true);
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-            mimeType: "video/webm"
+            mimeType: `video/${videoType}`
         });
         mediaRecorderRef.current.addEventListener(
             "dataavailable",
@@ -70,41 +95,75 @@ export function CameraRecord() {
         setSelectedVideo(file);
     };
 
-    const handleUpload = () => {
-        // 여기서 동영상 업로드 로직을 구현하면 됩니다.
-        if (selectedVideo) {
-        console.log('Uploading video:', selectedVideo);
-        // 여기서 선택한 동영상 파일을 서버로 업로드하거나 다른 작업을 수행할 수 있습니다.
-        } else {
-        console.log('No video selected.');
-        }
-    };
-
     const handleFileIconClick = React.useCallback(() => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
         }
     }, [fileInputRef]);
 
-    
-    //녹화한 동영상 다운로드
-    const handleDownload = React.useCallback(() => {
-        if (recordedChunks.length) {
-            const blob = new Blob(recordedChunks, {
-                type: "video/mp4"
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            document.body.appendChild(a);
-            a.style = "display: none";
-            a.href = url;
-            a.download = "react-webcam-stream-capture.webm";
-            a.click();
-            window.URL.revokeObjectURL(url);
-            setRecordedChunks([]);
+
+    //영상 서버에 업로드
+    const handleUpload = async (selectedVideo) => {
+        console.log("버튼 클릭")
+
+        if (selectedVideo) {
+            console.log("영상 있음")
+            const formData = new FormData();
+            formData.append('video', selectedVideo);
+
+            try {
+                const response = await fetch('/record', {
+                    method: 'POST',
+                    headers: {},
+                    body: formData,
+                }).then(response => {
+                    console.log(response)
+                    if (response.status === 200) {
+                        console.log('성공');
+                    }
+                    if (response.status === 400) {
+                        console.log('Error during video upload:');
+                    }
+                });
+            } 
+            catch (error) {
+                console.error('Error during video upload:', error);
+            }
+        } 
+
+        else if (recordedChunks.length) {
+            const blob = new Blob(recordedChunks, { type: "video/mp4" });
+            const formData = new FormData();
+            formData.append('video', blob);
+
+            console.log('영상 녹화 완료')
+
+            try {
+                const response = await fetch('/record', {
+                    method: 'POST',
+                    headers: {},
+                    body: formData,
+                }).then(response => {
+                    console.log(response)
+                    if (response.status === 200) {
+                        console.log('성공');
+                    }
+                    if (response.status === 400) {
+                        console.log('Error during video upload:');
+                    }
+                });
+            } 
+            catch (error) {
+                console.error('Error during video upload:', error);
+            }
         }
-    }, [recordedChunks]);
-  
+
+        else {
+            console.log('No video recorded.');
+        }
+    };
+    
+    
     
     return (
         <>
@@ -135,13 +194,15 @@ export function CameraRecord() {
                 </div>
                 
             )}
-            {recordedChunks.length > 0 && (
-                <button onClick={handleDownload}>Download</button>
-            )}
             
             <SyncOutlined className="switch" onClick={handleClick}/>
+        </div>
+
+        <div className="upload-button">
+            <Link to={'/upload'} state={{ prevURL: '/record' }} className="upload-link">
+                <div onClick={() => handleUpload(selectedVideo)}>UPLOAD</div>
+            </Link>
         </div>
         </>
     );
 };
-  

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { DownOutlined } from '@ant-design/icons'
 
 //상단바 날짜
@@ -15,18 +14,6 @@ export function LogDate(handleButtonClick) {
         <div className="date-box">
             <DownOutlined className="down-button" onClick={handleButtonClick}/>
             <h2>{` ${currentMonthName} ${nowD}, ${nowY} `}</h2>
-        </div>
-    )
-}
-
-
-
-export function UploadButton() {
-    return (
-        <div className="upload-button">
-            <Link to={'/upload'} state={{ prevURL: '/record' }} class="upload-link">
-                <div>UPLOAD</div>
-            </Link>
         </div>
     )
 }

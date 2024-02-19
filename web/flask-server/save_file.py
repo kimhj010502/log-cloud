@@ -1,5 +1,4 @@
 import paramiko
-import subprocess
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
 # SCP 연결 설정

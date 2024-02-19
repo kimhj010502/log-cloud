@@ -26,6 +26,64 @@ with app.app_context():
 	db.create_all()
 
 
+import paramiko
+from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
+
+
+@app.route('/record', methods=['POST'])
+def upload_video():
+	print('동영상 저장')
+
+	print(request.files)
+	try:
+		if 'video' in request.files:
+			# SCP 연결 설정
+			ssh_client = paramiko.SSHClient()
+			ssh_client.load_system_host_keys()
+			ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+			# SSH 서버 정보
+			ssh_host = SSH_HOST
+			ssh_port = SSH_PORT
+			ssh_username = SSH_USERNAME
+			ssh_password = SSH_PASSWORD
+
+			# 파일 경로
+			video_file = request.files['video']
+
+			# 임시 저장 경로 (원하는 경로와 파일명으로 변경)
+			local_video_path = 'web/temp/video.mp4' 
+
+			# 파일 저장
+			video_file.save(local_video_path)
+
+			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
+			remote_video_path = 'D:/log/video.mp4'
+
+			# SCP 연결
+			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+
+			# 파일을 SCP로 원격 서버에 업로드
+			with ssh_client.open_sftp() as sftp:
+				sftp.put(local_video_path, remote_video_path)
+			
+			#임시 파일 삭제
+			os.remove('web/temp/video.mp4') 
+
+			# SSH 연결 종료
+			ssh_client.close()
+
+			print('비디오 업로드 완료')
+			return 'Video uploaded successfully!'
+		
+		else:
+			return 'No video file provided', 400
+
+	except Exception as e:
+		print(f"Error in record: {str(e)}")
+
+
+
 @app.route('/check_authentication', methods=['GET'])
 def check_authentication():
 	user_id = session.get("user_id")
