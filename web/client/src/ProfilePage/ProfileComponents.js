@@ -3,6 +3,32 @@ import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
 
+export async function getUserProfileImage(username) {
+    try {
+        const response = await fetch('/get_profile_image', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username: username}),
+        })
+        if (response.ok) {
+            if (response.status === 200) {
+                const blob = await response.blob();
+                return URL.createObjectURL(blob);
+            }
+        } else if (response.status === 404) {
+            return // default image!!!
+        } else {
+            console.log("Error getting profile image:", response);
+        }
+    }
+    catch {
+        console.log("Error using /get_profile_image api");
+    }
+}
+
 export function ProfileImg({img_src}) {
     const [user, setUser] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -19,6 +45,18 @@ export function ProfileImg({img_src}) {
         }
         fetchUserData();
     }, []);
+
+    useEffect(() => {
+        async function fetchUserProfileImage() {
+            try {
+                const userProfileImage = await getUserProfileImage(user.username);
+                setSelectedImage(userProfileImage);
+            } catch (error) {
+                console.error('Error fetching user info for profile page:', error);
+            }
+        }
+        fetchUserProfileImage();
+    }, [user]);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
