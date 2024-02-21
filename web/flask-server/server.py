@@ -2,7 +2,7 @@ import calendar
 import os
 from uuid import uuid4
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort
+from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
@@ -252,6 +252,64 @@ def get_current_user():
 		"email": user.email,
 		"createdAt": user.created_at
 	})
+
+@app.route("/get_profile_image", methods=['POST'])
+def get_user_profile_image():
+	username = request.json['username']
+	
+	# fetch user data by username(from session) from user_info_db : user_account table
+	user = User.query.filter_by(username=username).first()
+	
+	if user.profile_img is not None:
+		try:
+			image_data = bytearray()
+			
+			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+			sftp = ssh_client.open_sftp()
+			
+			with ssh_client.open_sftp() as sftp:
+				file = sftp.file(user.profile_img)
+				image_data.extend(file.read())
+			sftp.close()
+			ssh_client.close()
+			
+			return send_file(bytearray(image_data), mimetype='image/jpeg')
+		except Exception as e:
+			return str(e), 500
+	else:
+		return "No image", 404
+	
+
+@app.route("/set_profile_image", methods=['POST'])
+def set_profile_image():
+	user_id = session.get("user_id")
+	
+	# fetch user data by username(from session) from user_info_db : user_account table
+	user = User.query.filter_by(username=user_id).first()
+	if user:
+		try:
+			image_file = request.files['image']
+			# convert image_file format to jpg if needed
+			local_image_path = 'web/temp/'+user_id+'.jpg'
+			image_file.save(local_image_path)
+			remote_image_path = 'D:/log/profile/'+user_id+'.jpg'
+			
+			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+
+			with ssh_client.open_sftp() as sftp:
+				sftp.put(local_image_path, remote_image_path)
+			
+			os.remove(local_image_path)
+			
+			ssh_client.close()
+			
+			return 'Successfully added profile image!', 200
+		except Exception as e:
+			print(f"Error in record: {str(e)}")
+			return 'Error setting profile image', 500
+	else:
+		return 'Unauthorized', 401
+
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month():
