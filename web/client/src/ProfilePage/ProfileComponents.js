@@ -2,8 +2,38 @@ import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
+import ProfilePage from "./Profile";
 
-export async function getUserProfileImage(username) {
+export async function setProfileImage(imageFile) {
+    try {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        const response = await fetch('/set_profile_image', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData,
+        }).then(response => {
+                console.log(response)
+                if (response.status === 200) {
+                    alert("Successfully uploaded image");
+                }
+                if (response.status === 500) {
+                    alert("Network error. Please try again later");
+                    console.log('Error during photo upload');
+                }
+                if (response.status === 401) {
+                    alert("Unable to process image");
+                    console.log('No image or user found');
+                }
+            });
+        }
+    catch (error) {
+        console.error('Error during video upload:', error);
+    }
+}
+
+export async function getProfileImage(username) {
     try {
         const response = await fetch('/get_profile_image', {
             method: 'POST',
@@ -12,27 +42,31 @@ export async function getUserProfileImage(username) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({username: username}),
-        })
+        });
         if (response.ok) {
             if (response.status === 200) {
                 const blob = await response.blob();
                 return URL.createObjectURL(blob);
             }
-        } else if (response.status === 404) {
-            return // default image!!!
+        } else if (response.status === 404) { // no image set; use default image
+            // return process.env.PUBLIC_URL + '/images/default.jpg';
+            return 'profile.png';
         } else {
             console.log("Error getting profile image:", response);
+            return 'profile.png';
         }
     }
-    catch {
-        console.log("Error using /get_profile_image api");
+    catch (error) {
+        console.log("Error getting profile image:", error);
+        return 'profile.png';
     }
 }
 
-export function ProfileImg({img_src}) {
+export function ProfileImg({ username }) {
     const [user, setUser] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = React.useRef(null);
+    const [profileImgSrc, setProfileImgSrc] = useState(null);
 
     useEffect(() => {
         async function fetchUserData() {
@@ -49,8 +83,11 @@ export function ProfileImg({img_src}) {
     useEffect(() => {
         async function fetchUserProfileImage() {
             try {
-                const userProfileImage = await getUserProfileImage(user.username);
-                setSelectedImage(userProfileImage);
+                if (user) {
+                    const userProfileImage = await getProfileImage(user.username);
+                    // change displayed profile image
+                    setProfileImgSrc(userProfileImage);
+                }
             } catch (error) {
                 console.error('Error fetching user info for profile page:', error);
             }
@@ -61,6 +98,7 @@ export function ProfileImg({img_src}) {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedImage(file);
+        setProfileImage(file);
     };
 
     const handleFileIconClick = React.useCallback(() => {
@@ -75,7 +113,7 @@ export function ProfileImg({img_src}) {
             {user ? (
                 <>
                     <div className="profile-img-box">
-                        <img className="profile-img" src={img_src} alt="profile img"/>
+                        <img className="profile-img" src={profileImgSrc} alt="profile image"/>
                     </div>
 
                     <div className="change-button-box">
