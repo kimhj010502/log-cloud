@@ -9,7 +9,7 @@ from flask_session import Session
 from datetime import datetime, timedelta
 import pandas as pd
 
-from sqlalchemy import extract, asc
+from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
