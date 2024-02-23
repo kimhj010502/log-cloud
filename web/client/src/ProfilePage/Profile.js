@@ -4,7 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { ProfileImg, ProfileButtons, DeleteAccount } from './ProfileComponents'
 import './Profile.css'
 
-function ProfilePage() {
+function ProfilePage({ imgSrc }) {
     const [isClicked, setIsClicked] = useState(false);
 
     return (
@@ -19,7 +19,7 @@ function ProfilePage() {
 
                 <h1>my profile</h1>
 
-                <ProfileImg img_src='profile.png'/>
+                <ProfileImg img_src={imgSrc}/>
 
                 <ProfileButtons isClicked={isClicked} setIsClicked={setIsClicked} />
 
@@ -35,4 +35,4 @@ function ProfilePage() {
     )
 }
 
-export default ProfilePage
+export default ProfilePage;

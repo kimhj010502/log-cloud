@@ -2,11 +2,14 @@ import calendar
 import os
 from uuid import uuid4
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort
+from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 import pymysql
+
+from PIL import Image
+import io
 
 from sqlalchemy import extract, asc
 from sqlalchemy.exc import IntegrityError
@@ -293,7 +296,10 @@ def get_current_user():
 	})
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8fd58b8b5af2afa3f0494d26c7c8f30d2cde3936
 @app.route("/get_profile_image", methods=['POST'])
 def get_user_profile_image():
 	try:
@@ -356,6 +362,10 @@ def set_profile_image():
 	else:
 		return 'Unauthorized', 401
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8fd58b8b5af2afa3f0494d26c7c8f30d2cde3936
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month():
 	username = request.json['username']
