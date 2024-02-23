@@ -2,12 +2,15 @@ import calendar
 import os
 from uuid import uuid4
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort
+from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 from datetime import datetime, timedelta
 import pandas as pd
+
+from PIL import Image
+import io
 
 from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
@@ -223,7 +226,7 @@ def login_user():
 	# set client-side session cookie
 	session["user_id"] = username
 	
-	return jsonify({'username': user.username, 'email': user.email})
+	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
 
 @app.route('/logout', methods=['GET'])
@@ -251,6 +254,70 @@ def get_current_user():
 		"email": user.email,
 		"createdAt": user.created_at
 	})
+
+
+@app.route("/get_profile_image", methods=['POST'])
+def get_user_profile_image():
+	try:
+		username = request.json['username']
+		
+		if not username:
+			return jsonify({"error": "Username not provided"}), 400
+			
+		# fetch user data by username(from session) from user_info_db : user_account table
+		user = User.query.filter_by(username=username).first()
+		
+		if not user or not user.profile_img:
+			return jsonify({"error": "Image not found"}), 404
+		
+		ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+		with ssh_client.open_sftp() as sftp:
+			with sftp.file(user.profile_img, 'rb') as file:
+				image_data = file.read()
+				return send_file(io.BytesIO(image_data), mimetype='image/png')
+		
+	except Exception as e:
+		print(str(e))
+		return jsonify({"error": "Internal server error"}), 500
+	
+
+@app.route("/set_profile_image", methods=['POST'])
+def set_profile_image():
+	user_id = session.get("user_id")
+	
+	# fetch user data by username(from session) from user_info_db : user_account table
+	user = User.query.filter_by(username=user_id).first()
+	print(request.files['image'])
+	
+	if (user and ('image' in request.files)):
+		try:
+			image_file = request.files['image']
+			# Save image locally (temporarily)
+			local_image_path = 'temp/image.jpg'
+			image_file.save(local_image_path)
+			
+			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
+			
+			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+
+			with ssh_client.open_sftp() as sftp:
+				sftp.put(local_image_path, remote_image_path)
+
+			os.remove(local_image_path)
+		
+			ssh_client.close()
+		
+			user.profile_img = remote_image_path
+			db.session.commit()
+		
+			return 'Successfully added profile image!', 200
+		
+		except Exception as e:
+			print(f"Error in record: {str(e)}")
+			return 'Error setting profile image', 500
+	else:
+		return 'Unauthorized', 401
+
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month():

@@ -2,27 +2,119 @@ import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
+import ProfilePage from "./Profile";
 
-export function ProfileImg({img_src}) {
-    const [user, setUser] = useState(null);
+
+function resizeAndCropImage(file, width, height) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let targetWidth = width;
+                let targetHeight = height;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                // Calculate scaling factor for resizing
+                const scaleX = img.width / width;
+                const scaleY = img.height / height;
+
+                // Determine which side to scale down and crop
+                if (scaleX > scaleY) {
+                    targetWidth = img.width / scaleY;
+                    offsetX = (targetWidth - width) / 2;
+                } else {
+                    targetHeight = img.height / scaleX;
+                    offsetY = (targetHeight - height) / 2;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, -offsetX, -offsetY, targetWidth, targetHeight);
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name, {
+                        type: 'image/jpeg', // Change the type if necessary
+                        lastModified: Date.now()
+                    }));
+                }, 'image/jpeg'); // Change the format if necessary
+            };
+            img.onerror = function(error) {
+                reject(error);
+            };
+        };
+        reader.onerror = function(error) {
+            reject(error);
+        };
+    });
+}
+
+
+export async function getProfileImage(username) {
+    try {
+        const response = await fetch('/get_profile_image', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username: username}),
+        });
+        if (response.ok) {
+            if (response.status === 200) {
+                const blob = await response.blob();
+                return URL.createObjectURL(blob);
+            }
+        } else if (response.status === 404) { // no image set; use default image
+            return 'profile.png';
+        } else {
+            console.log("Error getting profile image:", response);
+            return 'profile.png';
+        }
+    }
+    catch (error) {
+        console.log("Error getting profile image:", error);
+        return 'profile.png';
+    }
+}
+
+export function ProfileImg() {
+    const [username, setUsername] = useState(sessionStorage.getItem('username'));
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = React.useRef(null);
+    const [profileImgSrc, setProfileImgSrc] = useState(sessionStorage.getItem('myProfileImg'));
+    const [userCreatedAt, setUserCreatedAt] = useState(sessionStorage.getItem('createdAt'));
 
     useEffect(() => {
-        async function fetchUserData() {
-            try {
-                const userInfo = await getUserInfo();
-                setUser(userInfo);
-            } catch (error) {
-                console.error('Error fetching user info for profile page:', error);
+        async function fetchData() {
+            if (!username || !userCreatedAt) {
+                const user = await getUserInfo();
+
+                setUsername(user.username);
+                setUserCreatedAt(new Date(user.createdAt).getFullYear());
+
+                sessionStorage.setItem('username', username);
+                sessionStorage.setItem('createdAt', userCreatedAt);
+            }
+
+            if (!profileImgSrc) {
+                const userProfileImage = await getProfileImage(username);
+                setProfileImgSrc(userProfileImage);
+                sessionStorage.setItem('myProfileImg', userProfileImage);
             }
         }
-        fetchUserData();
-    }, []);
+        fetchData();
+    }, [profileImgSrc]);
+
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedImage(file);
+        setProfileImage(file);
     };
 
     const handleFileIconClick = React.useCallback(() => {
@@ -31,13 +123,49 @@ export function ProfileImg({img_src}) {
         }
     }, [fileInputRef]);
 
+    async function setProfileImage(imageFile) {
+        try {
+            const formData = new FormData();
+
+            const resizedImageFile = await resizeAndCropImage(imageFile, 500, 500);
+
+            formData.append('image', resizedImageFile);
+
+            const response = await fetch('/set_profile_image', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const newImage = URL.createObjectURL(resizedImageFile)
+                sessionStorage.setItem('myProfileImg', newImage);
+                setProfileImgSrc(newImage);
+                alert("Successfully uploaded!");
+                window.location.reload();
+            }
+            if (response.status === 500) {
+                console.log('Error during photo upload');
+                alert("Network error. Please try again later");
+            }
+            if (response.status === 401) {
+                console.log('No image or user found');
+                alert("Unable to process image");
+            }
+        }
+        catch (error) {
+            console.error('Error during photo upload:', error);
+            alert("Error during photo upload");
+        }
+    }
+
 
     return (
         <div className='profile-box'>
-            {user ? (
+            {username ? (
                 <>
                     <div className="profile-img-box">
-                        <img className="profile-img" src={img_src} alt="profile img"/>
+                        <img className="profile-img" src={profileImgSrc} alt="profile image"/>
                     </div>
 
                     <div className="change-button-box">
@@ -47,8 +175,8 @@ export function ProfileImg({img_src}) {
                     </div>
 
                     <div className='detail-box'>
-                        <div className='username'>{user.username}</div>
-                        <div className='since-when'>logging since {new Date(user.createdAt).getFullYear()}</div>
+                        <div className='username'>{username}</div>
+                        <div className='since-when'>logging since {userCreatedAt}</div>
                     </div>
                 </>
             ) : (
