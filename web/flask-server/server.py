@@ -227,7 +227,7 @@ def login_user():
 	# set client-side session cookie
 	session["user_id"] = username
 	
-	return jsonify({'username': user.username, 'email': user.email})
+	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
 
 @app.route('/logout', methods=['GET'])

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
+import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 export async function getUserInfo() {
     try {
@@ -165,13 +166,31 @@ export function CameraButton() {
 //내비게이션 바
 export function Navigation() {
     const location = useLocation();
-    const page = location.pathname
+    const page = location.pathname;
 
     let isHome = (page === '/')
     let isSocial = ((page === '/social') || (page === '/social-feed'))
     let isSearch = (page === '/search')
     let isAnalysis = (page === '/analysis')
     let isProfile = (page === '/profile')
+
+    const [username, setUsername] = useState(sessionStorage.getItem('username'));
+
+    if (!username ) {
+        const user = getUserInfo();
+
+        setUsername(user.username);
+        sessionStorage.setItem('username', username);
+    }
+
+    const [profileImgSrc, setProfileImgSrc] = useState(sessionStorage.getItem('myProfileImg'));
+
+    if (!profileImgSrc) {
+        const userProfileImage = getProfileImage(username);
+        setProfileImgSrc(userProfileImage);
+        sessionStorage.setItem('myProfileImg', userProfileImage);
+    }
+
 
     return (
         <div className="navigation">
@@ -193,7 +212,7 @@ export function Navigation() {
                     <TeamOutlined className="icon"/>
                 )}
             </Link>
-            
+
             <Link to={'/search'}>
                 {isSearch && (
                     <SearchOutlined className="icon-select"/>
@@ -215,12 +234,12 @@ export function Navigation() {
             <Link to={'/profile'}>
             {isProfile && (
                 <div className="profile-select">
-                <img className="profile-img" src="profile.png" alt="profile img"/>
+                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
             </div>
             )}
             {!isProfile && (
                 <div className="profile">
-                <img className="profile-img" src="profile.png" alt="profile img"/>
+                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
             </div>
             )}
             </Link>

@@ -71,8 +71,9 @@ function LoginPage() {
                 // const data = await response.json();
                 if (response.status === 200) {
                     const data = await response.json();
+
                     sessionStorage.setItem('username', data.username);
-                    sessionStorage.setItem('createdAt', data.createdAt);
+                    sessionStorage.setItem('createdAt', new Date(data.createdAt).getFullYear());
                     // sessionStorage.setItem('email', data.email);
 
                     sessionStorage.setItem('myProfileImg', await getProfileImage(data.username));
