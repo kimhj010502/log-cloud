@@ -4,10 +4,62 @@ import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
 import ProfilePage from "./Profile";
 
+
+function resizeAndCropImage(file, width, height) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let targetWidth = width;
+                let targetHeight = height;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                // Calculate scaling factor for resizing
+                const scaleX = img.width / width;
+                const scaleY = img.height / height;
+
+                // Determine which side to scale down and crop
+                if (scaleX > scaleY) {
+                    targetWidth = img.width / scaleY;
+                    offsetX = (targetWidth - width) / 2;
+                } else {
+                    targetHeight = img.height / scaleX;
+                    offsetY = (targetHeight - height) / 2;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, -offsetX, -offsetY, targetWidth, targetHeight);
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name, {
+                        type: 'image/jpeg', // Change the type if necessary
+                        lastModified: Date.now()
+                    }));
+                }, 'image/jpeg'); // Change the format if necessary
+            };
+            img.onerror = function(error) {
+                reject(error);
+            };
+        };
+        reader.onerror = function(error) {
+            reject(error);
+        };
+    });
+}
+
 export async function setProfileImage(imageFile) {
     try {
         const formData = new FormData();
-        formData.append('image', imageFile);
+
+        const resizedImageFile = await resizeAndCropImage(imageFile, 500, 500);
+
+        formData.append('image', resizedImageFile);
 
         const response = await fetch('/set_profile_image', {
             method: 'POST',
@@ -16,7 +68,7 @@ export async function setProfileImage(imageFile) {
         }).then(response => {
                 console.log(response)
                 if (response.status === 200) {
-                    alert("Successfully uploaded image");
+                    window.location.reload();
                 }
                 if (response.status === 500) {
                     alert("Network error. Please try again later");
@@ -29,7 +81,7 @@ export async function setProfileImage(imageFile) {
             });
         }
     catch (error) {
-        console.error('Error during video upload:', error);
+        console.error('Error during photo upload:', error);
     }
 }
 
@@ -87,6 +139,7 @@ export function ProfileImg({ username }) {
                     const userProfileImage = await getProfileImage(user.username);
                     // change displayed profile image
                     setProfileImgSrc(userProfileImage);
+                    sessionStorage.setItem('profileImage', userProfileImage);
                 }
             } catch (error) {
                 console.error('Error fetching user info for profile page:', error);
