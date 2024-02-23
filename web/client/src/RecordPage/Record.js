@@ -71,24 +71,4 @@ function Record() {
     )
 }
 
-// //접속 기기 및 브라우저 확인
-// function checkBrowser() {
-//     // 안드로이드 모바일 기기인 경우 webm 지정
-//     if (/Android/i.test(navigator.userAgent)) {
-//         return ['android', 'webm']
-//     }
-//     // ios 모바일 기기인 경우 mp4 지정
-//     else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-//         return ['ios', 'mp4']
-//     }
-//     // Windows 의 Chrome 브라우저인 경우 webm 지정
-//     else if (navigator.userAgent.indexOf("Chrome") > -1) {
-//         return ['chrome', 'webm']
-//     }
-//     // Mac OS 의 Safari 브라우저인 경우 mp4 지정
-//     else if (navigator.userAgent.indexOf("Safari") > -1) {
-//         return ['safari', 'mp4']
-//     }
-// }
-
 export default Record

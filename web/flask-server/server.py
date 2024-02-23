@@ -7,14 +7,19 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 import pymysql
-from datetime import datetime
-import pandas as pd
 
 from sqlalchemy import extract, asc
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
+
+from datetime import datetime
+import pandas as pd
+import cv2
+
+import paramiko
+from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -27,9 +32,6 @@ db.init_app(app)
 with app.app_context():
 	db.create_all()
 
-
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
 # SCP 연결 설정
 ssh_client = paramiko.SSHClient()
@@ -44,36 +46,56 @@ ssh_password = SSH_PASSWORD
 
 
 @app.route('/record', methods=['POST'])
-def upload_video():
+def record_video():
 	print('동영상 저장')
+	user_id = session.get("user_id")
 
-	print(request.files)
+	now = datetime.now()
+	date = now.date()
+	video_date = str(date).replace('-', '')
+
 	try:
 		if 'video' in request.files:
 			# 파일 경로
 			video_file = request.files['video']
 
+			file_name = user_id + video_date
+			print(f'동영상 이름: {file_name}')
+
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경)
-			local_video_path = 'web/temp/video.mp4'
+			local_image_path = f'web/temp/{file_name}.png'
+			local_video_path = f'web/temp/{file_name}.mp4'
+
+			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
+			remote_image_path = f'D:/log/video/{file_name}.png'
+			remote_video_path = f'D:/log/video/{file_name}.mp4'
 
 			# 파일 저장
 			video_file.save(local_video_path)
 
-			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
-			remote_video_path = 'D:/log/video/video.mp4'
+			#이미지 캡처
+			cap = cv2.VideoCapture(local_video_path)
+			ret, frame = cap.read()
+
+			if ret:
+				cv2.imwrite(local_image_path, frame)
+				print('썸네일 저장')
+			cap.release()
 
 			# SCP 연결
 			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
 
 			# 파일을 SCP로 원격 서버에 업로드
 			with ssh_client.open_sftp() as sftp:
+				sftp.put(local_image_path, remote_image_path)
 				sftp.put(local_video_path, remote_video_path)
-			
-			#임시 파일 삭제
-			os.remove('web/temp/video.mp4')
 
 			# SSH 연결 종료
 			ssh_client.close()
+			
+			# #임시 파일 삭제
+			# os.remove(f'web/temp/{file_name}.png')
+			# os.remove(f'web/temp/{file_name}.mp4')
 
 			print('비디오 업로드 완료')
 			return 'Video uploaded successfully!'
@@ -84,6 +106,23 @@ def upload_video():
 	except Exception as e:
 		print(f"Error in record: {str(e)}")
 
+
+@app.route('/upload', methods=['POST'])
+def upload_video():
+	user_id = session.get("user_id")
+
+	now = datetime.now()
+	date = now.date()
+	video_date = str(date).replace('-', '')
+
+	file_name = user_id + video_date
+
+	local_video_path = f'web/temp/{file_name}.mp4'
+
+	data = {"video_url": local_video_path}
+	
+	return jsonify(data)
+	
 
 
 @app.route('/check_authentication', methods=['GET'])
@@ -252,6 +291,70 @@ def get_current_user():
 		"email": user.email,
 		"createdAt": user.created_at
 	})
+
+
+
+@app.route("/get_profile_image", methods=['POST'])
+def get_user_profile_image():
+	try:
+		username = request.json['username']
+		
+		if not username:
+			return jsonify({"error": "Username not provided"}), 400
+			
+		# fetch user data by username(from session) from user_info_db : user_account table
+		user = User.query.filter_by(username=username).first()
+		
+		if not user or not user.profile_img:
+			return jsonify({"error": "Image not found"}), 404
+		
+		ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+		with ssh_client.open_sftp() as sftp:
+			with sftp.file(user.profile_img, 'rb') as file:
+				image_data = file.read()
+				return send_file(io.BytesIO(image_data), mimetype='image/png')
+		
+	except Exception as e:
+		print(str(e))
+		return jsonify({"error": "Internal server error"}), 500
+	
+
+@app.route("/set_profile_image", methods=['POST'])
+def set_profile_image():
+	user_id = session.get("user_id")
+	
+	# fetch user data by username(from session) from user_info_db : user_account table
+	user = User.query.filter_by(username=user_id).first()
+	print(request.files['image'])
+	
+	if (user and ('image' in request.files)):
+		try:
+			image_file = request.files['image']
+			# Save image locally (temporarily)
+			local_image_path = 'temp/image.jpg'
+			image_file.save(local_image_path)
+			
+			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
+			
+			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+
+			with ssh_client.open_sftp() as sftp:
+				sftp.put(local_image_path, remote_image_path)
+
+			os.remove(local_image_path)
+		
+			ssh_client.close()
+		
+			user.profile_img = remote_image_path
+			db.session.commit()
+		
+			return 'Successfully added profile image!', 200
+		
+		except Exception as e:
+			print(f"Error in record: {str(e)}")
+			return 'Error setting profile image', 500
+	else:
+		return 'Unauthorized', 401
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month():

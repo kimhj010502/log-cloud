@@ -35,6 +35,7 @@ export function checkBrowser() {
 export function CameraRecord() {
     //카메라 전환
     const [facingMode, setFacingMode] = React.useState(FACING_MODE_USER);
+    const [mirrorMode, setMirrorMode] = React.useState(false);
 
     const handleClick = React.useCallback(() => {
         setFacingMode(
@@ -45,12 +46,15 @@ export function CameraRecord() {
         );
     }, []);
 
+    useEffect(() => {
+        setMirrorMode(!mirrorMode);
+    }, [facingMode])
+    
 
     let [name, videoType] = ['', '']
     useEffect(() => {
         [name, videoType] = checkBrowser()
     }, [])
-
 
     //영상 녹화
     const webcamRef = React.useRef(null);
@@ -94,12 +98,16 @@ export function CameraRecord() {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedVideo(file);
+        console.log(selectedVideo)
+    };
 
+    useEffect(() => {
+        // selectedVideo가 변경되었을 때만 uploadButton.click()을 호출
         const uploadButton = document.querySelector('.upload-button .upload-link div');
-        if (uploadButton) {
+        if (uploadButton && selectedVideo) {
             uploadButton.click();
         }
-    };
+    }, [selectedVideo]);
 
     const handleFileIconClick = React.useCallback(() => {
         if (fileInputRef.current) {
@@ -170,20 +178,26 @@ export function CameraRecord() {
         }
     };
     
-    
-    
     return (
         <>
         <div className="camera-box">
             <Webcam 
             audio={true}
             muted={true}
+            mirrored={mirrorMode}
             ref={webcamRef} 
             videoConstraints={{
                 ...videoConstraints,
-                facingMode,
-                width: 522,
-                height: 351
+                facingMode
+            }}
+            style={{
+                position: "absolute",
+                textAlign: "center",
+                zindex: 8,
+                right:0,
+                height: "100%",
+                width: "100%",
+                objectFit: "fill",
             }} />
         </div>
 
