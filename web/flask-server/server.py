@@ -512,7 +512,7 @@ def get_friend_list():
 @app.route('/search_user', methods=['POST'])
 def search_user():
 	username = session.get("user_id")
-	search_string = request.json['search_string']
+	search_string = request.json['searchString']
 	
 	friend_list = []
 	friends = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 1).all()

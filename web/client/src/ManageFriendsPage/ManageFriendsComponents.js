@@ -37,7 +37,7 @@ export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }
             )}
 
             { !isRequests && (
-                <div className='no-request'>no requests just yet.</div>
+                <div className='no-request'>no requests yet..</div>
             )}
         </div>
     )
@@ -175,61 +175,67 @@ function FriendProfile({ img_src, id }) {
 
 
 // search result
-export function SearchingMyFriends() {
-    const [isFriends, setIsFriends] = useState(true) //친구가 0명이면 false로 설정
+export function SearchingMyFriends({ friendList, searchString }) {
+    const [isFriends, setIsFriends] = useState(true);
+    const [searchResult, setSearchResult] = useState([]);
+
+    useEffect(() => {
+        if (friendList){
+            // setIsFriends(friendList.length > 0);
+            const result = friendList.filter(friend => friend.toLowerCase().includes(searchString.toLowerCase()));
+            setSearchResult(result);
+            setIsFriends(result.length > 0)
+        }
+    }, [friendList, searchString]);
 
     return (
         <div className='searching-my-friends-box'>
             <div className='searching-my-friends-header'>my friends</div>
 
-            {/* 검색 결과에 맞는 친구 명수만큼 반복 */}
             { isFriends && (
                 <div className='searching-friends-box'>
-                    <FriendProfile img_src='profile.png' id='user1' />
-                    <FriendProfile img_src='profile.png' id='user2' />
-                    <FriendProfile img_src='profile.png' id='user3' />
-                    <FriendProfile img_src='profile.png' id='user4' />
-                    <FriendProfile img_src='profile.png' id='user5' />
-                    <FriendProfile img_src='profile.png' id='user6' />
+                    {searchResult.map((username, index) => (
+                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
             )}
 
             { !isFriends && (
-                <div className='searching-no-friend'>검색한 아이디의 친구가 없습니다.</div>
+                <div className='searching-no-friend'>no user found</div>
             )}
         </div>
     )
 }
 
 
-export function SearchingMoreResults() {
-    const [isMoreResults, setIsMoreResults] = useState(true) //친구가 0명이면 false로 설정
+export function SearchingMoreResults({ searchResult }) {
+    const [isMoreResults, setIsMoreResults] = useState(false);
+
+    useEffect(() => {
+        if (searchResult){
+            setIsMoreResults(searchResult.length > 0);
+        }
+    }, [searchResult]);
 
     return (
         <div className='searching-more-results-box'>
             <div className='searching-more-results-header'>more results</div>
 
-            {/* 검색 결과에 맞는 친구 명수만큼 반복 */}
-            { isMoreResults && (
+            { isMoreResults ? (
                 <div className='searching-results-box'>
-                    <MoreResultProfile img_src='profile.png' id='user1' />
-                    <MoreResultProfile img_src='profile.png' id='user2' />
-                    <MoreResultProfile img_src='profile.png' id='user3' />
-                    <MoreResultProfile img_src='profile.png' id='user4' />
-                    <MoreResultProfile img_src='profile.png' id='user5' />
-                    <MoreResultProfile img_src='profile.png' id='user6' />
+                    {searchResult.map((username, index) => (
+                        <MoreResultProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
-            )}
-
-            { !isMoreResults && (
-                <div className='searching-no-result'>검색한 아이디의 사용자가 없습니다.</div>
+            ) : (
+                <div className='searching-no-result'>no users found</div>
             )}
         </div>
-    )
+    );
 }
 
 
-function MoreResultProfile({ img_src, id }) {
+function MoreResultProfile({ key, img_src, id }) {
     const [follow, setFollow] = useState(false);
 
     const handleFollow = () => {

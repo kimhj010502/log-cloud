@@ -12,7 +12,9 @@ function ManageFriendsPage() {
     const [friendList, setFriendList] = useState([]);
     const [pendingReceivedRequests, setPendingReceivedRequests] = useState([]);
     const [pendingSentRequests, setPendingSentRequests] = useState([]);
-    
+
+    const [searchResult, setSearchResult] = useState([]);
+
     useEffect(() => {
         //검색중인지 확인
         if (friendUsername !== "") {
@@ -50,9 +52,34 @@ function ManageFriendsPage() {
         fetchFriendInfo();
     }, []);
 
+    async function fetchSearchResult(searchString) {
+        try {
+            const response = await fetch('/search_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({'searchString': searchString}),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // console.log(data);
+                setSearchResult(data.users);
+            } else {
+                console.log('Error fetching friend data');
+                setSearchResult([]);
+            }
+        } catch (error) {
+        console.error('Error fetching data:', error);
+        }
+    }
+
     const handleSetFriendName = (e) => {
         setFriendUsername(e.target.value);
         console.log(friendUsername);
+
+        fetchSearchResult(friendUsername);
     };
 
     return (
@@ -92,8 +119,8 @@ function ManageFriendsPage() {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <SearchingMyFriends />
-                        <SearchingMoreResults />
+                        <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
+                        <SearchingMoreResults searchResult={searchResult} />
                     </motion.div>
                 )}
  
