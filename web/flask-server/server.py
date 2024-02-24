@@ -6,6 +6,8 @@ from flask import Flask, request, redirect, url_for, session, flash, jsonify, Bl
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
+from flask_restx import Resource, Api
+
 import pymysql
 from datetime import datetime
 import pandas as pd
@@ -20,6 +22,7 @@ from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
 app = Flask(__name__)
+
 app.config.from_object(ApplicationConfig)
 
 CORS(app, supports_credentials=True)
@@ -29,7 +32,6 @@ db.init_app(app)
 
 with app.app_context():
 	db.create_all()
-
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
@@ -166,6 +168,7 @@ def change_user_password():
 	except Exception as e:
 		print(f"Error in changing password: {str(e)}")
 		return jsonify({"message": "Unauthorized"}), 401
+
 
 @app.route('/delete_account', methods=['POST'])
 def remove_registered_user():
@@ -459,6 +462,154 @@ def analysisReport():
 			"tired": tired}
 	
 	return jsonify(data)
+
+
+@app.route('/get_friend_list', methods=['POST'])
+def get_friend_list():
+	# username = session.get("user_id")
+	username = request.json['username']
+	
+	friend_list = []
+	pending_received_request_list = []
+	pending_sent_request_list = []
+	
+	# pending requests: status 0 means request sent from username1 to username2
+	#				    status 1 means friends
+	friends = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 1).all()
+	for entry in friends:
+		friend_list.append(entry.username2)
+		
+	friends = socialNetwork.query.filter(socialNetwork.username2 == username, socialNetwork.state == 1).all()
+	for entry in friends:
+		friend_list.append(entry.username1)
+	
+	pending = socialNetwork.query.filter(socialNetwork.username2 == username, socialNetwork.state == 0).all()
+	for entry in pending:
+		pending_received_request_list.append(entry.username1)
+		
+	pending = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 0).all()
+	for entry in pending:
+		pending_sent_request_list.append(entry.username2)
+	
+	print("friend list:", friend_list)
+	print("pending_received request_list:", pending_received_request_list)
+	print("pending_sent request_list:", pending_sent_request_list)
+
+	if friend_list or pending_received_request_list or pending_sent_request_list:
+		return jsonify({"friends": friend_list,
+						"pending_received_requests:": pending_received_request_list,
+						"pending_sent_requests": pending_sent_request_list}), 200
+	else:
+		return jsonify("Nothing to send"), 404
+
+
+@app.route('/search_user', methods=['POST'])
+def search_user():
+	# username = session.get("user_id")
+	username = request.json['username']
+	friend_username = request.json['friend_username']
+	
+	return jsonify({"users": []}), 200
+
+
+@app.route('/send_friend_request', methods=['POST'])
+def send_friend_request():
+	# username = session.get("user_id")
+	username = request.json['username']
+	friend_username = request.json['friend_username']
+	
+	if username == friend_username:
+		return jsonify({"error": "cannot send request to self"}), 404
+	
+	user = User.query.filter_by(username=username).first()
+	if not user:
+		return jsonify({"error": "unauthorized"}), 404
+	
+	# check if username exists in database
+	friend = User.query.filter_by(username=friend_username).first()
+	if not friend:
+		return jsonify({"error": "friend_username not found"}), 404
+	
+	# check if friend already sent a request to me
+	already_friends = 1 if (socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (socialNetwork.state == 1)).all()
+						or socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 1)).all()) else None
+	
+	existing_request = 1 if (socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (socialNetwork.state == 0)).all()) else None
+	
+	request_sent_by_friend = 1 if (socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).all()) else None
+	
+	if already_friends:
+		return jsonify({"error": "Already friends"}), 403
+	if existing_request:
+		return jsonify({"error": "Request exists"}), 403
+	if request_sent_by_friend:
+		return jsonify({"error": "Pending request from friend"}), 403
+	
+	new_friend_request = socialNetwork(username1=username, username2=friend_username, state=0)
+	db.session.add(new_friend_request)
+	db.session.commit()
+	
+	return jsonify({"message": "Successfully sent friend request"}), 201
+
+
+@app.route('/reject_friend_request', methods=['POST'])
+def reject_friend_request():
+	# username = session.get("user_id")
+	username = request.json['username']
+	friend_username = request.json['friend_username']
+	
+	friend_request = socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).all()
+	
+	if not friend_request:
+		return jsonify({"error": "Error finding request"}), 400
+	
+	socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).delete()
+	db.session.commit()
+	
+	return jsonify({"message": "Successfully rejected friend request"}), 200
+
+
+@app.route('/accept_friend_request', methods=['POST'])
+def accept_friend_request():
+	# username = session.get("user_id")
+	username = request.json['username']
+	friend_username = request.json['friend_username']
+	
+	friend_request = socialNetwork.query.filter(
+		(socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
+					socialNetwork.state == 0)).first()
+	
+	if not friend_request:
+		return jsonify({"error": "Error finding request"}), 400
+	
+	friend_request.state = 1
+	db.session.commit()
+	
+	return jsonify({"message": "Successfully accepted friend request"}), 200
+
+
+@app.route('/remove_friend', methods=['POST'])
+def remove_friend():
+	# username = session.get("user_id")
+	username = request.json['username']
+	friend_username = request.json['friend_username']
+	
+	friend = socialNetwork.query.filter(
+		((socialNetwork.username1 == friend_username) | (socialNetwork.username2 == username))
+		& (socialNetwork.state == 1)).all()
+	
+	print(friend)
+	
+	if not friend:
+		return jsonify({"error": "Error finding request"}), 400
+	
+	# delete friend from socialNetwork db
+	# in case multiple records exist: use .all() and iterate over the list
+	for f in friend:
+		db.session.delete(f)
+	db.session.commit()
+	
+	return jsonify({"message": "Successfully removed friend"}), 200
 
 
 if __name__ == "__main__":
