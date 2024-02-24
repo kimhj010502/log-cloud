@@ -206,7 +206,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
 }
 
 
-export function SearchingMoreResults({ searchResult }) {
+export function SearchingMoreResults({ searchResult, pendingSentRequests }) {
     const [isMoreResults, setIsMoreResults] = useState(false);
 
     useEffect(() => {
@@ -222,7 +222,7 @@ export function SearchingMoreResults({ searchResult }) {
             { isMoreResults ? (
                 <div className='searching-results-box'>
                     {searchResult.map((username, index) => (
-                        <MoreResultProfile key={index} img_src='profile.png' id={username} />
+                        <MoreResultProfile key={index} img_src='profile.png' id={username} pendingSentRequests={pendingSentRequests} />
                     ))}
                 </div>
             ) : (
@@ -233,15 +233,17 @@ export function SearchingMoreResults({ searchResult }) {
 }
 
 
-function MoreResultProfile({ img_src, id }) {
-    const [friendRequest, setFriendRequest] = useState(false);
+function MoreResultProfile({ img_src, id, request, pendingSentRequests }) {
+    const [requestSent, setRequestSent] = useState(false);
 
-    const handleFollow = () => {
-        setFriendRequest(!friendRequest)
-        if (friendRequest) {
-            console.log("unsend friend requst");
-            // use /unsend_friend_request api
-        } else {
+    useEffect(() => {
+        if (pendingSentRequests.includes(id)) {
+            setRequestSent(true);
+        }
+    }, [pendingSentRequests, id]);
+
+    const handleSendRequest = () => {
+        if (!requestSent) {
             console.log("send request");
             fetch('/send_friend_request', {
                 method: 'POST',
@@ -253,9 +255,30 @@ function MoreResultProfile({ img_src, id }) {
             })
             .then(response => {
                 if (response.ok) {
-                    setFriendRequest(true);
+                    setRequestSent(true);
                 } else {
-                    console.error('Failed to send friend request');
+                    alert('Failed to unsend friend request');
+                }
+            })
+            .catch(error => {
+                console.error('Error unsending friend request:', error);
+            });
+
+        } else {
+            console.log("unsend friend requst");
+            fetch('/unsend_friend_request', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "friend_username": id }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    setRequestSent(false);
+                } else {
+                    alert('Failed to send friend request');
                 }
             })
             .catch(error => {
@@ -274,11 +297,10 @@ function MoreResultProfile({ img_src, id }) {
                 {id}
             </div>
             
-            { friendRequest && (
-                <div className='request-sent' onClick={handleFollow}>request sent!</div>
-            )}
-            { !friendRequest && (
-                <div className='follow-button' onClick={handleFollow}>＋</div>
+            { requestSent ? (
+                <div className='request-sent' onClick={handleSendRequest}>request sent!</div>
+            ) : (
+                <div className='follow-button' onClick={handleSendRequest}>＋</div>
             )}
         </div>
     )

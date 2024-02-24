@@ -584,6 +584,25 @@ def send_friend_request():
 	return jsonify({"message": "Successfully sent friend request"}), 201
 
 
+@app.route('/unsend_friend_request', methods=['POST'])
+def unsend_friend_request():
+	username = session.get("user_id")
+	friend_username = request.json['friend_username']
+	
+	friend_request = socialNetwork.query.filter(
+		(socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (
+				socialNetwork.state == 0)).first()
+	
+	if not friend_request:
+		return jsonify({"error": "Friend request not found"}), 404
+	
+	socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (
+			socialNetwork.state == 0)).delete()
+	db.session.commit()
+	
+	return jsonify({"message": "Successfully unsent friend request"}), 200
+
+
 @app.route('/reject_friend_request', methods=['POST'])
 def reject_friend_request():
 	username = session.get("user_id")

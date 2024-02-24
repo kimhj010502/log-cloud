@@ -15,6 +15,9 @@ function ManageFriendsPage() {
 
     const [searchResult, setSearchResult] = useState([]);
 
+
+
+
     useEffect(() => {
         //검색중인지 확인
         if (friendUsername !== "") {
@@ -124,7 +127,7 @@ function ManageFriendsPage() {
                     transition={{ duration: 0.5 }}
                     >
                         <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
-                        <SearchingMoreResults searchResult={searchResult} />
+                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} />
                     </motion.div>
                 )}
  
