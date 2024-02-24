@@ -15,7 +15,7 @@ import pandas as pd
 from PIL import Image
 import io
 
-from sqlalchemy import extract, asc
+from sqlalchemy import extract, asc, not_, and_
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
@@ -34,7 +34,7 @@ with app.app_context():
 	db.create_all()
 
 import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
+from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD
 
 # SCP 연결 설정
 ssh_client = paramiko.SSHClient()
@@ -51,44 +51,43 @@ ssh_password = SSH_PASSWORD
 @app.route('/record', methods=['POST'])
 def upload_video():
 	print('동영상 저장')
-
+	
 	print(request.files)
 	try:
 		if 'video' in request.files:
 			# 파일 경로
 			video_file = request.files['video']
-
+			
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경)
 			local_video_path = 'web/temp/video.mp4'
-
+			
 			# 파일 저장
 			video_file.save(local_video_path)
-
+			
 			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
 			remote_video_path = 'D:/log/video/video.mp4'
-
+			
 			# SCP 연결
 			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-
+			
 			# 파일을 SCP로 원격 서버에 업로드
 			with ssh_client.open_sftp() as sftp:
 				sftp.put(local_video_path, remote_video_path)
 			
-			#임시 파일 삭제
+			# 임시 파일 삭제
 			os.remove('web/temp/video.mp4')
-
+			
 			# SSH 연결 종료
 			ssh_client.close()
-
+			
 			print('비디오 업로드 완료')
 			return 'Video uploaded successfully!'
 		
 		else:
 			return 'No video file provided', 400
-
+	
 	except Exception as e:
 		print(f"Error in record: {str(e)}")
-
 
 
 @app.route('/check_authentication', methods=['GET'])
@@ -98,7 +97,7 @@ def check_authentication():
 		return jsonify({'authenticated': True})
 	else:
 		return jsonify({'authenticated': False})
-	
+
 
 @app.route('/check_username_availability', methods=['GET'])
 def check_username_availability():
@@ -191,18 +190,19 @@ def remove_registered_user():
 			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
 			
 			# Delete user from social_network table (both username1 and username2)
-			social_network_to_delete = socialNetwork.query.filter((socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
-		
+			social_network_to_delete = socialNetwork.query.filter(
+				(socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
+			
 			# + additional deletion operation: remove all comments associated with the account
 			# + additional deletion operation: remove all likes associated with the account
 			
 			# Delete user from user_account table
 			db.session.delete(user)
-			
+		
 		db.session.commit()
 		session.clear()
 		return jsonify({"message": "Account deleted successfully"}), 200
-			
+	
 	except IntegrityError:
 		db.session.rollback()  # Rollback in case of an error
 		return jsonify({"error": "Database error"}), 500
@@ -241,7 +241,7 @@ def logout_user():
 		return jsonify({"msg": "Successful user logout"}), 200
 	else:
 		return jsonify({"error": "Unauthorized"}), 401
-	
+
 
 @app.route("/@me")
 def get_current_user():
@@ -267,7 +267,7 @@ def get_user_profile_image():
 		
 		if not username:
 			return jsonify({"error": "Username not provided"}), 400
-			
+		
 		# fetch user data by username(from session) from user_info_db : user_account table
 		user = User.query.filter_by(username=username).first()
 		
@@ -279,11 +279,11 @@ def get_user_profile_image():
 			with sftp.file(user.profile_img, 'rb') as file:
 				image_data = file.read()
 				return send_file(io.BytesIO(image_data), mimetype='image/png')
-		
+	
 	except Exception as e:
 		print(str(e))
 		return jsonify({"error": "Internal server error"}), 500
-	
+
 
 @app.route("/set_profile_image", methods=['POST'])
 def set_profile_image():
@@ -303,17 +303,17 @@ def set_profile_image():
 			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
 			
 			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-
+			
 			with ssh_client.open_sftp() as sftp:
 				sftp.put(local_image_path, remote_image_path)
-
+			
 			os.remove(local_image_path)
-		
+			
 			ssh_client.close()
-		
+			
 			user.profile_img = remote_image_path
 			db.session.commit()
-		
+			
 			return 'Successfully added profile image!', 200
 		
 		except Exception as e:
@@ -330,7 +330,12 @@ def get_log_overview_of_month():
 	year = request.json['year']
 	
 	start_date = datetime(year, month + 1, 1)
-	end_date = datetime(year, month + 1, calendar.monthrange(year, month + 1)[1]) if month < 12 else datetime(year + 1, 1, calendar.monthrange(year, month + 1)[1])
+	end_date = datetime(year, month + 1, calendar.monthrange(year, month + 1)[1]) if month < 12 else datetime(year + 1,
+																											  1,
+																											  calendar.monthrange(
+																												  year,
+																												  month + 1)[
+																												  1])
 	
 	# print(start_date, end_date)
 	
@@ -346,7 +351,7 @@ def get_log_overview_of_month():
 		for video in videos:
 			day_of_month = video.date.day
 			# print(video.date.day)
-	
+			
 			video_info_list.append({
 				'date': day_of_month,
 				'coverImage': video.cover_image,
@@ -358,13 +363,12 @@ def get_log_overview_of_month():
 		return jsonify({"error": "No videos found for the specified username"}), 404
 
 
-
 @app.route("/logdetail", methods=['POST'])
 def logDetail():
 	video_id = request.json['videoId']
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
-
+	
 	# error handling needed in case summary/emotion/hashtag doesn't exist
 	if video_detail:
 		print("Video URL:", video_detail.video_url)
@@ -414,27 +418,30 @@ def analysisReport():
 		return jsonify({"error": "User not found"}), 404
 	year = request.json['currentYear']
 	month = request.json['currentMonth']
-
-	start_date = datetime(year, month+1, 1)
-	end_date = (datetime(year, month+2, 1) if (month != 11) else datetime(year, 1, 1))
-
-	num = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).count()
-	hashtag = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).with_entities(videoInfo.hashtag).all()
-	emotion = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).with_entities(videoInfo.emotion).all()
-
+	
+	start_date = datetime(year, month + 1, 1)
+	end_date = (datetime(year, month + 2, 1) if (month != 11) else datetime(year, 1, 1))
+	
+	num = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
+								 videoInfo.date < end_date).count()
+	hashtag = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
+									videoInfo.date < end_date).with_entities(videoInfo.hashtag).all()
+	emotion = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
+									videoInfo.date < end_date).with_entities(videoInfo.emotion).all()
+	
 	# Top5 Hashtag
 	hashtag_list = []
 	for tag in hashtag:
-		tag_pre = tag[0].replace(' ','').split("#")
+		tag_pre = tag[0].replace(' ', '').split("#")
 		hashtag_list += [x for x in tag_pre if x]
-
+	
 	top5_tag = pd.Series(hashtag_list).value_counts()[:5].index.to_list()
 	
 	# count emotions
 	emotion_list = []
 	for i in emotion:
 		emotion_list.append(i[0])
-
+	
 	count_emotion = pd.Series(emotion_list).value_counts()
 	
 	def get_emotion_counts(x):
@@ -478,7 +485,7 @@ def get_friend_list():
 	friends = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 1).all()
 	for entry in friends:
 		friend_list.append(entry.username2)
-		
+	
 	friends = socialNetwork.query.filter(socialNetwork.username2 == username, socialNetwork.state == 1).all()
 	for entry in friends:
 		friend_list.append(entry.username1)
@@ -486,7 +493,7 @@ def get_friend_list():
 	pending = socialNetwork.query.filter(socialNetwork.username2 == username, socialNetwork.state == 0).all()
 	for entry in pending:
 		pending_received_request_list.append(entry.username1)
-		
+	
 	pending = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 0).all()
 	for entry in pending:
 		pending_sent_request_list.append(entry.username2)
@@ -494,7 +501,7 @@ def get_friend_list():
 	print("friend list:", friend_list)
 	print("pending_received request_list:", pending_received_request_list)
 	print("pending_sent request_list:", pending_sent_request_list)
-
+	
 	if friend_list or pending_received_request_list or pending_sent_request_list:
 		return jsonify({"friends": friend_list,
 						"pending_received_requests:": pending_received_request_list,
@@ -507,15 +514,34 @@ def get_friend_list():
 def search_user():
 	# username = session.get("user_id")
 	username = request.json['username']
-	friend_username = request.json['friend_username']
+	search_string = request.json['search_string']
 	
-	return jsonify({"users": []}), 200
+	friend_list = []
+	friends = socialNetwork.query.filter(socialNetwork.username1 == username, socialNetwork.state == 1).all()
+	for entry in friends:
+		friend_list.append(entry.username2)
+	
+	friends = socialNetwork.query.filter(socialNetwork.username2 == username, socialNetwork.state == 1).all()
+	for entry in friends:
+		friend_list.append(entry.username1)
+	
+	# search for users with username containing search_string
+	users = User.query.filter(and_(
+								User.username.like(f"%{search_string}%"),
+								not_(User.username.in_(friend_list)),
+								User.username != username)).all()
+	
+	if not users:
+		return jsonify("no user exists with the search string"), 204
+	
+	user_list = [user.username for user in users]
+	
+	return jsonify({"users": user_list}), 200
 
 
 @app.route('/send_friend_request', methods=['POST'])
 def send_friend_request():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	friend_username = request.json['friend_username']
 	
 	if username == friend_username:
@@ -531,12 +557,20 @@ def send_friend_request():
 		return jsonify({"error": "friend_username not found"}), 404
 	
 	# check if friend already sent a request to me
-	already_friends = 1 if (socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (socialNetwork.state == 1)).all()
-						or socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 1)).all()) else None
+	already_friends = 1 if (socialNetwork.query.filter(
+		(socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (
+				socialNetwork.state == 1)).all()
+							or socialNetwork.query.filter(
+				(socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
+						socialNetwork.state == 1)).all()) else None
 	
-	existing_request = 1 if (socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (socialNetwork.state == 0)).all()) else None
+	existing_request = 1 if (socialNetwork.query.filter(
+		(socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (
+				socialNetwork.state == 0)).all()) else None
 	
-	request_sent_by_friend = 1 if (socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).all()) else None
+	request_sent_by_friend = 1 if (socialNetwork.query.filter(
+		(socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
+				socialNetwork.state == 0)).all()) else None
 	
 	if already_friends:
 		return jsonify({"error": "Already friends"}), 403
@@ -554,16 +588,18 @@ def send_friend_request():
 
 @app.route('/reject_friend_request', methods=['POST'])
 def reject_friend_request():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	friend_username = request.json['friend_username']
 	
-	friend_request = socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).all()
+	friend_request = socialNetwork.query.filter(
+		(socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
+				socialNetwork.state == 0)).all()
 	
 	if not friend_request:
 		return jsonify({"error": "Error finding request"}), 400
 	
-	socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (socialNetwork.state == 0)).delete()
+	socialNetwork.query.filter((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
+			socialNetwork.state == 0)).delete()
 	db.session.commit()
 	
 	return jsonify({"message": "Successfully rejected friend request"}), 200
@@ -571,13 +607,12 @@ def reject_friend_request():
 
 @app.route('/accept_friend_request', methods=['POST'])
 def accept_friend_request():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	friend_username = request.json['friend_username']
 	
 	friend_request = socialNetwork.query.filter(
 		(socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username) & (
-					socialNetwork.state == 0)).first()
+				socialNetwork.state == 0)).first()
 	
 	if not friend_request:
 		return jsonify({"error": "Error finding request"}), 400
@@ -590,8 +625,7 @@ def accept_friend_request():
 
 @app.route('/remove_friend', methods=['POST'])
 def remove_friend():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	friend_username = request.json['friend_username']
 	
 	friend = socialNetwork.query.filter(
