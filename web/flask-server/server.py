@@ -9,13 +9,13 @@ from flask_session import Session
 from flask_restx import Resource, Api
 
 import pymysql
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 
 from PIL import Image
 import io
 
-from sqlalchemy import extract, asc, not_, and_
+from sqlalchemy import extract, asc, or_, not_, and_
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
@@ -459,14 +459,14 @@ def analysisReport():
 	tired = int(get_emotion_counts(6))
 	
 	data = {"num": num,
-			"hashtags": top5_tag,
-			"loved": loved,
-			"excited": excited,
-			"good": good,
-			"neutral": neutral,
-			"unhappy": unhappy,
-			"angry": angry,
-			"tired": tired}
+		"hashtags": top5_tag,
+		"loved": loved,
+		"excited": excited,
+		"good": good,
+		"neutral": neutral,
+		"unhappy": unhappy,
+		"angry": angry,
+		"tired": tired}
 	
 	return jsonify(data)
 
@@ -662,6 +662,53 @@ def remove_friend():
 	db.session.commit()
 	
 	return jsonify({"message": "Successfully removed friend"}), 200
+
+@app.route('/searchresult', methods=['POST','GET'])
+def searchResult():
+	user_id = session.get("user_id")
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	data = request.json['selectedValue']
+	
+	selectedWhat = data['selectedWhat']
+	selectedScope = data['selectedScope']
+	dateRange = data['dateRange']
+	keyword = data['keyword']
+
+	start_date = datetime.strptime(dateRange[0], '%Y-%m-%dT%H:%M:%S.%fZ') + timedelta(hours=9)
+	end_date = datetime.strptime(dateRange[1], '%Y-%m-%dT%H:%M:%S.%fZ') + timedelta(hours=9) + timedelta(days = 1)
+
+	all_posts = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date)
+
+	# 키워드를 포함하는 글들 추출
+	if selectedWhat == 'log전문':
+		key_posts = all_posts.filter(videoInfo.original_text.contains(keyword))
+	elif selectedWhat == '요약본':
+		key_posts = all_posts.filter(videoInfo.summary.contains(keyword))
+	elif selectedWhat == '해시태그':
+		key_posts = all_posts.filter(videoInfo.hashtag.contains(keyword))
+	elif selectedWhat == '전체':
+		key_posts = all_posts.filter(or_(videoInfo.hashtag.contains(keyword), videoInfo.summary.contains(keyword), videoInfo.original_text.contains(keyword)))
+
+	# 공유 범위에 따른 글 추출
+	posts = key_posts
+	if selectedScope == '개인기록':
+		posts = key_posts.filter(videoInfo.share == 0)
+	elif selectedScope == '친구공유':
+		posts = key_posts.filter(videoInfo.share == 1)
+
+	date_list = []
+	for i in posts.with_entities(videoInfo.date).all():
+		date_list.append(i[0])
+
+	coverImg_list = []
+	for i in posts.with_entities(videoInfo.cover_image).all():
+		coverImg_list.append(i[0])
+
+	data = [{ 'date': date, 'coverImg': "test_image.jpg" } for date, coverImg in zip(date_list, coverImg_list)] # coverImg
+	
+	return data
 
 
 if __name__ == "__main__":
