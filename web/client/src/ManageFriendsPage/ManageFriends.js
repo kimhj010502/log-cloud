@@ -16,6 +16,13 @@ function ManageFriendsPage() {
     const [searchResult, setSearchResult] = useState([]);
 
 
+    const updatePendingSentRequests = (friendUsername, isSent) => {
+        if (isSent) {
+            setPendingSentRequests([...pendingSentRequests, friendUsername]);
+        } else {
+            setPendingSentRequests(pendingSentRequests.filter(username => username !== friendUsername));
+        }
+    };
 
 
     useEffect(() => {
@@ -127,7 +134,7 @@ function ManageFriendsPage() {
                     transition={{ duration: 0.5 }}
                     >
                         <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
-                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} />
+                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
                     </motion.div>
                 )}
  

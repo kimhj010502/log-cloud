@@ -594,7 +594,7 @@ def unsend_friend_request():
 				socialNetwork.state == 0)).first()
 	
 	if not friend_request:
-		return jsonify({"error": "Friend request not found"}), 404
+		return jsonify({"Friend request not found"}), 402
 	
 	socialNetwork.query.filter((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username) & (
 			socialNetwork.state == 0)).delete()

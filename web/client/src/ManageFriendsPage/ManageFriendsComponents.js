@@ -206,7 +206,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
 }
 
 
-export function SearchingMoreResults({ searchResult, pendingSentRequests }) {
+export function SearchingMoreResults({ searchResult, pendingSentRequests, updatePendingSentRequests }) {
     const [isMoreResults, setIsMoreResults] = useState(false);
 
     useEffect(() => {
@@ -222,7 +222,7 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests }) {
             { isMoreResults ? (
                 <div className='searching-results-box'>
                     {searchResult.map((username, index) => (
-                        <MoreResultProfile key={index} img_src='profile.png' id={username} pendingSentRequests={pendingSentRequests} />
+                        <MoreResultProfile key={index} img_src='profile.png' id={username} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
                     ))}
                 </div>
             ) : (
@@ -233,7 +233,7 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests }) {
 }
 
 
-function MoreResultProfile({ img_src, id, request, pendingSentRequests }) {
+function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePendingSentRequests }) {
     const [requestSent, setRequestSent] = useState(false);
 
     useEffect(() => {
@@ -256,8 +256,9 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests }) {
             .then(response => {
                 if (response.ok) {
                     setRequestSent(true);
+                    updatePendingSentRequests(id, true);
                 } else {
-                    alert('Failed to unsend friend request');
+                    console.error('Failed to send friend request');
                 }
             })
             .catch(error => {
@@ -277,8 +278,9 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests }) {
             .then(response => {
                 if (response.ok) {
                     setRequestSent(false);
+                    updatePendingSentRequests(id, false);
                 } else {
-                    alert('Failed to send friend request');
+                    console.log('Failed to unsend friend request');
                 }
             })
             .catch(error => {
