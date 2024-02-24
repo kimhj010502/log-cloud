@@ -52,34 +52,38 @@ function ManageFriendsPage() {
         fetchFriendInfo();
     }, []);
 
-    async function fetchSearchResult(searchString) {
-        try {
-            const response = await fetch('/search_user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({'searchString': searchString}),
-            });
-            if (response.ok) {
-                const data = await response.json();
-                // console.log(data);
-                setSearchResult(data.users);
-            } else {
-                console.log('Error fetching friend data');
-                setSearchResult([]);
+    useEffect(() => {
+        async function fetchSearchResult() {
+            try {
+                const response = await fetch('/search_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({'searchString': friendUsername}),
+                });
+                if (response.status===200) {
+                    const data = await response.json();
+                    // console.log(data);
+                    setSearchResult(data.users);
+                } else if (response.status===202) {
+                    setSearchResult([]);
+                } else {
+                    console.log('Error fetching friend data');
+                    setSearchResult([]);
+                }
+            } catch (error) {
+            console.error('Error fetching data:', error);
             }
-        } catch (error) {
-        console.error('Error fetching data:', error);
         }
-    }
+        fetchSearchResult();
+    }, [friendUsername]);
 
     const handleSetFriendName = (e) => {
         setFriendUsername(e.target.value);
-        console.log(friendUsername);
+        // console.log(friendUsername);
 
-        fetchSearchResult(friendUsername);
     };
 
     return (

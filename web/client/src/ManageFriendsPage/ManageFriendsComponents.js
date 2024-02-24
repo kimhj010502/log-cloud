@@ -184,7 +184,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
             // setIsFriends(friendList.length > 0);
             const result = friendList.filter(friend => friend.toLowerCase().includes(searchString.toLowerCase()));
             setSearchResult(result);
-            setIsFriends(result.length > 0)
+            // setIsFriends(result.length > 0)
         }
     }, [friendList, searchString]);
 
@@ -192,15 +192,13 @@ export function SearchingMyFriends({ friendList, searchString }) {
         <div className='searching-my-friends-box'>
             <div className='searching-my-friends-header'>my friends</div>
 
-            { isFriends && (
+            { searchResult.length > 0 ? (
                 <div className='searching-friends-box'>
                     {searchResult.map((username, index) => (
                         <FriendProfile key={index} img_src='profile.png' id={username} />
                     ))}
                 </div>
-            )}
-
-            { !isFriends && (
+            ) : (
                 <div className='searching-no-friend'>no user found</div>
             )}
         </div>
@@ -235,7 +233,7 @@ export function SearchingMoreResults({ searchResult }) {
 }
 
 
-function MoreResultProfile({ key, img_src, id }) {
+function MoreResultProfile({ img_src, id }) {
     const [follow, setFollow] = useState(false);
 
     const handleFollow = () => {

@@ -530,7 +530,7 @@ def search_user():
 								User.username != username)).all()
 	
 	if not users:
-		return jsonify("no user exists with the search string"), 204
+		return jsonify({"users": []}), 204
 	
 	user_list = [user.username for user in users]
 	
