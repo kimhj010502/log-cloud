@@ -234,10 +234,34 @@ export function SearchingMoreResults({ searchResult }) {
 
 
 function MoreResultProfile({ img_src, id }) {
-    const [follow, setFollow] = useState(false);
+    const [friendRequest, setFriendRequest] = useState(false);
 
     const handleFollow = () => {
-        setFollow(!follow)
+        setFriendRequest(!friendRequest)
+        if (friendRequest) {
+            console.log("unsend friend requst");
+            // use /unsend_friend_request api
+        } else {
+            console.log("send request");
+            fetch('/send_friend_request', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "friend_username": id }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    setFriendRequest(true);
+                } else {
+                    console.error('Failed to send friend request');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending friend request:', error);
+            });
+        }
     };
 
     return (
@@ -250,10 +274,10 @@ function MoreResultProfile({ img_src, id }) {
                 {id}
             </div>
             
-            { follow && (
+            { friendRequest && (
                 <div className='request-sent' onClick={handleFollow}>request sent!</div>
             )}
-            { !follow && (
+            { !friendRequest && (
                 <div className='follow-button' onClick={handleFollow}>＋</div>
             )}
         </div>
