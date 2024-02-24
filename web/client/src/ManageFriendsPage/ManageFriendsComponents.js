@@ -15,25 +15,29 @@ export function ManageFriendsHeader() {
 }
 
 
-export function PendingRequests() {
-    const [isRequests, setIsRequests] = useState(true) //요청이 0개이면 false로 설정
+export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }) {
+    const [isRequests, setIsRequests] = useState(false)
+
+    useEffect(() => {
+        if (pendingReceivedRequests){
+            setIsRequests(pendingReceivedRequests.length > 0);
+        }
+    }, [pendingReceivedRequests]);
 
     return (
         <div className='pending-requests-box'>
             <div className='pending-requests-header'>pending requests</div>
 
-            {/* 개수만큼 반복 */}
             { isRequests && (
                 <div className='requests-box'>
-                    <RequestsProfile img_src='profile.png' id='user1' />
-                    <RequestsProfile img_src='profile.png' id='user2' />
-                    <RequestsProfile img_src='profile.png' id='user3' />
-                    <RequestsProfile img_src='profile.png' id='user4' />
+                    {pendingReceivedRequests.map((username, index) => (
+                        <RequestsProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
             )}
 
             { !isRequests && (
-                <div className='no-request'>팔로우를 요청한 친구가 없습니다.</div>
+                <div className='no-request'>no requests just yet.</div>
             )}
         </div>
     )
@@ -59,27 +63,30 @@ function RequestsProfile({ img_src, id}) {
     )
 }
 
-export function MyFriends() {
-    const [isFriends, setIsFriends] = useState(true) //친구가 0명이면 false로 설정
+export function MyFriends({ friendList }) {
+    const [isFriends, setIsFriends] = useState(false);
+    const username = sessionStorage.getItem('username');
+
+    useEffect(() => {
+        if (friendList){
+            setIsFriends(friendList.length > 0);
+        }
+    }, [friendList]);
 
     return (
         <div className='my-friends-box'>
             <div className='my-friends-header'>my friends</div>
 
-            {/* 친구 명수만큼 반복 */}
             { isFriends && (
                 <div className='friends-box'>
-                    <FriendProfile img_src='profile.png' id='user1' />
-                    <FriendProfile img_src='profile.png' id='user2' />
-                    <FriendProfile img_src='profile.png' id='user3' />
-                    <FriendProfile img_src='profile.png' id='user4' />
-                    <FriendProfile img_src='profile.png' id='user5' />
-                    <FriendProfile img_src='profile.png' id='user6' />
+                    {friendList.map((username, index) => (
+                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
             )}
 
             { !isFriends && (
-                <div className='no-friend'>친구가 없습니다.</div>
+                <div className='no-friend'>search to add your friends!</div>
             )}
         </div>
     )

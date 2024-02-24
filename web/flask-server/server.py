@@ -473,8 +473,7 @@ def analysisReport():
 
 @app.route('/get_friend_list', methods=['POST'])
 def get_friend_list():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	
 	friend_list = []
 	pending_received_request_list = []
@@ -504,7 +503,7 @@ def get_friend_list():
 	
 	if friend_list or pending_received_request_list or pending_sent_request_list:
 		return jsonify({"friends": friend_list,
-						"pending_received_requests:": pending_received_request_list,
+						"pending_received_requests": pending_received_request_list,
 						"pending_sent_requests": pending_sent_request_list}), 200
 	else:
 		return jsonify("Nothing to send"), 404
@@ -512,8 +511,7 @@ def get_friend_list():
 
 @app.route('/search_user', methods=['POST'])
 def search_user():
-	# username = session.get("user_id")
-	username = request.json['username']
+	username = session.get("user_id")
 	search_string = request.json['search_string']
 	
 	friend_list = []
