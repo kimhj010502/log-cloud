@@ -199,6 +199,7 @@ async function handleLogout() {
             const data = await response.json();
             // console.log('Logging out...');
             console.log(data);
+            sessionStorage.clear();
             // return {username: data.username, createdAt: data.createdAt};
         }
 
