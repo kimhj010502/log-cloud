@@ -43,7 +43,51 @@ export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }
     )
 }
 
-function RequestsProfile({ img_src, id}) {
+function RequestsProfile({ img_src, id }) {
+    function handleAcceptFriendRequest(friend_username) {
+        fetch('/accept_friend_request', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <accept-box> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to accept friend request');
+            }
+        })
+        .catch(error => {
+            console.error('Error accepting friend request:', error);
+        });
+    }
+
+    function handleDeclineFriendRequest(friend_username) {
+        fetch('/reject_friend_request', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <accept-box> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to reject friend request');
+            }
+        })
+        .catch(error => {
+            console.error('Error rejecting friend request:', error);
+        });
+    }
+
     return (
         <div className='request-box'>
             <div className="request-img">
@@ -55,9 +99,9 @@ function RequestsProfile({ img_src, id}) {
             </div>
 
             <div className='accept-box'>
-                <div className='accept-button'>Accept</div>
+                <div className='accept-button' onClick={() => handleAcceptFriendRequest(id)}>Accept</div>
                 <div className='middle-line'>|</div>
-                <div className='decline-button'>Decline</div>
+                <div className='decline-button' onClick={() => handleDeclineFriendRequest(id)}>Decline</div>
             </div>
         </div>
     )
@@ -65,7 +109,6 @@ function RequestsProfile({ img_src, id}) {
 
 export function MyFriends({ friendList }) {
     const [isFriends, setIsFriends] = useState(false);
-    const username = sessionStorage.getItem('username');
 
     useEffect(() => {
         if (friendList){
@@ -93,6 +136,28 @@ export function MyFriends({ friendList }) {
 }
 
 function FriendProfile({ img_src, id }) {
+    function handleRemoveFriend(friend_username) {
+        fetch('/remove_friend', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <FriendProfile> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to remove friend');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing friend:', error);
+        });
+    }
+
     return (
         <div className='friend-box'>
             <div className="friend-img">
@@ -103,7 +168,7 @@ function FriendProfile({ img_src, id }) {
                 {id}
             </div>
 
-            <div className='delete-button'>×</div>
+            <div className='delete-button' onClick={() => handleRemoveFriend(id)}>×</div>
         </div>
     )
 }

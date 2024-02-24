@@ -625,11 +625,12 @@ def accept_friend_request():
 def remove_friend():
 	username = session.get("user_id")
 	friend_username = request.json['friend_username']
+	print(username, friend_username)
 	
 	friend = socialNetwork.query.filter(
-		((socialNetwork.username1 == friend_username) | (socialNetwork.username2 == username))
-		& (socialNetwork.state == 1)).all()
-	
+		(((socialNetwork.username1 == friend_username) & (socialNetwork.username2 == username))
+		 | ((socialNetwork.username1 == username) & (socialNetwork.username2 == friend_username)))
+		 & (socialNetwork.state == 1)).all()
 	print(friend)
 	
 	if not friend:
