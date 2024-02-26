@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
+import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 export async function getUserInfo() {
     try {
