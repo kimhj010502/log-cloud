@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Link, useNavigate  } from 'react-router-dom'
-import { ArrowLeftOutlined, TeamOutlined, LockOutlined, HeartOutlined, HeartFilled, MessageFilled, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, TeamOutlined, LockOutlined, DeleteOutlined, HeartOutlined, HeartFilled, MessageFilled, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons'
 
 export function LogHeader() {
     const navigate = useNavigate();
@@ -33,6 +33,8 @@ export function DatePublic({ date, isPublic }) {
             {!isPublic && (
                 <LockOutlined className="detail-icon" />
             )}
+
+            <DeleteOutlined className="detail-icon" />
         </div>
     )
 }

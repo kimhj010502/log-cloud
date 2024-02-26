@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import './Routing.css'
 
 import App from '../AppPage/App'
@@ -24,7 +24,6 @@ import Record from '../RecordPage/Record'
 import Upload from '../UploadPage/Upload'
 import Save from '../SavePage/Save'
 import Edit from '../EditPage/Edit'
-
 
 function Routing() {
     return (

@@ -33,7 +33,7 @@
     float: left;
 	color: white;
 	height: 30px;
-	width: 330px;
+	width: 290px;
     font-size: 19px;
     font-weight: normal;
     margin-top: -3px;
@@ -46,6 +46,7 @@
     width: 23px;
     font-size: 23px;
     float: left;
+    margin-left: 10px;
 }
 
 /* 동영상 재생 */

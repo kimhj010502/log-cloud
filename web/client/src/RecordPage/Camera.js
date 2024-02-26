@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PictureOutlined, PictureFilled, SyncOutlined } from '@ant-design/icons'
 import Webcam from 'react-webcam';
+import Loading from '../Routing/Loading'
 
 
 //카메라 화면
@@ -33,6 +34,9 @@ export function checkBrowser() {
 }
 
 export function CameraRecord() {
+    const [loading, setLoading] = useState(false);
+
+
     //카메라 전환
     const [facingMode, setFacingMode] = React.useState(FACING_MODE_USER);
     const [mirrorMode, setMirrorMode] = React.useState(false);
@@ -103,7 +107,7 @@ export function CameraRecord() {
 
     useEffect(() => {
         // selectedVideo가 변경되었을 때만 uploadButton.click()을 호출
-        const uploadButton = document.querySelector('.upload-button .upload-link div');
+        const uploadButton = document.querySelector('.upload-button .upload-link');
         if (uploadButton && selectedVideo) {
             uploadButton.click();
         }
@@ -115,6 +119,15 @@ export function CameraRecord() {
         }
     }, [fileInputRef]);
 
+    const [videoInfo, setVideoInfo] = useState(null);
+    const navigate = useNavigate();
+
+    function wait(seconds) {
+        return new Promise(resolve => {
+            setTimeout(resolve, seconds * 1000);
+        });
+    }
+    
 
     //영상 서버에 업로드
     const handleUpload = async (selectedVideo) => {
@@ -126,23 +139,27 @@ export function CameraRecord() {
             formData.append('video', selectedVideo);
 
             try {
+                setLoading(true)
                 const response = await fetch('/record', {
                     method: 'POST',
                     headers: {},
                     body: formData,
-                }).then(response => {
+                })
+                
+                if (response.ok) {
                     console.log(response)
                     if (response.status === 200) {
-                        console.log('성공');
+                        const data = await response.json();
+                        setLoading(false)
+                        navigate('/upload', { state: { prevURL: '/record', videoInfo: JSON.stringify(data.video_info) } });
                     }
                     if (response.status === 400) {
-                        console.log('Error during video upload:');
+                        console.log('Error during video upload: 400');
                     }
-                });
-
+                }
             } 
             catch (error) {
-                console.error('Error during video upload:', error);
+                console.err('Error during video upload:', error);
             }
         } 
 
@@ -154,19 +171,24 @@ export function CameraRecord() {
             console.log('영상 녹화 완료')
 
             try {
+                setLoading(true)
                 const response = await fetch('/record', {
                     method: 'POST',
                     headers: {},
                     body: formData,
-                }).then(response => {
+                })
+
+                if (response.ok) {
                     console.log(response)
                     if (response.status === 200) {
-                        console.log('성공');
+                        const data = await response.json();
+                        setLoading(false)
+                        navigate('/upload', { state: { prevURL: '/record', videoInfo: JSON.stringify(data.video_info) } });
                     }
                     if (response.status === 400) {
                         console.log('Error during video upload:');
                     }
-                });
+                }
             } 
             catch (error) {
                 console.error('Error during video upload:', error);
@@ -177,9 +199,12 @@ export function CameraRecord() {
             console.log('No video recorded.');
         }
     };
+
     
     return (
         <>
+        {loading ? <Loading /> : null}
+
         <div className="camera-box">
             <Webcam 
             audio={true}
@@ -227,9 +252,9 @@ export function CameraRecord() {
         </div>
 
         <div className="upload-button">
-            <Link to={'/upload'} state={{ prevURL: '/record' }} className="upload-link">
-                <div onClick={() => handleUpload(selectedVideo)}>UPLOAD</div>
-            </Link>
+            {/* <Link to={'/upload'} state={{ prevURL: '/record', videoInfo: videoInfo }} className="upload-link"> */}
+            <div onClick={() => handleUpload(selectedVideo)} className="upload-link">UPLOAD</div>
+            {/* </Link> */}
         </div>
         </>
     );

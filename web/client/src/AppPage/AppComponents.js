@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
@@ -23,7 +23,6 @@ export async function getUserInfo() {
 
 //이번 달 달력
 export function Calendar() {
-
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
@@ -153,12 +152,45 @@ export function Calendar() {
 
 //카메라 버튼
 export function CameraButton() {
+    let date = new Date();
+    const todayYear = date.getFullYear();
+    const todayMonth = date.getMonth() + 1;
+    const todayDate = date.getDate();
+
+    const navigate = useNavigate();
+
+    const handleAddLog = async() => {
+        try {
+            const response = await fetch('/add_log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ upload_date: [todayYear, todayMonth, todayDate] }),
+            });
+
+            if (response.ok) {
+                console.log(response)
+                if (response.status === 200) {
+                    const data = await response.json();
+                    navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
+                }
+                if (response.status === 400) {
+                    console.log('Error during adding log: 400');
+                }
+            }
+
+        } catch (error) {
+            console.error('Error adding log:', error);
+        }
+    };
+
     return (
-        <Link to={'/record'} state={{ prevURL: '/' }}>
+        // <Link to={'/record'} state={{ prevURL: '/', videoInfo: JSON.stringify(data.video_info) }}>
             <div className="camera">
-                <button className="camera-button"></button>
+                <button className="camera-button" onClick={handleAddLog}></button>
             </div>
-        </Link>
+        // </Link>
     )
 }
 
@@ -172,6 +204,23 @@ export function Navigation() {
     let isSearch = (page === '/search')
     let isAnalysis = (page === '/analysis')
     let isProfile = (page === '/profile')
+
+    const [username, setUsername] = useState(sessionStorage.getItem('username'));
+
+    if (!username ) {
+        const user = getUserInfo();
+
+        setUsername(user.username);
+        sessionStorage.setItem('username', username);
+    }
+
+    const [profileImgSrc, setProfileImgSrc] = useState(sessionStorage.getItem('myProfileImg'));
+
+    if (!profileImgSrc) {
+        const userProfileImage = getProfileImage(username);
+        setProfileImgSrc(userProfileImage);
+        sessionStorage.setItem('myProfileImg', userProfileImage);
+    }
 
     return (
         <div className="navigation">
@@ -215,12 +264,12 @@ export function Navigation() {
             <Link to={'/profile'}>
             {isProfile && (
                 <div className="profile-select">
-                <img className="profile-img" src="profile.png" alt="profile img"/>
+                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
             </div>
             )}
             {!isProfile && (
                 <div className="profile">
-                <img className="profile-img" src="profile.png" alt="profile img"/>
+                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
             </div>
             )}
             </Link>

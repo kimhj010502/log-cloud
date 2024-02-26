@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom'
 import { ArrowLeftOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons'
 import Switch, { switchClasses } from '@mui/joy/Switch';
 
-export function LogDate(handleButtonClick) {
-    let date = new Date()
-    let nowY = date.getFullYear()
-    let nowM = date.getMonth()
-    let nowD = date.getDate()
+export function LogDate(handleButtonClick, upload_date) {
+    let nowY = upload_date[0]
+    let nowM = upload_date[1]
+    let nowD = upload_date[2]
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    let currentMonthName = monthNames[nowM]
+    let currentMonthName = monthNames[nowM - 1]
 
     return (
         <div className="date-box">
@@ -99,14 +98,7 @@ function ToggleSwitch({ label, onChange, checked }) {
     );
 }
   
-export function Toggle() {
-    const [switches, setSwitches] = useState({
-        bgm: false,
-        summary: false,
-        hashtag: false,
-        public: false,
-    });
-  
+export function Toggle({ switches, setSwitches }) {
     const handleSwitchChange = (id) => (event) => {
         setSwitches((prevSwitches) => ({
             ...prevSwitches,
@@ -146,8 +138,7 @@ export function Toggle() {
 
 
 
-export function SelectEmotion() {
-    const [emotion, setEmotion] = useState(null);
+export function SelectEmotion({ emotion, setEmotion }) {
     const handleItemClick = (index) => {
         setEmotion(index);
     };
@@ -202,11 +193,11 @@ export function SelectEmotion() {
 }
 
 
-export function NextButton() {
+export function NextButton({ handleUpload }) {
     return (
         <div className="next-button">
             <Link to={'/save'} state={{ prevURL: '/upload' }} className="next-link">
-                <div>NEXT</div>
+                <div onClick={handleUpload}>NEXT</div>
             </Link>
         </div>
     )

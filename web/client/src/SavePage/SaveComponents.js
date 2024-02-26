@@ -99,7 +99,7 @@ export function Scope({ isPublic }) {
 export function EditButton() {
     return (
         <div className="edit-button">
-            <Link to={'/edit'} state={{ prevURL: '/save' }} class="edit-link">
+            <Link to={'/edit'} state={{ prevURL: '/save' }} className="edit-link">
                 <div>EDIT</div>
             </Link>
         </div>
@@ -109,7 +109,7 @@ export function EditButton() {
 export function SaveButton() {
     return (
         <div className="save-button">
-            <Link to={'/'} state={{ prevURL: '/save' }} class="save-link">
+            <Link to={'/'} state={{ prevURL: '/save' }} className="save-link">
                 <div>SAVE</div>
             </Link>
         </div>

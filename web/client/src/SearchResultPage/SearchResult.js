@@ -5,21 +5,43 @@ import { Navigation } from '../AppPage/AppComponents'
 import { SearchHeader, SelectedValue, Result } from './SearchResultComponents'
 import './SearchResult.css'
 
+
+async function fetchData(selectedValue){
+    try {
+        const response = await fetch('/searchresult', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ selectedValue }),
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Sending data', error);
+        throw error;
+        }
+}
+
+
 function SearchResultPage() {
     const location = useLocation();
     const selectedValue = location.state;
-
+    
     const [data, setData] = useState([{}])
-    useEffect(() => {
-        fetch("/socialdetail").then(
-            res => res.json()
-        ).then(
-            data => {
-                setData(data)
-                console.log(data)
-            })
-    }, []);
 
+    useEffect(() => {
+        fetchData(selectedValue)
+            .then(data => {
+                setData(data);
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data', error);
+            });
+    }, [selectedValue]);
+    
     return (
         <div className="search-result-page">
 
@@ -36,16 +58,16 @@ function SearchResultPage() {
                 <SelectedValue selectedValue={selectedValue} />
 
                 <div className='results-box'>
-                    <Result date={data.date} cover_img_src="test_image.jpg" />
-                    <Result date={data.date} cover_img_src="test_image.jpg" />
+                    {data.map((cont) => (
+                        <Result date={cont? cont.date: null} cover_img_src={cont? cont.coverImg: null} />
+                    ))
+                }
                 </div>
-            
                 </motion.div>
             </AnimatePresence>
             <Navigation />
         </div>
     )
 }
-
 
 export default SearchResultPage

@@ -6,6 +6,9 @@ import { LogDate } from './RecordComponents';
 import './Record.css'
 
 function Record() {
+    //sessionStorage.removeItem('video_info');
+    console.log(sessionStorage)
+
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)
 
@@ -23,6 +26,7 @@ function Record() {
 
     const location = useLocation();
     const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
+    const uploadDate = JSON.parse(location.state?.uploadDate); 
 
     useEffect(() => {
         let [name, videoType] = checkBrowser()
@@ -43,7 +47,7 @@ function Record() {
                 transition={{ duration: 0.5 }}
                 className="record-page"
                 >
-                    {LogDate(handleButtonClick)}
+                    {LogDate(handleButtonClick, uploadDate)}
 
                     <CameraRecord />
 
@@ -59,7 +63,7 @@ function Record() {
                 transition={{ duration: 0.5 }}
                 className="record-page"
                 >
-                    {LogDate(handleButtonClick)}
+                    {LogDate(handleButtonClick, uploadDate)}
 
                     <CameraRecord />
 

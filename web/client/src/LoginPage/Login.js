@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
+import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -69,6 +70,14 @@ function LoginPage() {
             if (response.ok) {
                 // const data = await response.json();
                 if (response.status === 200) {
+                    const data = await response.json();
+
+                    sessionStorage.setItem('username', data.username);
+                    sessionStorage.setItem('createdAt', new Date(data.createdAt).getFullYear());
+                    // sessionStorage.setItem('email', data.email);
+
+                    sessionStorage.setItem('myProfileImg', await getProfileImage(data.username));
+
                     navigate("/", { replace: true });
                 }
             } else if (response.status === 401) {

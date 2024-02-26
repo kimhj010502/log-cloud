@@ -115,6 +115,11 @@
 	width: 150px;
 	height: 60px;
 	text-align: center;
+	cursor: pointer;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none
 }
 
 .upload-link {
