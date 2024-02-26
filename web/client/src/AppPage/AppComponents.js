@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
-import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 export async function getUserInfo() {
     try {
@@ -24,7 +23,6 @@ export async function getUserInfo() {
 
 //이번 달 달력
 export function Calendar() {
-
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
@@ -154,19 +152,52 @@ export function Calendar() {
 
 //카메라 버튼
 export function CameraButton() {
+    let date = new Date();
+    const todayYear = date.getFullYear();
+    const todayMonth = date.getMonth() + 1;
+    const todayDate = date.getDate();
+
+    const navigate = useNavigate();
+
+    const handleAddLog = async() => {
+        try {
+            const response = await fetch('/add_log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ upload_date: [todayYear, todayMonth, todayDate] }),
+            });
+
+            if (response.ok) {
+                console.log(response)
+                if (response.status === 200) {
+                    const data = await response.json();
+                    navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
+                }
+                if (response.status === 400) {
+                    console.log('Error during adding log: 400');
+                }
+            }
+
+        } catch (error) {
+            console.error('Error adding log:', error);
+        }
+    };
+
     return (
-        <Link to={'/record'} state={{ prevURL: '/' }}>
+        // <Link to={'/record'} state={{ prevURL: '/', videoInfo: JSON.stringify(data.video_info) }}>
             <div className="camera">
-                <button className="camera-button"></button>
+                <button className="camera-button" onClick={handleAddLog}></button>
             </div>
-        </Link>
+        // </Link>
     )
 }
 
 //내비게이션 바
 export function Navigation() {
     const location = useLocation();
-    const page = location.pathname;
+    const page = location.pathname
 
     let isHome = (page === '/')
     let isSocial = ((page === '/social') || (page === '/social-feed'))
@@ -191,7 +222,6 @@ export function Navigation() {
         sessionStorage.setItem('myProfileImg', userProfileImage);
     }
 
-
     return (
         <div className="navigation">
             <hr />
@@ -212,7 +242,7 @@ export function Navigation() {
                     <TeamOutlined className="icon"/>
                 )}
             </Link>
-
+            
             <Link to={'/search'}>
                 {isSearch && (
                     <SearchOutlined className="icon-select"/>
