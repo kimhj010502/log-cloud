@@ -1,13 +1,30 @@
+import calendar
+import os
+from uuid import uuid4
+
 from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
+import pymysql
+
+from PIL import Image
+import io
+
+from sqlalchemy import extract, asc, or_
+from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
-app = Flask(__name__)
+from datetime import datetime, timedelta
+import pandas as pd
+import cv2
 
+import paramiko
+from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
+
+app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 
 CORS(app, supports_credentials=True)
@@ -18,8 +35,6 @@ db.init_app(app)
 with app.app_context():
 	db.create_all()
 
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD
 
 # SCP 연결 설정
 ssh_client = paramiko.SSHClient()
@@ -33,12 +48,39 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
+from server_khj import record_video, select_option, add_log
+
+@app.route('/add_log', methods=['POST'])
+def add_log_route():
+	return add_log(request, session)
+
+@app.route('/record', methods=['POST'])
+def record_video_route():
+	return record_video(request, session)
+
+@app.route('/upload', methods=['POST'])
+def select_option_route():
+	return select_option(request, session)
+
+
+
+from server_jjh import analysisReport, searchResult
+
+@app.route("/analysisReport", methods=['POST', 'GET'])
+def analysisReport_route():
+   return analysisReport(request, session)
+
+
+@app.route('/searchresult', methods=['POST','GET'])
+def searchResult_route():
+   return searchResult(request, session)
+
+
+
 from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
 	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
 	get_log_overview_of_month, send_friend_request, search_user, get_friend_list, log_detail, unsend_friend_request, \
 	reject_friend_request, accept_friend_request, remove_friend, logout_user
-
-
 
 @app.route("/generateDetails")
 def generate_details():
@@ -151,6 +193,7 @@ def accept_friend_request_route():
 @app.route('/remove_friend', methods=['POST'])
 def remove_friend_route():
 	return remove_friend(request, session)
+
 
 
 if __name__ == "__main__":
