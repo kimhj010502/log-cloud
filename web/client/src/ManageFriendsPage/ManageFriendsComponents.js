@@ -15,31 +15,79 @@ export function ManageFriendsHeader() {
 }
 
 
-export function PendingRequests() {
-    const [isRequests, setIsRequests] = useState(true) //요청이 0개이면 false로 설정
+export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }) {
+    const [isRequests, setIsRequests] = useState(false)
+
+    useEffect(() => {
+        if (pendingReceivedRequests){
+            setIsRequests(pendingReceivedRequests.length > 0);
+        }
+    }, [pendingReceivedRequests]);
 
     return (
         <div className='pending-requests-box'>
             <div className='pending-requests-header'>pending requests</div>
 
-            {/* 개수만큼 반복 */}
             { isRequests && (
                 <div className='requests-box'>
-                    <RequestsProfile img_src='profile.png' id='user1' />
-                    <RequestsProfile img_src='profile.png' id='user2' />
-                    <RequestsProfile img_src='profile.png' id='user3' />
-                    <RequestsProfile img_src='profile.png' id='user4' />
+                    {pendingReceivedRequests.map((username, index) => (
+                        <RequestsProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
             )}
 
             { !isRequests && (
-                <div className='no-request'>팔로우를 요청한 친구가 없습니다.</div>
+                <div className='no-request'>no requests yet..</div>
             )}
         </div>
     )
 }
 
-function RequestsProfile({ img_src, id}) {
+function RequestsProfile({ img_src, id }) {
+    function handleAcceptFriendRequest(friend_username) {
+        fetch('/accept_friend_request', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <accept-box> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to accept friend request');
+            }
+        })
+        .catch(error => {
+            console.error('Error accepting friend request:', error);
+        });
+    }
+
+    function handleDeclineFriendRequest(friend_username) {
+        fetch('/reject_friend_request', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <accept-box> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to reject friend request');
+            }
+        })
+        .catch(error => {
+            console.error('Error rejecting friend request:', error);
+        });
+    }
+
     return (
         <div className='request-box'>
             <div className="request-img">
@@ -51,41 +99,65 @@ function RequestsProfile({ img_src, id}) {
             </div>
 
             <div className='accept-box'>
-                <div className='accept-button'>Accept</div>
+                <div className='accept-button' onClick={() => handleAcceptFriendRequest(id)}>Accept</div>
                 <div className='middle-line'>|</div>
-                <div className='decline-button'>Decline</div>
+                <div className='decline-button' onClick={() => handleDeclineFriendRequest(id)}>Decline</div>
             </div>
         </div>
     )
 }
 
-export function MyFriends() {
-    const [isFriends, setIsFriends] = useState(true) //친구가 0명이면 false로 설정
+export function MyFriends({ friendList }) {
+    const [isFriends, setIsFriends] = useState(false);
+
+    useEffect(() => {
+        if (friendList){
+            setIsFriends(friendList.length > 0);
+        }
+    }, [friendList]);
 
     return (
         <div className='my-friends-box'>
             <div className='my-friends-header'>my friends</div>
 
-            {/* 친구 명수만큼 반복 */}
             { isFriends && (
                 <div className='friends-box'>
-                    <FriendProfile img_src='profile.png' id='user1' />
-                    <FriendProfile img_src='profile.png' id='user2' />
-                    <FriendProfile img_src='profile.png' id='user3' />
-                    <FriendProfile img_src='profile.png' id='user4' />
-                    <FriendProfile img_src='profile.png' id='user5' />
-                    <FriendProfile img_src='profile.png' id='user6' />
+                    {friendList.map((username, index) => (
+                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
             )}
 
             { !isFriends && (
-                <div className='no-friend'>친구가 없습니다.</div>
+                <div className='no-friend'>search to add your friends!</div>
             )}
         </div>
     )
 }
 
 function FriendProfile({ img_src, id }) {
+    function handleRemoveFriend(friend_username) {
+        fetch('/remove_friend', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "friend_username": friend_username }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // remove current <FriendProfile> tag
+                window.location.reload();
+            } else {
+                console.error('Failed to remove friend');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing friend:', error);
+        });
+    }
+
     return (
         <div className='friend-box'>
             <div className="friend-img">
@@ -96,72 +168,125 @@ function FriendProfile({ img_src, id }) {
                 {id}
             </div>
 
-            <div className='delete-button'>×</div>
+            <div className='delete-button' onClick={() => handleRemoveFriend(id)}>×</div>
         </div>
     )
 }
 
 
 // search result
-export function SearchingMyFriends() {
-    const [isFriends, setIsFriends] = useState(true) //친구가 0명이면 false로 설정
+export function SearchingMyFriends({ friendList, searchString }) {
+    const [isFriends, setIsFriends] = useState(true);
+    const [searchResult, setSearchResult] = useState([]);
+
+    useEffect(() => {
+        if (friendList){
+            // setIsFriends(friendList.length > 0);
+            const result = friendList.filter(friend => friend.toLowerCase().includes(searchString.toLowerCase()));
+            setSearchResult(result);
+            // setIsFriends(result.length > 0)
+        }
+    }, [friendList, searchString]);
 
     return (
         <div className='searching-my-friends-box'>
             <div className='searching-my-friends-header'>my friends</div>
 
-            {/* 검색 결과에 맞는 친구 명수만큼 반복 */}
-            { isFriends && (
+            { searchResult.length > 0 ? (
                 <div className='searching-friends-box'>
-                    <FriendProfile img_src='profile.png' id='user1' />
-                    <FriendProfile img_src='profile.png' id='user2' />
-                    <FriendProfile img_src='profile.png' id='user3' />
-                    <FriendProfile img_src='profile.png' id='user4' />
-                    <FriendProfile img_src='profile.png' id='user5' />
-                    <FriendProfile img_src='profile.png' id='user6' />
+                    {searchResult.map((username, index) => (
+                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                    ))}
                 </div>
-            )}
-
-            { !isFriends && (
-                <div className='searching-no-friend'>검색한 아이디의 친구가 없습니다.</div>
+            ) : (
+                <div className='searching-no-friend'>no user found</div>
             )}
         </div>
     )
 }
 
 
-export function SearchingMoreResults() {
-    const [isMoreResults, setIsMoreResults] = useState(true) //친구가 0명이면 false로 설정
+export function SearchingMoreResults({ searchResult, pendingSentRequests, updatePendingSentRequests }) {
+    const [isMoreResults, setIsMoreResults] = useState(false);
+
+    useEffect(() => {
+        if (searchResult){
+            setIsMoreResults(searchResult.length > 0);
+        }
+    }, [searchResult]);
 
     return (
         <div className='searching-more-results-box'>
             <div className='searching-more-results-header'>more results</div>
 
-            {/* 검색 결과에 맞는 친구 명수만큼 반복 */}
-            { isMoreResults && (
+            { isMoreResults ? (
                 <div className='searching-results-box'>
-                    <MoreResultProfile img_src='profile.png' id='user1' />
-                    <MoreResultProfile img_src='profile.png' id='user2' />
-                    <MoreResultProfile img_src='profile.png' id='user3' />
-                    <MoreResultProfile img_src='profile.png' id='user4' />
-                    <MoreResultProfile img_src='profile.png' id='user5' />
-                    <MoreResultProfile img_src='profile.png' id='user6' />
+                    {searchResult.map((username, index) => (
+                        <MoreResultProfile key={index} img_src='profile.png' id={username} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
+                    ))}
                 </div>
-            )}
-
-            { !isMoreResults && (
-                <div className='searching-no-result'>검색한 아이디의 사용자가 없습니다.</div>
+            ) : (
+                <div className='searching-no-result'>no users found</div>
             )}
         </div>
-    )
+    );
 }
 
 
-function MoreResultProfile({ img_src, id }) {
-    const [follow, setFollow] = useState(false);
+function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePendingSentRequests }) {
+    const [requestSent, setRequestSent] = useState(false);
 
-    const handleFollow = () => {
-        setFollow(!follow)
+    useEffect(() => {
+        if (pendingSentRequests.includes(id)) {
+            setRequestSent(true);
+        }
+    }, [pendingSentRequests, id]);
+
+    const handleSendRequest = () => {
+        if (!requestSent) {
+            console.log("send request");
+            fetch('/send_friend_request', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "friend_username": id }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    setRequestSent(true);
+                    updatePendingSentRequests(id, true);
+                } else {
+                    console.error('Failed to send friend request');
+                }
+            })
+            .catch(error => {
+                console.error('Error unsending friend request:', error);
+            });
+
+        } else {
+            console.log("unsend friend requst");
+            fetch('/unsend_friend_request', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "friend_username": id }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    setRequestSent(false);
+                    updatePendingSentRequests(id, false);
+                } else {
+                    console.log('Failed to unsend friend request');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending friend request:', error);
+            });
+        }
     };
 
     return (
@@ -174,11 +299,10 @@ function MoreResultProfile({ img_src, id }) {
                 {id}
             </div>
             
-            { follow && (
-                <div className='request-sent' onClick={handleFollow}>request sent!</div>
-            )}
-            { !follow && (
-                <div className='follow-button' onClick={handleFollow}>＋</div>
+            { requestSent ? (
+                <div className='request-sent' onClick={handleSendRequest}>request sent!</div>
+            ) : (
+                <div className='follow-button' onClick={handleSendRequest}>＋</div>
             )}
         </div>
     )

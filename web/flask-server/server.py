@@ -47,6 +47,7 @@ ssh_port = SSH_PORT
 ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
+
 from server_khj import record_video, select_option, add_log
 
 @app.route('/add_log', methods=['POST'])
@@ -74,12 +75,12 @@ def analysisReport_route():
 def searchResult_route():
    return searchResult(request, session)
 
+
+
 from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
 	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
 	get_log_overview_of_month, send_friend_request, search_user, get_friend_list, log_detail, unsend_friend_request, \
 	reject_friend_request, accept_friend_request, remove_friend, logout_user
-
-
 
 @app.route("/generateDetails")
 def generate_details():

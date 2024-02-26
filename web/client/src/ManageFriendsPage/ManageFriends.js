@@ -6,23 +6,94 @@ import { ManageFriendsHeader, PendingRequests, MyFriends, SearchingMyFriends, Se
 import './ManageFriends.css'
 
 function ManageFriendsPage() {
-    const [friendName, setFriendName] = useState(null);
+    const [friendUsername, setFriendUsername] = useState("");
     const [isSearching, setIsSearching] = useState(false);
-    
+
+    const [friendList, setFriendList] = useState([]);
+    const [pendingReceivedRequests, setPendingReceivedRequests] = useState([]);
+    const [pendingSentRequests, setPendingSentRequests] = useState([]);
+
+    const [searchResult, setSearchResult] = useState([]);
+
+
+    const updatePendingSentRequests = (friendUsername, isSent) => {
+        if (isSent) {
+            setPendingSentRequests([...pendingSentRequests, friendUsername]);
+        } else {
+            setPendingSentRequests(pendingSentRequests.filter(username => username !== friendUsername));
+        }
+    };
+
+
     useEffect(() => {
         //검색중인지 확인
-        if (friendName !== undefined && friendName != null && friendName != "") {
-            setIsSearching(true)
+        if (friendUsername !== "") {
+            setIsSearching(true);
         }
         else {
-            setIsSearching(false)
+            setIsSearching(false);
         }
-    }, [friendName]);
+    }, [friendUsername]);
 
+    useEffect(() => {
+        async function fetchFriendInfo() {
+            try {
+                const response = await fetch('/get_friend_list', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    // body: JSON.stringify({ username: sessionStorage.getItem('username') })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // console.log(data);
+                    setFriendList(data.friends);
+                    setPendingReceivedRequests(data.pending_received_requests);
+                    setPendingSentRequests(data.pending_sent_requests);
+                } else {
+                    console.log('Error fetching friend data');
+                }
+            } catch (error) {
+            console.error('Error fetching data:', error);
+            }
+        }
+        fetchFriendInfo();
+    }, []);
+
+    useEffect(() => {
+        async function fetchSearchResult() {
+            try {
+                const response = await fetch('/search_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({'searchString': friendUsername}),
+                });
+                if (response.status===200) {
+                    const data = await response.json();
+                    // console.log(data);
+                    setSearchResult(data.users);
+                } else if (response.status===202) {
+                    setSearchResult([]);
+                } else {
+                    console.log('Error fetching friend data');
+                    setSearchResult([]);
+                }
+            } catch (error) {
+            console.error('Error fetching data:', error);
+            }
+        }
+        fetchSearchResult();
+    }, [friendUsername]);
 
     const handleSetFriendName = (e) => {
-        setFriendName(e.target.value);
-        console.log(friendName)
+        setFriendUsername(e.target.value);
+        // console.log(friendUsername);
+
     };
 
     return (
@@ -39,7 +110,7 @@ function ManageFriendsPage() {
 
                 <div className='search-friends-box'>
                     <SearchOutlined className='search-icon' />
-                    <input value={friendName} onChange={(e) => handleSetFriendName(e)} placeholder='add or search friends' className='search-friends'></input>
+                    <input value={friendUsername} onChange={(e) => handleSetFriendName(e)} placeholder='add or search friends' className='search-friends'></input>
                 </div>
 
                 
@@ -50,8 +121,8 @@ function ManageFriendsPage() {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <PendingRequests />
-                        <MyFriends />
+                        <PendingRequests pendingReceivedRequests={pendingReceivedRequests} pendingSentRequests={pendingSentRequests} />
+                        <MyFriends friendList={friendList} />
                     </motion.div>
                 )}
 
@@ -62,8 +133,8 @@ function ManageFriendsPage() {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <SearchingMyFriends />
-                        <SearchingMoreResults />
+                        <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
+                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
                     </motion.div>
                 )}
  

@@ -38,4 +38,4 @@ class socialNetwork(db.Model):
 	__tablename__ = "social_network"
 	username1 = db.Column(db.String(32), nullable=False, primary_key = True)
 	username2 = db.Column(db.String(32), nullable=False, primary_key = True)
-	state = db.Column(db.Enum('apply', 'wait', 'friend'), nullable=False, primary_key = True)
+	state = db.Column(db.Integer, nullable=False, primary_key = True)
