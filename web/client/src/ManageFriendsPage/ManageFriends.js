@@ -4,6 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { SearchOutlined } from '@ant-design/icons'
 import { ManageFriendsHeader, PendingRequests, MyFriends, SearchingMyFriends, SearchingMoreResults } from './ManageFriendsComponents'
 import './ManageFriends.css'
+import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 function ManageFriendsPage() {
     const [friendUsername, setFriendUsername] = useState("");
@@ -35,7 +36,7 @@ function ManageFriendsPage() {
         }
     }, [friendUsername]);
 
-    useEffect(() => {
+    useEffect( () => {
         async function fetchFriendInfo() {
             try {
                 const response = await fetch('/get_friend_list', {
@@ -52,14 +53,23 @@ function ManageFriendsPage() {
                     setFriendList(data.friends);
                     setPendingReceivedRequests(data.pending_received_requests);
                     setPendingSentRequests(data.pending_sent_requests);
+
+                    for (const user of data.friends) {
+                        sessionStorage.setItem(user, await getProfileImage(user));
+                    }
+                    for (const user of data.pending_received_requests) {
+                        sessionStorage.setItem(user, await getProfileImage(user));
+                    }
                 } else {
                     console.log('Error fetching friend data');
                 }
             } catch (error) {
-            console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error);
             }
         }
+
         fetchFriendInfo();
+
     }, []);
 
     useEffect(() => {
@@ -89,6 +99,30 @@ function ManageFriendsPage() {
         }
         fetchSearchResult();
     }, [friendUsername]);
+
+    useEffect( () => {
+        async function fetchProfileImage() {
+            for (const user of searchResult) {
+                if (!sessionStorage[user]) {
+                    sessionStorage.setItem(user, await getProfileImage(user));
+                }
+            }
+        }
+
+        fetchProfileImage();
+    }, [searchResult]);
+
+    useEffect( () => {
+        async function fetchProfileImage() {
+            for (const user of friendList) {
+                if (!sessionStorage[user]) {
+                    sessionStorage.setItem(user, await getProfileImage(user));
+                }
+            }
+        }
+
+        fetchProfileImage();
+    }, [friendList]);
 
     const handleSetFriendName = (e) => {
         setFriendUsername(e.target.value);
