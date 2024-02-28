@@ -272,6 +272,13 @@ def save_log(request, session):
 		summary = request.json['summary']
 		hashtags = request.json['hashtags']
 
+		prev_log = videoInfo.query.filter_by(video_id=video_info['video_id']).first()
+	
+		if prev_log:
+			db.session.delete(prev_log)
+			db.session.commit()
+			print('이전 로그 삭제')
+
 		new_log = videoInfo(username=user_id, video_id=video_info['video_id'], video_date=video_date, video_url=video_info['video_url'], cover_image=video_info['cover_image'], original_text=session['original_text'], summary=summary, emotion=session['emotion'], hashtag=hashtags, share=int(switches['public']))
 		db.session.add(new_log)
 		db.session.commit()
@@ -283,7 +290,7 @@ def save_log(request, session):
 			os.remove(path)
 		# os.remove(f'web/temp/{file_name}.mp4')
 
-		return "Log saved"
+		return jsonify({'Finish': 'SAVE'})
 
 	except Exception as e:
 		print(f"Error in save: {str(e)}")
