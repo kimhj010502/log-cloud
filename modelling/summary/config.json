@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "gogamza/kobart-summarization",
+  "_name_or_path": "jjae/summary",
   "activation_dropout": 0.0,
   "activation_function": "gelu",
   "add_bias_logits": false,

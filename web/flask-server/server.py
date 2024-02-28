@@ -8,7 +8,6 @@ from flask_cors import CORS
 from flask_session import Session
 import pymysql
 
-from PIL import Image
 import io
 
 from sqlalchemy import extract, asc, or_
@@ -48,7 +47,7 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-from server_khj import record_video, select_option, add_log
+from server_khj import record_video, select_option, add_log, save_log
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
@@ -62,7 +61,9 @@ def record_video_route():
 def select_option_route():
 	return select_option(request, session)
 
-
+@app.route('/save', methods=['POST'])
+def save_log_route():
+	return save_log(request, session)
 
 from server_jjh import analysisReport, searchResult
 

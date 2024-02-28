@@ -2,18 +2,18 @@ import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeftOutlined, PlayCircleOutlined, PauseCircleOutlined, TeamOutlined, LockOutlined } from '@ant-design/icons'
 
-export function LogDate(handleButtonClick) {
-    let date = new Date()
-    let nowY = date.getFullYear()
-    let nowM = date.getMonth()
-    let nowD = date.getDate()
+export function LogDate(handleButtonClick, videoInfo) {
+    const upload_date = videoInfo.upload_date
+    let nowY = upload_date[0]
+    let nowM = upload_date[1]
+    let nowD = upload_date[2]
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     let currentMonthName = monthNames[nowM]
 
     return (
         <div className="date-box">
-            <Link  to={'/upload'} state={{ prevURL: '/save' }}>
+            <Link  to={'/upload'} state={{ prevURL: '/save', videoInfo: JSON.stringify(videoInfo), uploadDate: JSON.stringify(upload_date) }}>
                 <ArrowLeftOutlined className="left-button" onClick={handleButtonClick}/>
             </Link>
             
@@ -96,22 +96,22 @@ export function Scope({ isPublic }) {
     )
 }
 
-export function EditButton() {
+export function EditButton({ videoInfo, summary, hashtags, switches }) {
     return (
         <div className="edit-button">
-            <Link to={'/edit'} state={{ prevURL: '/save' }} className="edit-link">
+            <Link to={'/edit'} state={{ prevURL: '/save', videoInfo: JSON.stringify(videoInfo), switches: switches, summary: summary, hashtags: hashtags } } className="edit-link">
                 <div>EDIT</div>
             </Link>
         </div>
     )
 }
   
-export function SaveButton() {
+export function SaveButton({ handleSave }) {
     return (
         <div className="save-button">
-            <Link to={'/'} state={{ prevURL: '/save' }} className="save-link">
-                <div>SAVE</div>
-            </Link>
+            {/* <Link to={'/'} state={{ prevURL: '/save' }} className="save-link"> */}
+                <div className="save-link" onClick={handleSave} >SAVE</div>
+            {/* </Link> */}
         </div>
     )
 }

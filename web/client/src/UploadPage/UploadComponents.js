@@ -13,7 +13,7 @@ export function LogDate(handleButtonClick, upload_date) {
 
     return (
         <div className="date-box">
-            <Link  to={'/record'} state={{ prevURL: '/upload' }}>
+            <Link  to={'/record'} state={{ prevURL: '/upload', uploadDate: JSON.stringify(upload_date) }}>
                 <ArrowLeftOutlined className="left-button" onClick={handleButtonClick}/>
             </Link>
             
@@ -196,9 +196,9 @@ export function SelectEmotion({ emotion, setEmotion }) {
 export function NextButton({ handleUpload }) {
     return (
         <div className="next-button">
-            <Link to={'/save'} state={{ prevURL: '/upload' }} className="next-link">
-                <div onClick={handleUpload}>NEXT</div>
-            </Link>
+            {/* <Link to={'/save'} state={{ prevURL: '/upload' }} > */}
+            <div onClick={handleUpload} className="next-link">NEXT</div>
+            {/* </Link> */}
         </div>
     )
 }

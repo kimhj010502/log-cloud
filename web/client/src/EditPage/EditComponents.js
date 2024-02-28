@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { ArrowLeftOutlined, PlusCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 
-export function LogDate(handleButtonClick) {
-    let date = new Date()
-    let nowY = date.getFullYear()
-    let nowM = date.getMonth()
-    let nowD = date.getDate()
+export function LogDate(handleButtonClick, videoInfo) {
+    const upload_date = videoInfo.upload_date
+    let nowY = upload_date[0]
+    let nowM = upload_date[1]
+    let nowD = upload_date[2]
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     let currentMonthName = monthNames[nowM]
 
     return (
         <div className="date-box">
-            <Link  to={'/save'} state={{ prevURL: '/edit' }}>
+            <Link  to={'/save'} state={{ prevURL: '/edit', videoInfo: JSON.stringify(videoInfo), uploadDate: JSON.stringify(upload_date) }}>
                 <ArrowLeftOutlined className="left-button" onClick={handleButtonClick}/>
             </Link>
             
@@ -45,9 +45,7 @@ export function AddHashTag({ newHashtag, setNewHashtag, onAdd }) {
     )
 }
 
-export function EditSummary({ prevSummary }) {
-    const [currentSummary, setCurrentSummary] = useState(prevSummary);
-
+export function EditSummary({ prevSummary, currentSummary, setCurrentSummary }) {
     useEffect(() => {
         setCurrentSummary(prevSummary);
     }, [prevSummary]);
@@ -65,10 +63,10 @@ export function EditSummary({ prevSummary }) {
 }
 
 
-export function UpdateButton() {
+export function UpdateButton({ videoInfo, summary, hashtags, switches }) {
     return (
         <div className="update-button">
-            <Link to={'/save'} state={{ prevURL: '/after-edit' }} class="update-link">
+            <Link to={'/save'} state={{ prevURL: '/after-edit', videoInfo: JSON.stringify(videoInfo), switches: switches, summary: summary, hashtags: hashtags }} class="update-link">
                 <div>UPDATE</div>
             </Link>
         </div>

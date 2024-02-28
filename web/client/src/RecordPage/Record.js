@@ -26,7 +26,17 @@ function Record() {
 
     const location = useLocation();
     const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
-    const uploadDate = JSON.parse(location.state?.uploadDate); 
+    const uploadDate = JSON.parse(location.state?.uploadDate)
+    // const uploadDate = JSON.parse(location.state?.uploadDate) ? JSON.parse(location.state?.uploadDate) : JSON.stringify({ upload_date: [todayYear, todayMonth, todayDate] });
+
+    // let date = new Date();
+    // const todayYear = date.getFullYear();
+    // const todayMonth = date.getMonth() + 1;
+    // const todayDate = date.getDate();
+    
+    // uploadDate = uploadDate ? uploadDate : JSON.stringify({ upload_date: [todayYear, todayMonth, todayDate] })
+    console.log("REcord 페이지 실행")
+    console.log(uploadDate)
 
     useEffect(() => {
         let [name, videoType] = checkBrowser()
