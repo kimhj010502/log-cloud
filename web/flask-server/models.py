@@ -15,14 +15,15 @@ class User(db.Model):
 class videoInfo(db.Model):
 	__tablename__ = "video_info"
 	username = db.Column(db.String(32), nullable=False)
-	date = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.now())
+	date = db.Column(db.TIMESTAMP, server_default=db.func.now())
 	video_id = db.Column(db.String(45), nullable=False, unique=True, primary_key=True)
+	video_date = db.Column(db.String(20), nullable=False)
 	video_url = db.Column(db.String(45), nullable=False, unique=True)
 	cover_image = db.Column(db.String(50), nullable=True)
 	original_text = db.Column(db.Text, nullable=True)
 	summary = db.Column(db.Text, nullable=True)
 	emotion = db.Column(db.Integer, nullable=True)
-	hashtag = db.Column(db.Text, nullable=True)
+	hashtag = db.Column(db.JSON, nullable=True)
 	share = db.Column(db.Integer, nullable=False)
 
 
