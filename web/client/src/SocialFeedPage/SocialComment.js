@@ -4,13 +4,13 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, LikeList, Comment, AddComment } from './SocialCommentComponents'
 import './SocialComment.css';
 
-export function SocialComment({ data, setPage, prevPage, setPrevPage }) {
+export function SocialComment({ data, date, username, profile, setPage, prevPage, setPrevPage }) {
     return (
         <div className="social-comment-page">
             
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
 
-            <ProfileDate date={data.date} id="test_id" profile_img_src="profile.png" />
+            <ProfileDate date={date} id={username} profile_img_src={profile} />
 
             <AnimatePresence mode='wait'>
                 {prevPage === 'social-detail' && (

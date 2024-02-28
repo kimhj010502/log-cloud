@@ -22,7 +22,7 @@ class videoInfo(db.Model):
 	original_text = db.Column(db.Text, nullable=True)
 	summary = db.Column(db.Text, nullable=True)
 	emotion = db.Column(db.Integer, nullable=True)
-	hashtag = db.Column(db.Text, nullable=True)
+	hashtag = db.Column(db.JSON, nullable=True)
 	share = db.Column(db.Integer, nullable=False)
 
 

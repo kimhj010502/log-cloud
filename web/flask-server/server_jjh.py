@@ -9,8 +9,9 @@ from flask_cors import CORS
 from flask_session import Session
 from datetime import datetime, timedelta
 import pandas as pd
+import base64
 
-from sqlalchemy import extract, asc, or_
+from sqlalchemy import extract, asc, or_, desc
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
@@ -43,7 +44,7 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-def analysisReport():
+def analysisReport(request, session):
 	user_id = session.get('user_id')
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
@@ -63,12 +64,16 @@ def analysisReport():
 	emotion = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date, videoInfo.date < end_date).with_entities(videoInfo.emotion).all()
 
 	# Top5 Hashtag
+	
 	hashtag_list = []
+	print(hashtag)
 	for tag in hashtag:
-		tag_pre = tag[0].replace(' ','').split("#")
-		hashtag_list += [x for x in tag_pre if x]
-
-	top5_tag = pd.Series(hashtag_list).value_counts()[:5].index.to_list()
+		hashtag_list += tag[0][1:]
+	
+	if len(set(hashtag_list)) >= 5:
+		top5_tag = pd.Series(hashtag_list).value_counts()[:5].index.to_list()
+	else:
+		top5_tag = pd.Series(hashtag_list).value_counts().index.to_list()
 	
 	# count emotions
 	emotion_list = []
@@ -105,8 +110,9 @@ def analysisReport():
 
 
 
-def searchResult():
+def searchResult(request, session):
 	user_id = session.get("user_id")
+	
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
 	
@@ -141,6 +147,9 @@ def searchResult():
 	elif selectedScope == '친구공유':
 		posts = key_posts.filter(videoInfo.share == 1)
 
+	if (posts.count() == 0):
+		return jsonify("No records meet the conditions.")
+
 	date_list = []
 	for i in posts.with_entities(videoInfo.date).all():
 		date_list.append(i[0])
@@ -149,16 +158,123 @@ def searchResult():
 	for i in posts.with_entities(videoInfo.cover_image).all():
 		coverImg_list.append(i[0])
 
+	if not user_id or len(coverImg_list) == 0:
+		return jsonify({"error": "Image not found"}), 404
+	
 	image_data_list = []
+	
 	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
 	with ssh_client.open_sftp() as sftp:
 		for coverImg in coverImg_list:
 			with sftp.file(coverImg, 'rb') as file:
-				image_data = file.read()
+				image_data = base64.b64encode(file.read()).decode('utf-8')
 				image_data_list.append(image_data)
 
 	sftp.close()
 	ssh_client.close()
 
-	data = [{ 'date': date, 'coverImg': send_file(io.BytesIO(coverImg), mimetype='image/png') } for date, coverImg in zip(date_list, image_data_list)]
-	return data
+
+	data = [{ 'date': date, 'coverImg': coverImg} for date, coverImg in zip(date_list, image_data_list)]
+
+	return jsonify(data)
+
+
+
+
+def social(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	
+	friends_list = []
+	friends1 = socialNetwork.query.filter(socialNetwork.username1 == user_id, socialNetwork.state == 1).with_entities(socialNetwork.username2).all()
+	friends2 = socialNetwork.query.filter(socialNetwork.username2 == user_id, socialNetwork.state == 1).with_entities(socialNetwork.username1).all()
+
+	for i in friends1:
+		friends_list.append(i[0])
+	for j in friends2:
+		friends_list.append(j[0])
+
+	end_date = datetime.now()
+	start_date = (end_date - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+	week_videos = videoInfo.query.filter(videoInfo.username.in_(friends_list), videoInfo.date >= start_date, videoInfo.date <= end_date, videoInfo.share == 1).order_by(desc(videoInfo.date))
+
+	if (week_videos.count() == 0):
+		return jsonify("No one has shared their memories.")
+	
+	date_list = []
+	\
+	for i in week_videos.with_entities(videoInfo.date).all():
+		date_list.append(i[0])
+
+	coverImg_list = []
+	for i in week_videos.with_entities(videoInfo.cover_image).all():
+		coverImg_list.append(i[0])
+
+	profileusername_list = []
+	for i in week_videos.with_entities(videoInfo.username).all():
+		profileusername_list.append(i[0])
+
+	profile_list = []
+	join_table = videoInfo.query.join(User, videoInfo.username == User.username).filter(videoInfo.username.in_(friends_list), videoInfo.date >= start_date, videoInfo.date <= end_date).order_by(desc(videoInfo.date))
+	for i in join_table.with_entities(User.profile_img).all():
+		profile_list.append(i[0])
+
+
+	cover_image = []
+	profile_image = []
+
+	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+	with ssh_client.open_sftp() as sftp:
+		for coverImg in coverImg_list:
+			with sftp.file(coverImg, 'rb') as file:
+				image_data = base64.b64encode(file.read()).decode('utf-8')
+				cover_image.append(image_data)
+		for profile in profile_list:
+			with sftp.file(profile, 'rb') as file:
+				image_data = base64.b64encode(file.read()).decode('utf-8')
+				profile_image.append(image_data)
+
+	sftp.close()
+	ssh_client.close()
+	
+	data = [{ 'date': date, 'coverImg': coverImg, 'profileUsername':username, 'profileImg':profile} for date, coverImg, username, profile in zip(date_list, cover_image, profileusername_list, profile_image)]
+
+	return jsonify(data)
+
+
+
+def socialDetail(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+
+	date = request.json['date']
+	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+	post_user = request.json['id']
+	
+	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
+	summary = video_detail.with_entities(videoInfo.summary).all()[0][0]
+	hashtags = video_detail.with_entities(videoInfo.hashtag).all()[0][0]
+	emotion = video_detail.with_entities(videoInfo.emotion).all()[0][0]
+	video_url = video_detail.with_entities(videoInfo.video_url).all()[0][0]
+	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
+	print(video_id)
+	
+	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+	with ssh_client.open_sftp() as sftp:
+		with sftp.file(video_url, 'rb') as file:
+			video_file = base64.b64encode(file.read()).decode('utf-8')
+	sftp.close()
+	ssh_client.close()
+	
+	data = {"hashtags": hashtags,
+			"summary": summary,
+			"emotion": emotion,
+			"video": video_file}
+	
+	return jsonify(data)

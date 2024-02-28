@@ -5,7 +5,7 @@ export function Social({ date, id, profile_img_src, cover_img_src }) {
     return (
         <div className='social-box'>
             <ProfileDate date={date} id={id} profile_img_src={profile_img_src}/>
-            <CoverImg cover_img_src={cover_img_src} />
+            <CoverImg date={date} id={id} profile_img_src={profile_img_src} cover_img_src={cover_img_src} />
         </div>
     )
 }
@@ -28,9 +28,15 @@ function ProfileDate({ date, id, profile_img_src }) {
     )
 }
 
-function CoverImg({ cover_img_src }) {
+function CoverImg({ date, id, profile_img_src, cover_img_src }) {
     return (
-        <Link to={'/social-feed'}>
+        <Link  to={'/social-feed'} 
+            state={{ 
+                date,
+                id,
+                profile_img_src, 
+                cover_img_src
+                }}>
             <div className='social-img'>
                 <img className="cover-img" src={cover_img_src} alt="cover img"/>
             </div>

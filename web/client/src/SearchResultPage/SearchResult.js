@@ -41,6 +41,7 @@ function SearchResultPage() {
                 console.error('Error fetching data', error);
             });
     }, [selectedValue]);
+
     
     return (
         <div className="search-result-page">
@@ -58,10 +59,11 @@ function SearchResultPage() {
                 <SelectedValue selectedValue={selectedValue} />
 
                 <div className='results-box'>
-                    {data.map((cont) => (
-                        <Result date={cont? cont.date: null} cover_img_src={cont? cont.coverImg: null} />
+                    {data && data.map((cont) => (
+                        <Result date={cont? cont.date: null} 
+                        cover_img_src={cont.coverImg? 'data:image/png;base64,'+cont.coverImg: null}  />
                     ))
-                }
+                    }
                 </div>
                 </motion.div>
             </AnimatePresence>

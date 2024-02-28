@@ -8,13 +8,16 @@ import './Social.css';
 function SocialPage() {
     const [data, setData] = useState([{}])
     useEffect(() => {
-        fetch("/socialdetail").then(
+        fetch("/social").then(
             res => res.json()
         ).then(
             data => {
                 setData(data)
                 console.log(data)
             })
+        .catch(error => {
+            console.error('Error fetching data', error);
+        });
     }, []);
 
     return (
@@ -34,8 +37,13 @@ function SocialPage() {
                     transition={{ duration: 0.5 }}
                     >
                         <div className='socials-box'>
-                            <Social date={data.date} id="test_id" profile_img_src="profile.png" cover_img_src="test_image.jpg" />
-                            <Social date={data.date} id="test_id" profile_img_src="profile.png" cover_img_src="test_image.jpg" />
+                        {data && data.map((cont) => (
+                        <Social date={cont? cont.date: null} 
+                            id={cont.profileUsername? cont.profileUsername: null}
+                            profile_img_src={cont.profileImg? 'data:image/jpg;base64,'+cont.profileImg: null}
+                            cover_img_src={cont.coverImg?'data:image/png;base64,'+cont.coverImg: null}  /> 
+                        ))
+                        }
                         </div>
                         
                     </motion.div>

@@ -1,0 +1,99 @@
+* {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+body {
+	height: 800px;
+	width: 390px;
+	margin: 0 auto;
+	background-color: black;
+}
+
+h1 {
+    margin-left: auto;
+	margin-right: auto;
+    text-align: center;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: 18px;
+    font-style: normal;
+    color: white;
+}
+
+p {
+    font-size: 16px;
+    color: white;
+}
+
+.container {
+    display: flex;
+    height: 650px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.full-coverimage {
+    width: 100%;
+    border-radius: 15px;
+    height: 500px;
+    background-color: white;
+}
+
+.hashtag-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+p.hashtag {
+    height: 25px;
+    width: auto;
+    background-color: white;
+    border-radius: 13px;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    margin: 3px;
+}
+
+.summary {
+    text-align: center;
+    line-height: 1.6;
+    color: white;
+}
+
+.privacy {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.small-coverimage {
+    width: 60%;
+    border-radius: 15px;
+    height: 50%;
+    background-color: white;
+}
+
+button {
+    background-color: black;
+    color: white;
+    font-size: 24px;
+    border: none;
+}
+
+.button-container {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

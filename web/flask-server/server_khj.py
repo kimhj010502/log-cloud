@@ -7,7 +7,6 @@ from flask_cors import CORS
 from flask_session import Session
 import pymysql
 
-from PIL import Image
 import io
 
 from sqlalchemy import extract, asc, or_
@@ -17,7 +16,6 @@ from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
-import cv2
 from moviepy.editor import VideoFileClip
 
 import paramiko

@@ -7,11 +7,11 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 import pymysql
+import base64
 
-from PIL import Image
 import io
 
-from sqlalchemy import extract, asc, or_
+from sqlalchemy import extract, asc, or_, desc
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
@@ -19,7 +19,6 @@ from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
 import pandas as pd
-import cv2
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
@@ -64,7 +63,7 @@ def select_option_route():
 
 
 
-from server_jjh import analysisReport, searchResult
+from server_jjh import analysisReport, searchResult, social, socialDetail
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
@@ -74,6 +73,16 @@ def analysisReport_route():
 @app.route('/searchresult', methods=['POST','GET'])
 def searchResult_route():
    return searchResult(request, session)
+
+
+@app.route("/social")
+def social_route():
+	return social(request, session)
+
+
+@app.route("/socialdetail", methods=['POST','GET'])
+def socialDetail_route():
+	return socialDetail(request, session)
 
 
 
@@ -91,14 +100,6 @@ def generate_details():
 			"privacy": "전체 공개",
 			"location": "Sicily, Italy",
 			"emotion": "happy"}
-
-
-@app.route("/socialdetail")
-def socialDetail():
-	return {"date": "December 9, 2023",
-			"coverImg": "/route/to/image",
-			"profileImg": "/route/to/profile_image",
-			"profileUsername": "username"}
 
 
 @app.route('/authentication', methods=['GET'])
@@ -154,11 +155,6 @@ def set_profile_image_route():
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month_route():
 	return get_log_overview_of_month(request)
-	
-
-@app.route("/logdetail", methods=['POST'])
-def log_detail_route():
-	return log_detail(request, session)
 
 
 @app.route('/get_friend_list', methods=['POST'])
@@ -193,7 +189,6 @@ def accept_friend_request_route():
 @app.route('/remove_friend', methods=['POST'])
 def remove_friend_route():
 	return remove_friend(request, session)
-
 
 
 if __name__ == "__main__":
