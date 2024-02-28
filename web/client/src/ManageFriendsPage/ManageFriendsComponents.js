@@ -31,7 +31,7 @@ export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }
             { isRequests && (
                 <div className='requests-box'>
                     {pendingReceivedRequests.map((username, index) => (
-                        <RequestsProfile key={index} img_src='profile.png' id={username} />
+                        <RequestsProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
                     ))}
                 </div>
             )}
@@ -123,7 +123,7 @@ export function MyFriends({ friendList }) {
             { isFriends && (
                 <div className='friends-box'>
                     {friendList.map((username, index) => (
-                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                        <FriendProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
                     ))}
                 </div>
             )}
@@ -195,7 +195,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
             { searchResult.length > 0 ? (
                 <div className='searching-friends-box'>
                     {searchResult.map((username, index) => (
-                        <FriendProfile key={index} img_src='profile.png' id={username} />
+                        <FriendProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
                     ))}
                 </div>
             ) : (
@@ -222,7 +222,7 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests, update
             { isMoreResults ? (
                 <div className='searching-results-box'>
                     {searchResult.map((username, index) => (
-                        <MoreResultProfile key={index} img_src='profile.png' id={username} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
+                        <MoreResultProfile key={index} img_src={sessionStorage.getItem(username)} id={username} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
                     ))}
                 </div>
             ) : (

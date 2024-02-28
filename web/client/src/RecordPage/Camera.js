@@ -69,7 +69,9 @@ export function CameraRecord() {
     const handleStartRecordClick = React.useCallback(() => {
         setRecording(true);
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-            mimeType: `video/${videoType}`
+            mimeType: `video/${videoType}; codecs=avc1`,
+            audioBitsPerSecond: 1280000,
+            videoBitsPerSecond: 2500000
         });
         mediaRecorderRef.current.addEventListener(
             "dataavailable",
@@ -151,6 +153,7 @@ export function CameraRecord() {
                     if (response.status === 200) {
                         const data = await response.json();
                         setLoading(false)
+                        console.log("받은 데이터", data)
                         navigate('/upload', { state: { prevURL: '/record', videoInfo: JSON.stringify(data.video_info) } });
                     }
                     if (response.status === 400) {
@@ -183,6 +186,7 @@ export function CameraRecord() {
                     if (response.status === 200) {
                         const data = await response.json();
                         setLoading(false)
+                        console.log("받은 데이터", data)
                         navigate('/upload', { state: { prevURL: '/record', videoInfo: JSON.stringify(data.video_info) } });
                     }
                     if (response.status === 400) {

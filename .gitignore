@@ -9,11 +9,6 @@ venv/
 #Ignore .bin files
 *.bin
 
-*.ipynb_checkpoints
-
-checkpoint-1000/
-checkpoint-2000/
-
 dump.rdb
 
 __pycache__/

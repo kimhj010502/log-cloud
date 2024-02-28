@@ -32,10 +32,36 @@
 # # SSH 연결 종료
 # ssh_client.close()
 
-from datetime import datetime
+# from datetime import datetime
 
-now = datetime.now()
-upload_date = [now.year, now.month, now.day]
-remote_video_date = str(now.strftime("%Y%m%d")).replace('-','')
-local_video_date = str(now).replace('-','').replace(' ','').replace(':','').replace('.','')
-print(remote_video_date, local_video_date)
+# now = datetime.now()
+# upload_date = [now.year, now.month, now.day]
+# remote_video_date = str(now.strftime("%Y%m%d")).replace('-','')
+# local_video_date = str(now).replace('-','').replace(' ','').replace(':','').replace('.','')
+# print(remote_video_date, local_video_date)
+
+
+# local_video_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228014729041799.mp4"
+# local_audio_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228014729041799.wav"
+
+# import moviepy.editor as mp
+
+# ffmpeg_path = '/usr/bin/ffmpeg'
+
+# input_file = "input.mp4"
+# output_file = "C:/Users/user/Desktop/log/log/web/client/public/temp/output.mp4"
+
+# mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path,  local_audio_path)
+
+# import moviepy.editor as mp
+
+# local_video_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228185941477681.mp4"
+# local_audio_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228185941477681.mp3"
+
+# mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
+
+from models import db, User, videoInfo, videoLog, socialNetwork
+
+new_log = videoInfo(username=user_id, video_id=video_info['video_id'], video_date=video_date, video_url=video_info['video_url'], cover_image=video_info['cover_image'], original_text=session['original_text'], summary=summary, emotion=session['emotion'], hashtag=hashtags, share=int(switches['public']))
+db.session.add(new_log)
+db.session.commit()

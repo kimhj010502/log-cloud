@@ -7,7 +7,6 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 import pymysql
-import base64
 
 import io
 
@@ -19,6 +18,7 @@ from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
 import pandas as pd
+import cv2
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
@@ -47,7 +47,7 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-from server_khj import record_video, select_option, add_log
+from server_khj import record_video, select_option, add_log, save_log
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
@@ -61,6 +61,9 @@ def record_video_route():
 def select_option_route():
 	return select_option(request, session)
 
+@app.route('/save', methods=['POST'])
+def save_log_route():
+	return save_log(request, session)
 
 
 from server_jjh import analysisReport, searchResult, social, socialDetail
@@ -100,6 +103,14 @@ def generate_details():
 			"privacy": "전체 공개",
 			"location": "Sicily, Italy",
 			"emotion": "happy"}
+
+
+@app.route("/socialdetail")
+def socialDetail():
+	return {"date": "December 9, 2023",
+			"coverImg": "/route/to/image",
+			"profileImg": "/route/to/profile_image",
+			"profileUsername": "username"}
 
 
 @app.route('/authentication', methods=['GET'])
@@ -155,6 +166,11 @@ def set_profile_image_route():
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month_route():
 	return get_log_overview_of_month(request)
+	
+
+@app.route("/logdetail", methods=['POST'])
+def log_detail_route():
+	return log_detail(request, session)
 
 
 @app.route('/get_friend_list', methods=['POST'])
@@ -189,6 +205,7 @@ def accept_friend_request_route():
 @app.route('/remove_friend', methods=['POST'])
 def remove_friend_route():
 	return remove_friend(request, session)
+
 
 
 if __name__ == "__main__":
