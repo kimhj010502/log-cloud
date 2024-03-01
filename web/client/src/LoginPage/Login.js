@@ -4,22 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
 import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
-function LoginPage() {
+function LoginPage({ updateIsAuthorized }) {
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Fetch authentication status from the backend
-        fetch('/check_authentication')
-            .then(response => response.json())
-            .then(data => {
-                if (data.authenticated){
-                    navigate("/");
-                }
-            })
-            .catch(error => {
-                console.error('Error checking authentication:', error);
-            });
-    }, []);
+    // useEffect(() => {
+    //     // Fetch authentication status from the backend
+    //     fetch('/check_authentication')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.authenticated){
+    //                 navigate("/");
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error checking authentication:', error);
+    //         });
+    // }, []);
 
 
     const [username, setUsername] = useState("");
@@ -36,6 +36,7 @@ function LoginPage() {
     const location = useLocation();
     const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
     const [isVisible, setIsVisible] = useState(true);
+
     useEffect(() => {
         if (isVisible && prevURL === '/signup') {
 
@@ -48,7 +49,7 @@ function LoginPage() {
       }, [isVisible, prevURL]);
 
     function handleFindPassword() {
-        return
+        return;
     }
 
     const handleLogin = async() => {
@@ -75,8 +76,9 @@ function LoginPage() {
                     sessionStorage.setItem('username', data.username);
                     sessionStorage.setItem('createdAt', new Date(data.createdAt).getFullYear());
                     // sessionStorage.setItem('email', data.email);
-
                     sessionStorage.setItem('myProfileImg', await getProfileImage(data.username));
+
+                    updateIsAuthorized(true);
 
                     navigate("/", { replace: true });
                 }

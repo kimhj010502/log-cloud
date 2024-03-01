@@ -253,45 +253,6 @@ def set_profile_image(request, session):
 		return 'Unauthorized', 401
 
 
-def get_log_overview_of_month(request):
-	username = request.json['username']
-	month = request.json['month']
-	year = request.json['year']
-	
-	start_date = datetime(year, month + 1, 1)
-	end_date = datetime(year, month + 1, calendar.monthrange(year, month + 1)[1]) if month < 12 else datetime(year + 1,
-																											  1,
-																											  calendar.monthrange(
-																												  year,
-																												  month + 1)[
-																												  1])
-	
-	# print(start_date, end_date)
-	
-	videos = videoInfo.query.filter(
-		videoInfo.username == username,
-		videoInfo.date >= start_date,
-		videoInfo.date < end_date
-	).order_by(asc(videoInfo.date)).all()
-	
-	# print(videos)
-	if videos:
-		video_info_list = []
-		for video in videos:
-			day_of_month = video.date.day
-			# print(video.date.day)
-			
-			video_info_list.append({
-				'date': day_of_month,
-				'coverImage': video.cover_image,
-				'videoId': video.video_id,
-			})
-		# print(video_info_list)
-		return jsonify(video_info_list)
-	else:
-		return jsonify({"error": "No videos found for the specified username"}), 404
-
-
 def log_detail(request, session):
 	video_id = request.json['videoId']
 	

@@ -4,7 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { ProfileImg, ProfileButtons, DeleteAccount } from './ProfileComponents'
 import './Profile.css'
 
-function ProfilePage({ imgSrc }) {
+function ProfilePage({ updateIsAuthorized, imgSrc }) {
     const [isClicked, setIsClicked] = useState(false);
 
     return (
@@ -21,7 +21,7 @@ function ProfilePage({ imgSrc }) {
 
                 <ProfileImg img_src={imgSrc}/>
 
-                <ProfileButtons isClicked={isClicked} setIsClicked={setIsClicked} />
+                <ProfileButtons isClicked={isClicked} setIsClicked={setIsClicked} updateIsAuthorized={updateIsAuthorized} />
 
                 { isClicked && (
                     <DeleteAccount isClicked={isClicked} setIsClicked={setIsClicked} />
