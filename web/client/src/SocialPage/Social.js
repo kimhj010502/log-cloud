@@ -40,8 +40,8 @@ function SocialPage() {
                         {data && data.map((cont) => (
                         <Social date={cont? cont.date: null} 
                             id={cont.profileUsername? cont.profileUsername: null}
-                            profile_img_src={cont.profileImg? 'data:image/jpg;base64,'+cont.profileImg: null}
-                            cover_img_src={cont.coverImg?'data:image/png;base64,'+cont.coverImg: null}  /> 
+                            profile_img_src={cont.profileImg? cont.profileImg: null}
+                            cover_img_src={cont.coverImg? cont.coverImg: null}  /> 
                         ))
                         }
                         </div>

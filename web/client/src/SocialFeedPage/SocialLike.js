@@ -4,12 +4,12 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, Like } from './SocialLikeComponents'
 import './SocialLike.css';
 
-export function SocialLike({ data, setPage, setPrevPage }) {
+export function SocialLike({ data, id, setPage, setPrevPage }) {
     return (
         <div className="social-like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
 
-            <ProfileDate date={data.date} id="test_id" profile_img_src="profile.png" />
+            <ProfileDate date={data.date} id={id} profile_img_src="profile.png" />
 
             <AnimatePresence mode='wait'>
                 <motion.div
@@ -24,17 +24,10 @@ export function SocialLike({ data, setPage, setPrevPage }) {
 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
+                        {data.likeList && data.likeImage.map((cont) => (
+                            <Like img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} />
+                        ))
+                        }
                     </div>
                 </div>
 

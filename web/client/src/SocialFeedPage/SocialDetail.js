@@ -5,7 +5,6 @@ import { LogHeader, ProfileDate, VideoPlay, HeartComment, HashTag, Summary } fro
 import './SocialDetail.css';
 
 export function SocialDetail({ data, date, username, profile, setPage, setPrevPage }) {
-    console.log(data);
     return (
         <div className="social-detail-page">
             <LogHeader />
@@ -22,9 +21,9 @@ export function SocialDetail({ data, date, username, profile, setPage, setPrevPa
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <VideoPlay url={data.video? 'data:video/mp4;base64,'+data.video: null}/>
+                        <VideoPlay url={data.video? data.video: null}/>
 
-                        <HeartComment isPublic={true} isLiked={false} setPage={setPage} setPrevPage={setPrevPage} />
+                        <HeartComment isPublic={true} isLiked={data.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId}/>
 
                         <div className="hashtag-container">
                             {data.hashtags && data.hashtags.map((tag, index) => (
