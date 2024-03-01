@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { SocialDetail } from './SocialDetail'
 import { SocialComment } from './SocialComment'
 import { SocialLike } from './SocialLike'
+import Loading from '../Routing/Loading'
 
 async function fetchData(date, id) {
     try {
@@ -23,27 +24,37 @@ async function fetchData(date, id) {
 }
 
 function SocialFeedPage() {
+    const [loading, setLoading] = useState(false);
+
     const location = useLocation();
     const { date, id, profile_img_src, cover_img_src} = location.state;
+    console.log(location.state);
 
     const [data, setData] = useState([{}])
 
     useEffect(() => {
+        setLoading(true);
         fetchData(date, id)
             .then(data => {
-                setData(data);
                 console.log(data);
+                setData(data);
+                setLoading(false);
+                console.log('받아온 데이터', data)
             })
             .catch(error => {
                 console.error('Error fetching data', error);
             });
-    }, [date, id]);
+    }, []);
 
     const [page, setPage] = useState('social-detail')
     const [prevPage, setPrevPage] = useState('social-feed')
 
     return (
         <>
+        {loading ? (
+            <Loading />
+        ) : (
+            <>
             { page === 'social-detail' && (
                 <SocialDetail data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
@@ -52,8 +63,10 @@ function SocialFeedPage() {
                 <SocialComment data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
             { page === 'social-like' && (
-                <SocialLike data={data} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
+                <SocialLike data={data} id={id} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
+            </>
+        )}
         </>
     );
 

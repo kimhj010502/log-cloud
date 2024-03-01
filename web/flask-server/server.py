@@ -65,7 +65,7 @@ def save_log_route():
 	return save_log(request, session)
 
 
-from server_jjh import analysisReport, searchResult, social, socialDetail
+from server_jjh import analysisReport, searchResult, social, socialDetail, comments, hearts
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
@@ -87,6 +87,16 @@ def socialDetail_route():
 	return socialDetail(request, session)
 
 
+@app.route("/comments", methods=['POST','GET'])
+def comments_route():
+	return comments(request, session)
+
+
+@app.route("/hearts", methods=['POST','GET'])
+def hearts_route():
+	return hearts(request, session)
+
+
 
 from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
 	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
@@ -102,14 +112,6 @@ def generate_details():
 			"privacy": "전체 공개",
 			"location": "Sicily, Italy",
 			"emotion": "happy"}
-
-
-@app.route("/socialdetail")
-def socialDetail():
-	return {"date": "December 9, 2023",
-			"coverImg": "/route/to/image",
-			"profileImg": "/route/to/profile_image",
-			"profileUsername": "username"}
 
 
 @app.route('/authentication', methods=['GET'])

@@ -61,7 +61,7 @@ function SearchResultPage() {
                 <div className='results-box'>
                     {data && data.map((cont) => (
                         <Result date={cont? cont.date: null} 
-                        cover_img_src={cont.coverImg? 'data:image/png;base64,'+cont.coverImg: null}  />
+                        cover_img_src={cont.coverImg? cont.coverImg: null}  />
                     ))
                     }
                 </div>
