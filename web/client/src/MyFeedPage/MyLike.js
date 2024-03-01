@@ -9,7 +9,7 @@ export function MyLike({ data, setPage, setPrevPage }) {
         <div className="like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
 
-            <DatePublic date={data.date} isPublic={true} />
+            <DatePublic date={data.date} isPublic={data.privacy} />
 
             <AnimatePresence mode='wait'>
                 <motion.div
@@ -24,17 +24,10 @@ export function MyLike({ data, setPage, setPrevPage }) {
 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id2' />
-                        <Like img_src='profile.png' id='test_id1' />
-                        <Like img_src='profile.png' id='test_id2' />
+                        {data.likeList && data.likeImage.map((cont) => (
+                            <Like img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} />
+                        ))
+                        }
                     </div>
                 </div>
 

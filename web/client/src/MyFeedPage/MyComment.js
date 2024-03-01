@@ -10,7 +10,7 @@ export function MyComment({ data, setPage, prevPage, setPrevPage }) {
             
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
 
-            <DatePublic date={data.date} isPublic={true} />
+            <DatePublic date={data.date} isPublic={data.privacy} />
 
             <AnimatePresence mode='wait'>
                 {prevPage === 'detail' && (
@@ -24,20 +24,17 @@ export function MyComment({ data, setPage, prevPage, setPrevPage }) {
 
                     <div className='comments-like-box'>
 
-                        <LikeList like_id_list={ ['test_idtest_id1test_id1', 'test_id2', 'test_id2', 'test_id2', 'test_id2'] } setPage={setPage} setPrevPage={setPrevPage} />
+                        <LikeList like_id_list={ data.likeList? data.likeList: [] } setPage={setPage} setPrevPage={setPrevPage} />
 
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글2' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글4' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글4' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
+                            {data.commentList && data.commentList.map((cont) => (
+                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                            ))
+                            }
                         </div>
 
-                        <AddComment />
+                        <AddComment videoId={data.videoId}/>
                     </div>
 
                     
@@ -59,16 +56,13 @@ export function MyComment({ data, setPage, prevPage, setPrevPage }) {
 
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글댓글' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글2' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글4' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
-                            <Comment img_src='profile.png' id='test_id2' value= '댓글2댓글4' />
-                            <Comment img_src='profile.png' id='test_id1' value= '댓글3' />
+                            {data.commentList && data.commentList.map((cont) => (
+                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} value={cont.comments? cont.comments: null} />
+                            ))
+                            }
                         </div>
 
-                        <AddComment />
+                        <AddComment videoId={data.videoId} />
                     </div>
 
                     

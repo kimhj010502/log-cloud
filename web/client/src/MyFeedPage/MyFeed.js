@@ -47,9 +47,6 @@ function FeedPage() {
         return <div>Loading...</div>;
     }
 
-    // console.log(prevPage)
-    // console.log(page)
-
     return (
         <>
             {page === 'detail' && (

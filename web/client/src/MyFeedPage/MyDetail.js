@@ -19,11 +19,11 @@ export function MyDetail({ data, setPage, setPrevPage }) {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <DatePublic date={data.date} isPublic={true} />
+                        <DatePublic date={data.date} isPublic={data.privacy} />
 
-                        <VideoPlay url="test_video.mp4"/>
+                        <VideoPlay url={data.video}/>
 
-                        <HeartComment isPublic={true} isLiked={false} setPage={setPage} setPrevPage={setPrevPage} />
+                        <HeartComment isPublic={data.privacy} isLiked={data.isLiked} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId} />
 
                         <div className="hashtag-container">
                             {data.hashtags && data.hashtags.map((tag, index) => (

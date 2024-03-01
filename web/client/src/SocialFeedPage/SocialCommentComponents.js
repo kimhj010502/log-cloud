@@ -92,15 +92,22 @@ export function Comment({ img_src, id, value }) {
 }
 
 export function AddComment(videoId) {
-    const [comment, SetComment] = useState("");
+    const [prevComment, SetPrevComment] = useState("");
+    const [newComment, setNewComment] = useState();
     const handleSetComment = (e) => {
-        SetComment(e.target.value);
+        SetPrevComment(e.target.value);
     };
-    console.log(videoId);
+    const comment_data = { videoId: videoId, comment: prevComment };
+
+    const onAdd = (newComment) => {
+        const newComments = [...prevComment, newComment]
+        SetPrevComment(newComments)
+        setNewComment('')
+    }
+    
+    console.log('comment', prevComment);
 
     const handlePostComment = () => {
-        // 사용자가 입력한 댓글 데이터
-        const comment_data = { videoId: videoId, comment: comment };
 
         // POST 요청을 보내고 서버로 데이터 전송
         fetch('/comments', {
@@ -116,7 +123,7 @@ export function AddComment(videoId) {
             }
             // 성공적으로 댓글을 게시한 후에 수행할 작업
             console.log('Comment posted successfully');
-            SetComment(""); // 댓글창 초기화
+            SetPrevComment(""); // 댓글창 초기화
         })
         .catch(error => {
             console.error('Error posting comment:', error);
@@ -125,7 +132,7 @@ export function AddComment(videoId) {
 
     return (
         <div className='add-comment-box'>
-            <textarea value={comment} onChange={(e) => handleSetComment(e)} placeholder='Add a comment' className='comment-textarea'></textarea>
+            <textarea value={prevComment} onChange={(e) => handleSetComment(e)} placeholder='Add a comment' className='comment-textarea'></textarea>
             <div className='post-comment' onClick={handlePostComment}>post</div>
         </div>
     )
