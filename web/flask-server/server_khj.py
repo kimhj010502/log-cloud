@@ -190,12 +190,12 @@ def make_tag(text, emotion):
 	decoded_output = hashtag_tokenizer.decode(output[0], skip_special_tokens=True)
 
 	hashtag_list = list(decoded_output.split("#"))[:5]
-	hashtag_list.remove('')
+	if '' in hashtag_list:
+		hashtag_list.remove('')
 	hashtag_list = [s.strip() for s in hashtag_list]
 	hashtag_list.insert(0, emotion_list[emotion])
 	return hashtag_list
 
-from pydub import AudioSegment
 
 def select_option(request, session):
 	user_id = session.get("user_id")

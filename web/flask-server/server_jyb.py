@@ -163,6 +163,7 @@ def login_user(request, bcrypt):
 	
 	# set client-side session cookie
 	session["user_id"] = username
+	print("session id:", session["user_id"])
 	
 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 

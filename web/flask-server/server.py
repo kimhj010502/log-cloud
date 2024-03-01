@@ -18,7 +18,6 @@ from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
 import pandas as pd
-import cv2
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 

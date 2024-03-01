@@ -206,7 +206,7 @@ def social(request, session):
 		return jsonify("No one has shared their memories.")
 	
 	date_list = []
-	\
+	
 	for i in week_videos.with_entities(videoInfo.date).all():
 		date_list.append(i[0])
 
