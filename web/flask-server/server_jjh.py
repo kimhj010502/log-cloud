@@ -15,7 +15,7 @@ from sqlalchemy import extract, asc, or_, desc
 from sqlalchemy.exc import IntegrityError
 
 from config import ApplicationConfig
-from models import db, User, videoInfo, videoLog, socialNetwork
+from models import db, User, videoInfo, videoLog, socialNetwork, likeLog, commentLog
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -44,6 +44,86 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
+# API
+def get_list(db_data):
+	list_tmp = []
+	for i in db_data:
+		list_tmp.append(i[0])
+	return list_tmp
+
+
+
+def get_images(image_list, image_type):
+	images = []
+
+	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+	with ssh_client.open_sftp() as sftp:
+		for img in image_list:
+			with sftp.file(img, 'rb') as file:
+				image_data = base64.b64encode(file.read()).decode('utf-8')
+				image_data = 'data:image/'+image_type+';base64,'+image_data
+				images.append(image_data)
+
+	sftp.close()
+	ssh_client.close()
+	
+	return images
+
+
+
+def get_video(video_url):
+	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+	with ssh_client.open_sftp() as sftp:
+		with sftp.file(video_url, 'rb') as file:
+			video_file = 'data:video/mp4;base64,'+ base64.b64encode(file.read()).decode('utf-8')
+	sftp.close()
+	ssh_client.close()
+	return video_file
+
+
+
+def get_likes(videoId):
+	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
+	likes_list = []
+	for i in like_ids:
+		likes_list.append(i[0])
+
+	join_table = likeLog.query.join(User, likeLog.username == User.username).filter(likeLog.video_id == videoId)
+	like_profile = get_list(join_table.with_entities(User.profile_img).all())
+	like_profile_image = get_images(like_profile, 'jpg')
+
+	data =  [{ 'id': id, 'profile':profile } for id, profile in zip(likes_list, like_profile_image)]
+	
+	return likes_list, data
+
+	
+
+def get_comments(videoId):
+	comment_ids = commentLog.query.filter(commentLog.video_id == videoId).order_by(commentLog.date).with_entities(commentLog.username).all()
+	comments = commentLog.query.filter(commentLog.video_id == videoId).order_by(commentLog.date).with_entities(commentLog.comment).all()
+	
+	commentId_list = get_list(comment_ids)
+	comments_list = get_list(comments)
+
+	join_table = commentLog.query.join(User, commentLog.username == User.username).filter(commentLog.video_id == videoId).order_by(commentLog.date)
+	comment_profile = get_list(join_table.with_entities(User.profile_img).all())
+	comment_profile_image = get_images(comment_profile, 'jpg')
+
+	data = [{ 'id': id, 'comments': comment, 'profile':profile } for id, comment, profile in zip(commentId_list, comments_list, comment_profile_image)]
+	
+	return data
+
+
+def did_u_like(videoId, username, likeList):
+	if username in likeList:
+		return True
+	else:
+		return False
+
+
+
+
+# PAGE FUNCTION
 def analysisReport(request, session):
 	user_id = session.get('user_id')
 	if not user_id:
@@ -76,10 +156,7 @@ def analysisReport(request, session):
 		top5_tag = pd.Series(hashtag_list).value_counts().index.to_list()
 	
 	# count emotions
-	emotion_list = []
-	for i in emotion:
-		emotion_list.append(i[0])
-
+	emotion_list = get_list(emotion)
 	count_emotion = pd.Series(emotion_list).value_counts()
 	
 	def get_emotion_counts(x):
@@ -150,29 +227,13 @@ def searchResult(request, session):
 	if (posts.count() == 0):
 		return jsonify("No records meet the conditions.")
 
-	date_list = []
-	for i in posts.with_entities(videoInfo.date).all():
-		date_list.append(i[0])
-
-	coverImg_list = []
-	for i in posts.with_entities(videoInfo.cover_image).all():
-		coverImg_list.append(i[0])
+	date_list = get_list(posts.with_entities(videoInfo.date).all())
+	coverImg_list = get_list(posts.with_entities(videoInfo.cover_image).all())
 
 	if not user_id or len(coverImg_list) == 0:
 		return jsonify({"error": "Image not found"}), 404
 	
-	image_data_list = []
-	
-	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-	with ssh_client.open_sftp() as sftp:
-		for coverImg in coverImg_list:
-			with sftp.file(coverImg, 'rb') as file:
-				image_data = base64.b64encode(file.read()).decode('utf-8')
-				image_data_list.append(image_data)
-
-	sftp.close()
-	ssh_client.close()
-
+	image_data_list = get_images(coverImg_list, 'png')
 
 	data = [{ 'date': date, 'coverImg': coverImg} for date, coverImg in zip(date_list, image_data_list)]
 
@@ -188,14 +249,9 @@ def social(request, session):
 		return jsonify({"error": "Unauthorized"}), 401
 	
 	
-	friends_list = []
 	friends1 = socialNetwork.query.filter(socialNetwork.username1 == user_id, socialNetwork.state == 1).with_entities(socialNetwork.username2).all()
 	friends2 = socialNetwork.query.filter(socialNetwork.username2 == user_id, socialNetwork.state == 1).with_entities(socialNetwork.username1).all()
-
-	for i in friends1:
-		friends_list.append(i[0])
-	for j in friends2:
-		friends_list.append(j[0])
+	friends_list = get_list(friends1) + get_list(friends2)
 
 	end_date = datetime.now()
 	start_date = (end_date - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -205,41 +261,16 @@ def social(request, session):
 	if (week_videos.count() == 0):
 		return jsonify("No one has shared their memories.")
 	
-	date_list = []
-	\
-	for i in week_videos.with_entities(videoInfo.date).all():
-		date_list.append(i[0])
-
-	coverImg_list = []
-	for i in week_videos.with_entities(videoInfo.cover_image).all():
-		coverImg_list.append(i[0])
-
-	profileusername_list = []
-	for i in week_videos.with_entities(videoInfo.username).all():
-		profileusername_list.append(i[0])
-
-	profile_list = []
+	date_list = get_list(week_videos.with_entities(videoInfo.date).all())
+	coverImg_list = get_list(week_videos.with_entities(videoInfo.cover_image).all())
+	profileusername_list = get_list(week_videos.with_entities(videoInfo.username).all())
+	
 	join_table = videoInfo.query.join(User, videoInfo.username == User.username).filter(videoInfo.username.in_(friends_list), videoInfo.date >= start_date, videoInfo.date <= end_date).order_by(desc(videoInfo.date))
-	for i in join_table.with_entities(User.profile_img).all():
-		profile_list.append(i[0])
+	profile_list = get_list(join_table.with_entities(User.profile_img).all())
 
 
-	cover_image = []
-	profile_image = []
-
-	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-	with ssh_client.open_sftp() as sftp:
-		for coverImg in coverImg_list:
-			with sftp.file(coverImg, 'rb') as file:
-				image_data = base64.b64encode(file.read()).decode('utf-8')
-				cover_image.append(image_data)
-		for profile in profile_list:
-			with sftp.file(profile, 'rb') as file:
-				image_data = base64.b64encode(file.read()).decode('utf-8')
-				profile_image.append(image_data)
-
-	sftp.close()
-	ssh_client.close()
+	cover_image = get_images(coverImg_list, 'png')
+	profile_image = get_images(profile_list, 'jpg')
 	
 	data = [{ 'date': date, 'coverImg': coverImg, 'profileUsername':username, 'profileImg':profile} for date, coverImg, username, profile in zip(date_list, cover_image, profileusername_list, profile_image)]
 
@@ -256,6 +287,7 @@ def socialDetail(request, session):
 	date = request.json['date']
 	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 	post_user = request.json['id']
+	#liked = request.json['liked']
 	
 	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
 	summary = video_detail.with_entities(videoInfo.summary).all()[0][0]
@@ -263,18 +295,67 @@ def socialDetail(request, session):
 	emotion = video_detail.with_entities(videoInfo.emotion).all()[0][0]
 	video_url = video_detail.with_entities(videoInfo.video_url).all()[0][0]
 	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
-	print(video_id)
-	
-	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-	with ssh_client.open_sftp() as sftp:
-		with sftp.file(video_url, 'rb') as file:
-			video_file = base64.b64encode(file.read()).decode('utf-8')
-	sftp.close()
-	ssh_client.close()
+
+	likeList, likeImage = get_likes(video_id)
+	commentsList = get_comments(video_id)
+
+	video_file = get_video(video_url)
+
+	is_like = did_u_like(video_id, user_id, likeList)
 	
 	data = {"hashtags": hashtags,
 			"summary": summary,
 			"emotion": emotion,
-			"video": video_file}
+			"video": video_file,
+			"likeList": likeList,
+			"likeImage": likeImage,
+			"commentList": commentsList,
+			"videoId": video_id, 
+			"isLike": is_like}
+	
+
+	print("------------------")
+	#print(liked)
 	
 	return jsonify(data)
+
+
+
+def comments(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	video_id = request.json.get('videoId')['videoId']
+	comment = request.json.get('comment')
+	print("------------")
+	print(video_id, comment)
+
+	# Insert comment into the database
+	new_comment = commentLog(video_id = video_id, username=user_id, comment = comment)
+	db.session.add(new_comment)
+	db.session.commit()
+	return ""
+
+
+
+def hearts(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	video_id = request.json.get('videoId')
+	like = request.json.get('liked')
+
+	# Insert comment into the database
+	if like:
+		new_like = likeLog(video_id = video_id, username=user_id)
+		db.session.add(new_like)
+	else:
+		delete_like = likeLog.query.filter_by(video_id = video_id, username=user_id).one()
+		db.session.delete(delete_like)
+	db.session.commit()
+	
+	return ""

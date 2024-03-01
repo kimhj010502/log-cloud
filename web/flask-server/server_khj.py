@@ -17,7 +17,6 @@ from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
-import cv2
 import moviepy.editor as mp
 import speech_recognition as sr
 
@@ -195,7 +194,6 @@ def make_tag(text, emotion):
 	hashtag_list.insert(0, emotion_list[emotion])
 	return hashtag_list
 
-from pydub import AudioSegment
 
 def select_option(request, session):
 	user_id = session.get("user_id")

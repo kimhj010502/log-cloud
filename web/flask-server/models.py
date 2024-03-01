@@ -40,3 +40,17 @@ class socialNetwork(db.Model):
 	username1 = db.Column(db.String(32), nullable=False, primary_key = True)
 	username2 = db.Column(db.String(32), nullable=False, primary_key = True)
 	state = db.Column(db.Integer, nullable=False, primary_key = True)
+
+
+class likeLog(db.Model):
+	__tablename__ = "like_log"
+	video_id = db.Column(db.String(45), nullable=False, primary_key = True)
+	username = db.Column(db.String(45), nullable=False, primary_key = True)
+
+
+class commentLog(db.Model):
+	__tablename__ = "comment_log"
+	video_id = db.Column(db.String(45), nullable=False, primary_key = True)
+	username = db.Column(db.String(45), nullable=False, primary_key = True)
+	comment = db.Column(db.Text, nullable=False, primary_key = True)
+	date = db.Column(db.TIMESTAMP, server_default=db.func.now())
