@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
-import ProfilePage from "./Profile";
 
 
 function resizeAndCropImage(file, width, height) {
@@ -186,7 +185,7 @@ export function ProfileImg() {
     );
 }
 
-async function handleLogout() {
+async function handleLogout(updateIsAuthorized) {
     try {
         const response = await fetch('/logout', {
             method: 'GET',
@@ -200,6 +199,7 @@ async function handleLogout() {
             // console.log('Logging out...');
             console.log(data);
             sessionStorage.clear();
+            console.log(updateIsAuthorized);
             // return {username: data.username, createdAt: data.createdAt};
         }
 
@@ -208,10 +208,19 @@ async function handleLogout() {
     }
 }
 
-export function ProfileButtons({ isClicked, setIsClicked }) {
+
+export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) {
+
+
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
     };
+
+    function handleLogoutClick(updateIsAuthorized) {
+        handleLogout(updateIsAuthorized)
+        updateIsAuthorized(false);
+
+    }
 
     return (
         <div className='buttons-box'>
@@ -223,7 +232,7 @@ export function ProfileButtons({ isClicked, setIsClicked }) {
                 <div className='profile-button'>change password</div>
             </Link>
 
-            <Link to={'/login'} onClick={handleLogout} className='profile-link'>
+            <Link to={'/login'} onClick={handleLogoutClick} className='profile-link'>
                 <div className='profile-button'>log out</div>
             </Link>
 

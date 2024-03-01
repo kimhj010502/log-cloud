@@ -24,35 +24,58 @@ import Record from '../RecordPage/Record'
 import Upload from '../UploadPage/Upload'
 import Save from '../SavePage/Save'
 import Edit from '../EditPage/Edit'
+import {useEffect, useState} from "react";
 
 function Routing() {
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    // authorization check
+    useEffect(() => {
+        // add authorization
+        async function checkAuthentication() {
+            try {
+                const response = await fetch('/authentication');
+                const data = await response.json();
+                setIsAuthorized(data.authenticated);
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                setIsAuthorized(false);
+            }
+        }
+        checkAuthentication();
+    }, []);
+
+    const updateIsAuthorized = (value) => {
+        setIsAuthorized(value);
+    };
+
     return (
         <div className="body">
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={<App />} />
+                    <Route path='/' element={isAuthorized ? <App /> : <Navigate to="/login" replace />} />
 
-                    <Route path='feed' element={<Feed />} />
+                    <Route path='feed' element={isAuthorized ? <Feed /> : <Navigate to="/login" replace />} />
 
-                    <Route path='social' element={<Social />} />
-                    <Route path='social-feed' element={<SocialFeed />} />
+                    <Route path='social' element={isAuthorized ? <Social /> : <Navigate to="/login" replace />} />
+                    <Route path='social-feed' element={isAuthorized ? <SocialFeed /> : <Navigate to="/login" replace />} />
 
-                    <Route path='search' element={<Search />} />
-                    <Route path='search-result' element={<SearchResult />} />
+                    <Route path='search' element={isAuthorized ? <Search /> : <Navigate to="/login" replace />} />
+                    <Route path='search-result' element={isAuthorized ? <SearchResult /> : <Navigate to="/login" replace />} />
 
-                    <Route path='analysis' element={<Analysis />} />
+                    <Route path='analysis' element={isAuthorized ? <Analysis /> : <Navigate to="/login" replace />} />
 
-                    <Route path='profile' element={<Profile />} />
-                    <Route path='manage-friends' element={<ManageFriends />} />
-                    <Route path='change-password' element={<ChangePassword />} />
+                    <Route path='profile' element={isAuthorized ? <Profile updateIsAuthorized={updateIsAuthorized} /> : <Navigate to="/login" replace />} />
+                    <Route path='manage-friends' element={isAuthorized ? <ManageFriends /> : <Navigate to="/login" replace />} />
+                    <Route path='change-password' element={isAuthorized ? <ChangePassword /> : <Navigate to="/login" replace />} />
 
-                    <Route path='login' element={<Login />} />
-                    <Route path='signup' element={<Signup />} />
+                    <Route path='login' element={isAuthorized ? <Navigate to="/" replace /> : <Login updateIsAuthorized={updateIsAuthorized} /> } />
+                    <Route path='signup' element={isAuthorized ? <Navigate to="/" replace /> : <Signup /> } />
 
-                    <Route path='record' element={<Record />} />
-                    <Route path='upload' element={<Upload />} />
-                    <Route path='save' element={<Save />} />
-                    <Route path='edit' element={<Edit />} />
+                    <Route path='record' element={isAuthorized ? <Record /> : <Navigate to="/login" replace />} />
+                    <Route path='upload' element={isAuthorized ? <Upload /> : <Navigate to="/login" replace />} />
+                    <Route path='save' element={isAuthorized ? <Save /> : <Navigate to="/login" replace />} />
+                    <Route path='edit' element={isAuthorized ? <Edit /> : <Navigate to="/login" replace />} />
                 </Routes>
             </BrowserRouter>
         </div>
