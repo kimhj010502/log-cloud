@@ -13,6 +13,8 @@ import io
 from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
 
+import cv2
+
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
