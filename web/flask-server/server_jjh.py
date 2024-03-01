@@ -287,7 +287,6 @@ def socialDetail(request, session):
 	date = request.json['date']
 	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 	post_user = request.json['id']
-	#liked = request.json['liked']
 	
 	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
 	summary = video_detail.with_entities(videoInfo.summary).all()[0][0]
@@ -312,10 +311,6 @@ def socialDetail(request, session):
 			"commentList": commentsList,
 			"videoId": video_id, 
 			"isLike": is_like}
-	
-
-	print("------------------")
-	#print(liked)
 	
 	return jsonify(data)
 
@@ -359,3 +354,74 @@ def hearts(request, session):
 	db.session.commit()
 	
 	return ""
+
+
+
+def log_detail(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	video_id = request.json['videoId']
+	
+	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
+	
+	# error handling needed in case summary/emotion/hashtag doesn't exist
+	if video_detail:
+		print("Video URL:", video_detail.video_url)
+		print("Summary:", video_detail.summary)
+		print("Emotion:", video_detail.emotion)
+		print("Hashtag:", video_detail.hashtag.split(', '))
+		print("Date:", video_detail.date)
+	else:
+		print("Video detail not found.")
+	
+	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
+			"coverImg": video_detail.cover_image,
+			"hashtags": video_detail.hashtag,
+			"summary": video_detail.summary,
+			"privacy": video_detail.share,
+			"emotion": video_detail.emotion}
+
+
+
+
+def get_log_overview_of_month(request):
+	username = request.json['username']
+	month = request.json['month']
+	year = request.json['year']
+	
+	start_date = datetime(year, month + 1, 1)
+	end_date = datetime(year, month + 1, calendar.monthrange(year, month + 1)[1]) if month < 12 else datetime(year + 1,
+																											  1,
+																											  calendar.monthrange(
+																												  year,
+																												  month + 1)[
+																												  1])
+	videos = videoInfo.query.filter(videoInfo.username == username, 
+								 videoInfo.date >= start_date, 
+								 videoInfo.date < end_date
+	).order_by(asc(videoInfo.date)).all()
+	
+	if videos:
+		date_list = []
+		coverImg_list = []
+		videoId_list = []
+		for video in videos:
+			date_list.append(video.date.day)
+			coverImg_list.append(video.cover_image)
+			videoId_list.append(video.video_id)
+
+		coverImage = get_images(coverImg_list, 'png')
+
+		video_info_list = [{ 'date': date, 'coverImage': img, 'videoId': videoId } for date, img, videoId in zip(date_list, coverImage, videoId_list)]
+
+		# print(video_info_list)
+		return jsonify(video_info_list)
+	else:
+		return jsonify({"error": "No videos found for the specified username"}), 404
+
+
+
+	

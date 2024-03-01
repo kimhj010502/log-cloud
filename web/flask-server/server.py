@@ -65,7 +65,7 @@ def save_log_route():
 	return save_log(request, session)
 
 
-from server_jjh import analysisReport, searchResult, social, socialDetail, comments, hearts
+from server_jjh import analysisReport, searchResult, social, socialDetail, comments, hearts, get_log_overview_of_month, log_detail
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
@@ -97,10 +97,23 @@ def hearts_route():
 	return hearts(request, session)
 
 
+@app.route("/month-overview", methods=['POST'])
+def get_log_overview_of_month_route():
+	return get_log_overview_of_month(request)
+
+
+@app.route("/logdetail", methods=['POST','GET'])
+def log_detail_route():
+	return log_detail(request)
+
+
+
+
+
 
 from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
 	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
-	get_log_overview_of_month, send_friend_request, search_user, get_friend_list, log_detail, unsend_friend_request, \
+	send_friend_request, search_user, get_friend_list, log_detail, unsend_friend_request, \
 	reject_friend_request, accept_friend_request, remove_friend, logout_user
 
 @app.route("/generateDetails")
@@ -162,16 +175,6 @@ def get_user_profile_image_route():
 @app.route("/set_profile_image", methods=['POST'])
 def set_profile_image_route():
 	return set_profile_image(request, session)
-
-
-@app.route("/month-overview", methods=['POST'])
-def get_log_overview_of_month_route():
-	return get_log_overview_of_month(request)
-	
-
-@app.route("/logdetail", methods=['POST'])
-def log_detail_route():
-	return log_detail(request, session)
 
 
 @app.route('/get_friend_list', methods=['POST'])
