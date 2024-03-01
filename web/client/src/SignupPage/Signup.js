@@ -12,20 +12,6 @@ function SignupPage() {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Fetch authentication status from the backend
-        fetch('/check_authentication')
-            .then(response => response.json())
-            .then(data => {
-                if (data.authenticated){
-                    navigate("/");
-                }
-            })
-            .catch(error => {
-                console.error('Error checking authentication:', error);
-            });
-    }, []);
-
     const handleSetEmail = (e) => {
         setEmail(e.target.value);
     };
