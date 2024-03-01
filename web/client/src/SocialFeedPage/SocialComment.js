@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, LikeList, Comment, AddComment } from './SocialCommentComponents'
@@ -26,10 +26,9 @@ export function SocialComment({ data, date, username, profile, setPage, prevPage
 
                         <LikeList like_id_list={ data.likeList? data.likeList: [] } setPage={setPage} setPrevPage={setPrevPage} />
 
-                        {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
                             {data.commentList && data.commentList.map((cont) => (
-                                <Comment img_src='profile.png' id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
                             ))
                             }
                         </div>

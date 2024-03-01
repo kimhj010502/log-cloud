@@ -132,7 +132,8 @@ export function CameraRecord() {
     
 
     //영상 서버에 업로드
-    const handleUpload = async (selectedVideo) => {
+    const handleUpload = async (e, selectedVideo) => {
+        e.preventDefault();  // 이벤트의 기본 동작 막기
         console.log("버튼 클릭")
 
         if (selectedVideo) {
@@ -257,7 +258,7 @@ export function CameraRecord() {
 
         <div className="upload-button">
             {/* <Link to={'/upload'} state={{ prevURL: '/record', videoInfo: videoInfo }} className="upload-link"> */}
-            <div onClick={() => handleUpload(selectedVideo)} className="upload-link">UPLOAD</div>
+            <div onClick={(e) => handleUpload(e, selectedVideo)} className="upload-link">UPLOAD</div>
             {/* </Link> */}
         </div>
         </>

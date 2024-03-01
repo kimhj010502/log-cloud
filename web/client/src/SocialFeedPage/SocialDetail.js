@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, VideoPlay, HeartComment, HashTag, Summary } from './SocialDetailComponents'
@@ -35,6 +35,7 @@ export function SocialDetail({ data, date, username, profile, setPage, setPrevPa
                     </motion.div>
                 </AnimatePresence>
             )}
+
             <Navigation />
         </div>
 

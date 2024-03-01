@@ -163,6 +163,7 @@ def login_user(request, bcrypt):
 	
 	# set client-side session cookie
 	session["user_id"] = username
+	print("session id:", session["user_id"])
 	
 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
@@ -290,29 +291,6 @@ def get_log_overview_of_month(request):
 		return jsonify(video_info_list)
 	else:
 		return jsonify({"error": "No videos found for the specified username"}), 404
-
-
-def log_detail(request, session):
-	video_id = request.json['videoId']
-	
-	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
-	
-	# error handling needed in case summary/emotion/hashtag doesn't exist
-	if video_detail:
-		print("Video URL:", video_detail.video_url)
-		print("Summary:", video_detail.summary)
-		print("Emotion:", video_detail.emotion)
-		print("Hashtag:", video_detail.hashtag.split(', '))
-		print("Date:", video_detail.date)
-	else:
-		print("Video detail not found.")
-	
-	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
-			"coverImg": video_detail.cover_image,
-			"hashtags": video_detail.hashtag.split(', '),
-			"summary": video_detail.summary,
-			"privacy": video_detail.share,
-			"emotion": video_detail.emotion}
 
 
 def get_friend_list(request, session):

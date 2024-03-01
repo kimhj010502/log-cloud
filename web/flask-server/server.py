@@ -110,7 +110,6 @@ def log_detail_route():
 
 
 
-
 from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
 	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
 	send_friend_request, search_user, get_friend_list, log_detail, unsend_friend_request, \

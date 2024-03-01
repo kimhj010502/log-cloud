@@ -13,10 +13,13 @@ import io
 from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
 
+import cv2
+
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
+import cv2
 import moviepy.editor as mp
 import speech_recognition as sr
 
@@ -189,7 +192,8 @@ def make_tag(text, emotion):
 	decoded_output = hashtag_tokenizer.decode(output[0], skip_special_tokens=True)
 
 	hashtag_list = list(decoded_output.split("#"))[:5]
-	hashtag_list.remove('')
+	if '' in hashtag_list:
+		hashtag_list.remove('')
 	hashtag_list = [s.strip() for s in hashtag_list]
 	hashtag_list.insert(0, emotion_list[emotion])
 	return hashtag_list
