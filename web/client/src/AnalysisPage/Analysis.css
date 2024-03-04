@@ -122,14 +122,13 @@
 }
 
 .analysis-page .emotion-graph-box {
-    width: 470px;
-    height: 300px;
-    margin-top: -20px;
+    width: 400px;
+    height: 250px;
+    margin-top: 20px;
     margin-left: -10px;
 }
 
 .analysis-page .emotion-graph {
     width: 400px;
     height: 250px;
-    border: 1px solid blue;
 }

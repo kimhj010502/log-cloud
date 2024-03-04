@@ -60,8 +60,43 @@
 
 # mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
 
-from models import db, User, videoInfo, videoLog, socialNetwork
+# from models import db, User, videoInfo, videoLog, socialNetwork
 
-new_log = videoInfo(username=user_id, video_id=video_info['video_id'], video_date=video_date, video_url=video_info['video_url'], cover_image=video_info['cover_image'], original_text=session['original_text'], summary=summary, emotion=session['emotion'], hashtag=hashtags, share=int(switches['public']))
-db.session.add(new_log)
-db.session.commit()
+# new_log = videoInfo(username='user', video_id='olduser', video_date=video_date, video_url=video_info['video_url'], cover_image=video_info['cover_image'], original_text=session['original_text'], summary=summary, emotion=session['emotion'], hashtag=hashtags, share=int(switches['public']))
+# db.session.add(new_log)
+# db.session.commit()
+
+# from moviepy.editor import VideoFileClip, AudioFileClip
+
+# filename = "web/client/public/temp/olduser20240303205144515697.mp4"
+# clip = VideoFileClip(filename)
+# clip.audio.write_audiofile(filename[:-4] + ".wav")
+# clip.close()
+
+
+from pyffmpeg import FFmpeg
+
+# 원본 동영상 파일과 배경음악 파일 경로
+video_path = "web/client/public/temp/olduser20240303205144515697.mp4"
+audio_path = "web/client/public/sample_bgm.mp3"
+
+result_path = "web/client/public/temp/result.mp4"
+
+
+# FFmpeg 객체 생성
+import subprocess
+
+# 비디오와 음악을 합치는 FFmpeg 명령어 생성
+command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
+
+# FFmpeg 명령어 실행
+subprocess.run(command, shell=True)
+# 새로운 동영상 저장
+# output_path = "web/client/public/temp/output.mp4"
+# video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
+
+# ffmpeg -i web/client/public/temp/olduser20240303205144515697.mp4 -i web/client/public/example_bgm.mp3 -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest web/client/public/temp/result.mp4
+
+# ffmpeg -i web/client/public/temp/olduser20240303205144515697.mp4 -i web/client/public/example_bgm.mp3 -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[0a];[1:a]aformat=fltp:44100:stereo[1a];[0a][1a]amix=inputs=2:duration=first" -c:v copy -map 0:v:0 -map "[0a]" -shortest web/client/public/temp/result.mp4
+
+# ffmpeg -i web/client/public/temp/olduser20240303205144515697.mp4 -i web/client/public/example_bgm.mp3 -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest web/client/public/temp/result.mp4
