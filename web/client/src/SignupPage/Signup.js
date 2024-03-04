@@ -67,7 +67,7 @@ function SignupPage() {
 
         if (username && email && password1 && password2) {
             try {
-                const response = await fetch('/signup', {
+                const response = await fetch('/registration', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
