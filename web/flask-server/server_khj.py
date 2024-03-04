@@ -65,9 +65,28 @@ class SSHManager:
 	def create_remote_folder(self, folder_path):
 		if self.sftp:
 			self.sftp.mkdir(folder_path)
-			
+
+	def remove_folder_contents(self, folder_path):
+		if self.sftp:
+			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+			remote_items = self.sftp.listdir(folder_path)
+
+			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
+			for item in remote_items:
+				remote_item_path = os.path.join(folder_path, item)
+				
+                # 원격 항목의 속성 가져오기
+				remote_item_attr = self.sftp.stat(remote_item_path)
+				
+				if stat.S_ISDIR(remote_item_attr.st_mode):
+					self.remove_folder_contents(remote_item_path)
+				else:
+					self.sftp.remove(remote_item_path)
+
+
 	def delete_folder(self, folder_path):
 		if self.sftp:
+			self.remove_folder_contents(folder_path)
 			self.sftp.rmdir(folder_path)
 			
 	def get_remote_folder(self, remote_folder_path, local_folder_path):
@@ -109,6 +128,13 @@ class SSHManager:
             # 파일 복사
 			self.sftp.get(remote_file_path, local_file_path)
 
+import shutil
+
+def delete_local_folder(folder_path):
+    try:
+        shutil.rmtree(folder_path)
+    except Exception as e:
+        print(f"Error deleting folder {folder_path}: {e}")
 	
 ssh_manager = SSHManager()
 
@@ -182,10 +208,14 @@ def remove_registered_user(request, session):
 			db.session.delete(user)
 		
 		db.session.commit()
-		session.clear()
+		
 
 
-		ssh_manager.open()
+		# 로컬 폴더 경로
+		local_folder_path = f'web/client/public/temp/{user_id}'
+
+		delete_local_folder(local_folder_path)
+		print('로컬 폴더 삭제 완료')
 
 		# 삭제할 폴더 경로
 		remote_folder_path = f'D:/log/{user_id}'
@@ -193,6 +223,8 @@ def remove_registered_user(request, session):
 
 		# SFTP 세션 닫기
 		ssh_manager.close()
+
+		session.clear()
 
 		return jsonify({"message": "Account deleted successfully"}), 200
 	
@@ -247,10 +279,8 @@ def logout_user(request, session):
 		# 로컬 폴더 경로
 		local_folder_path = f'web/client/public/temp/{user_id}'
 
-		# 원격 폴더 내용을 로컬로 복사
-		ssh_manager.delete_folder(local_folder_path)
-
-		ssh_manager.close()
+		delete_local_folder(local_folder_path)
+		print('로컬 폴더 삭제 완료')
 		
 		return jsonify({"msg": "Successful user logout"}), 200
 	else:
@@ -466,9 +496,11 @@ def select_option(request, session):
 					text = r.recognize_sphinx(audio, language='ko-KR')
 				except:
 					text = ''  # 빈 문자열로 설정
+		else:
+			text = ''
 
-			session['original_text'] = text
-			print('text: ', text)
+		session['original_text'] = text
+		print('text: ', text)
 
 		if switches["summary"]:
 			# 요약 모델
