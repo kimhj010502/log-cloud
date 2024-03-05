@@ -4,7 +4,31 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, VideoPlay, HeartComment, HashTag, Summary } from './SocialDetailComponents'
 import './SocialDetail.css';
 
-export function SocialDetail({ data, date, username, profile, setPage, setPrevPage }) {
+export function SocialDetail({ data, date, username, profile, setPage, setPrevPage, setLike }) {
+
+    // Send whether user likes or not
+    const sendHeartStatus = (liked) => {
+        const heart_data = { videoId: data.videoId, liked: liked };
+        setLike(liked);
+
+        fetch('/hearts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(heart_data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to send heart status');
+            }
+            console.log(liked, 'Heart status sent successfully');
+        })
+        .catch(error => {
+            console.error('Error sending heart status:', error);
+        });
+    };
+
     return (
         <div className="social-detail-page">
             <LogHeader />
@@ -23,7 +47,7 @@ export function SocialDetail({ data, date, username, profile, setPage, setPrevPa
                     >
                         <VideoPlay url={data.video? data.video: null}/>
 
-                        <HeartComment isPublic={true} isLiked={data.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId}/>
+                        <HeartComment isPublic={true} isLiked={data.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId} sendHeartStatus={sendHeartStatus} />
 
                         <div className="hashtag-container">
                             {data.hashtags && data.hashtags.map((tag, index) => (

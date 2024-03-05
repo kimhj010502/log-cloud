@@ -31,6 +31,7 @@ function SocialFeedPage() {
     console.log(location.state);
 
     const [data, setData] = useState([{}])
+    const[like, setLike] = data.isLike;
 
     useEffect(() => {
         setLoading(true);
@@ -56,14 +57,14 @@ function SocialFeedPage() {
         ) : (
             <>
             { page === 'social-detail' && (
-                <SocialDetail data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
+                <SocialDetail data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} setLike={setLike} />
             )}
             
             { page === 'social-comment' && (
                 <SocialComment data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
             { page === 'social-like' && (
-                <SocialLike data={data} id={id} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
+                <SocialLike data={data} id={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
             </>
         )}

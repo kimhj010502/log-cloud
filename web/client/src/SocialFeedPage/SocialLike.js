@@ -4,12 +4,12 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, Like } from './SocialLikeComponents'
 import './SocialLike.css';
 
-export function SocialLike({ data, id, setPage, setPrevPage }) {
+export function SocialLike({ data, id, profile, setPage, setPrevPage }) {
     return (
         <div className="social-like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
 
-            <ProfileDate date={data.date} id={id} profile_img_src="profile.png" />
+            <ProfileDate date={data.date} id={id} profile_img_src={profile} />
 
             <AnimatePresence mode='wait'>
                 <motion.div

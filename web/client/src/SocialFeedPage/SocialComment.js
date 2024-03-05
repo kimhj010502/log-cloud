@@ -5,6 +5,40 @@ import { LogHeader, ProfileDate, LikeList, Comment, AddComment } from './SocialC
 import './SocialComment.css';
 
 export function SocialComment({ data, date, username, profile, setPage, prevPage, setPrevPage }) {
+    const [newComment, setNewComment] = useState('');
+    const [prevComment, setPrevComment] = useState(data.commentList);
+    const account_holder_profile = sessionStorage.getItem('myProfileImg');
+    const account_holder_name = sessionStorage.getItem('username');
+
+    const handlePostComment = (newComment) => {
+        setNewComment(newComment);
+        const commentData = { videoId: data.videoId, comment: newComment };
+        console.log(newComment);
+
+        // 댓글 업데이트
+        const updatedList = [...prevComment, {'id':account_holder_name, 'comments':newComment, 'profile': account_holder_profile}];
+        setPrevComment(updatedList);
+
+        // POST 요청을 보내고 서버로 데이터 전송
+        fetch('/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(commentData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to post comment');
+            }
+            // 성공적으로 댓글을 게시한 후에 수행할 작업
+            console.log('Comment posted successfully');
+        })
+        .catch(error => {
+            console.error('Error posting comment:', error);
+        });
+    };
+
     return (
         <div className="social-comment-page">
             
@@ -27,13 +61,13 @@ export function SocialComment({ data, date, username, profile, setPage, prevPage
                         <LikeList like_id_list={ data.likeList? data.likeList: [] } setPage={setPage} setPrevPage={setPrevPage} />
 
                         <div className='comments-box'>
-                            {data.commentList && data.commentList.map((cont) => (
+                            {prevComment && prevComment.map((cont) => (
                                 <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
                             ))
                             }
                         </div>
 
-                        <AddComment videoId={data.videoId} />
+                        <AddComment setNewComment={handlePostComment} />
                     </div>
 
                     
@@ -55,13 +89,13 @@ export function SocialComment({ data, date, username, profile, setPage, prevPage
 
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
-                            {data.commentList && data.commentList.map((cont) => (
+                            {prevComment && prevComment.map((cont) => (
                                 <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} value={cont.comments? cont.comments: null} />
                             ))
                             }
                         </div>
 
-                        <AddComment videoId={data.videoId} />
+                        <AddComment setNewComment={handlePostComment} />
                     </div>
 
                     

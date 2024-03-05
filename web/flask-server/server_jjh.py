@@ -324,7 +324,7 @@ def comments(request, session):
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
 	
-	video_id = request.json.get('videoId')['videoId']
+	video_id = request.json.get('videoId')
 	comment = request.json.get('comment')
 	
 	# Insert comment into the database

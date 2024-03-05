@@ -46,7 +46,8 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-from server_khj import record_video, select_option, add_log, save_log
+from server_khj import record_video, select_option, add_log, save_log, \
+   register_user, remove_registered_user, login_user, logout_user
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
@@ -110,10 +111,10 @@ def log_detail_route():
 
 
 
-from server_jyb import check_authentication, check_username_availability, register_user, change_user_password, \
-	remove_registered_user, login_user, get_current_user, get_user_profile_image, set_profile_image, \
-	send_friend_request, search_user, get_friend_list, unsend_friend_request, \
-	reject_friend_request, accept_friend_request, remove_friend, logout_user
+from server_jyb import check_authentication, check_username_availability, change_user_password, \
+   get_current_user, get_user_profile_image, set_profile_image, \
+   send_friend_request, search_user, get_friend_list, unsend_friend_request, \
+   reject_friend_request, accept_friend_request, remove_friend
 
 @app.route("/generateDetails")
 def generate_details():
