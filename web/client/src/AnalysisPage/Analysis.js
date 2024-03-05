@@ -25,16 +25,20 @@ async function fetchData(currentYear, currentMonth) {
 
 
 function AnalysisPage() {
+    const [loading, setLoading] = useState(false);
+
     let date = new Date()
     const [currentYear, setCurrentYear] = useState(date.getFullYear())
     const [currentMonth, setCurrentMonth] = useState(date.getMonth())
     const [data, setData] = useState([{}])
 
     useEffect(() => {
+        setLoading(true)
         fetchData(currentYear, currentMonth)
             .then(data => {
                 setData(data);
                 console.log(data);
+                setLoading(false)
             })
             .catch(error => {
                 console.error('Error fetching data', error);
@@ -47,6 +51,7 @@ function AnalysisPage() {
 
             <h1>analysis report</h1>
 
+            
             {Object.keys(data).length === 0 ? ( // Check if data is empty
                 <h2>Loading...</h2>
             ) : (
@@ -58,7 +63,8 @@ function AnalysisPage() {
                     transition={{ duration: 0.5 }}
                     >
                     
-                    <Analysis currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} num={data.num} hashtag={data.hashtags} loved={data.loved} excited={data.excited} good={data.good} neutral={data.neutral} unhappy={data.unhappy} angry={data.angry} tired={data.tired}/>
+                    <Analysis currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} num={data.num} hashtag={data.hashtags} loved={data.loved} excited={data.excited} good={data.good} neutral={data.neutral} unhappy={data.unhappy} angry={data.angry} tired={data.tired} loading={loading} setLoading={setLoading}/>
+                    
                     </motion.div>
                 </AnimatePresence>
             )}

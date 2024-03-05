@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { ResponsiveLine } from '@nivo/line'
+import Loading from '../Routing/Loading'
 
-
-export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth, num, hashtag, loved, excited, good, neutral, unhappy, angry, tired }) {
+export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth, num, hashtag, loved, excited, good, neutral, unhappy, angry, tired, loading, setLoading }) {
     
     const handleClickLeft = () => {
         const newMonth = currentMonth - 1
@@ -29,8 +29,10 @@ export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrent
 
                 <RightOutlined className='right-button' onClick={handleClickRight}/>
             </div>
-
-            <MonthAnalysis year={currentYear} month={currentMonth + 1} num={num} hashtag={hashtag} loved={loved} excited={excited} good={good} neutral={neutral} unhappy={unhappy} angry={angry} tired={tired}/>
+            
+            {loading ? (<Loading />) : (
+                <MonthAnalysis year={currentYear} month={currentMonth + 1} num={num} hashtag={hashtag} loved={loved} excited={excited} good={good} neutral={neutral} unhappy={unhappy} angry={angry} tired={tired}/>
+            )}
         </div>
         
     )
@@ -137,7 +139,7 @@ function EmotionGraph({ data, max_num }) {
         <div className='emotion-graph-box'>
             <ResponsiveLine
             data={data}
-            margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+            margin={{ top: 10, right: 50, bottom: 50, left: 60 }}
             xScale={{ type: 'point' }}
             yScale={{
                 type: 'linear',

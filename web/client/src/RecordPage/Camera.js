@@ -132,7 +132,7 @@ export function CameraRecord() {
     
 
     //영상 서버에 업로드
-    const handleUpload = async (e, selectedVideo) => {
+    const handleUpload = async (e) => {
         e.preventDefault();  // 이벤트의 기본 동작 막기
         console.log("버튼 클릭")
 
@@ -140,7 +140,8 @@ export function CameraRecord() {
             console.log("영상 있음")
             const formData = new FormData();
             formData.append('video', selectedVideo);
-
+            console.log("파일 저장함")
+            
             try {
                 setLoading(true)
                 const response = await fetch('/record', {
@@ -165,7 +166,7 @@ export function CameraRecord() {
             catch (error) {
                 console.err('Error during video upload:', error);
             }
-        } 
+        }
 
         else if (recordedChunks.length) {
             const blob = new Blob(recordedChunks, { type: "video/mp4" });
@@ -200,8 +201,13 @@ export function CameraRecord() {
             }
         }
 
+        else if (recording) {
+            alert("녹화 종료 후 업로드해주세요.")
+        }
+
         else {
             console.log('No video recorded.');
+            alert("녹화된 영상이 없습니다.")
         }
     };
 
@@ -258,7 +264,7 @@ export function CameraRecord() {
 
         <div className="upload-button">
             {/* <Link to={'/upload'} state={{ prevURL: '/record', videoInfo: videoInfo }} className="upload-link"> */}
-            <div onClick={(e) => handleUpload(e, selectedVideo)} className="upload-link">UPLOAD</div>
+            <div onClick={handleUpload} className="upload-link">UPLOAD</div>
             {/* </Link> */}
         </div>
         </>

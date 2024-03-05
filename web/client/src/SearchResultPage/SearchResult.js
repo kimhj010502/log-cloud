@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navigation } from '../AppPage/AppComponents'
+import Loading from '../Routing/Loading'
 import { SearchHeader, SelectedValue, Result } from './SearchResultComponents'
 import './SearchResult.css'
 
@@ -26,16 +27,20 @@ async function fetchData(selectedValue){
 
 
 function SearchResultPage() {
+    const [loading, setLoading] = useState(false);
+
     const location = useLocation();
     const selectedValue = location.state;
     
     const [data, setData] = useState([{}])
 
     useEffect(() => {
+        setLoading(true)
         fetchData(selectedValue)
             .then(data => {
                 setData(data);
                 console.log(data);
+                setLoading(false)
             })
             .catch(error => {
                 console.error('Error fetching data', error);
@@ -48,6 +53,8 @@ function SearchResultPage() {
 
             <SearchHeader />
             
+            {loading ? (<Loading />) :
+            (
             <AnimatePresence mode='wait'>
                 <motion.div
                 initial={{ opacity: 0 }}
@@ -67,6 +74,8 @@ function SearchResultPage() {
                 </div>
                 </motion.div>
             </AnimatePresence>
+            )}
+
             <Navigation />
         </div>
     )
