@@ -37,7 +37,7 @@ function SignupPage() {
 
     const handleCheckAvailability = async() => {
         console.log(username);
-        const response = await fetch(`/check_username_availability?username=${username}`);
+        const response = await fetch(`/username_availability?username=${username}`);
         const data = await response.json();
         console.log(data);
         if (data.available === true) {
@@ -67,7 +67,7 @@ function SignupPage() {
 
         if (username && email && password1 && password2) {
             try {
-                const response = await fetch('/signup', {
+                const response = await fetch('/registration', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

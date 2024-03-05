@@ -1,67 +1,72 @@
-# import paramiko
-# from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
+import os
+import stat
+import paramiko
+from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
-# # SCP 연결 설정
-# ssh_client = paramiko.SSHClient()
-# ssh_client.load_system_host_keys()
-# ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# SCP 연결 설정
+ssh_client = paramiko.SSHClient()
+ssh_client.load_system_host_keys()
+ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-# # SSH 서버 정보
-# ssh_host = SSH_HOST
-# ssh_port = SSH_PORT
-# ssh_username = SSH_USERNAME
-# ssh_password = SSH_PASSWORD
-
-# # 파일 경로
-# file_name = 'olduser20240225034229650906'
-# local_image_path = f'web/client/public/temp/{file_name}.png'
-# local_video_path = f'web/client/public/temp/{file_name}.mp4'
-
-# # 저장 경로 (원하는 경로와 파일명으로 변경)
-# remote_image_path = f'D:/log/{file_name}.png'
-# remote_video_path = f'D:/log/{file_name}.mp4'
-
-# # SCP 연결
-# ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-
-# # 파일을 SCP로 원격 서버에 업로드
-# with ssh_client.open_sftp() as sftp:
-#     sftp.put(local_image_path, remote_image_path)
-#     sftp.put(local_video_path, remote_video_path)
-
-# # SSH 연결 종료
-# ssh_client.close()
-
-# from datetime import datetime
-
-# now = datetime.now()
-# upload_date = [now.year, now.month, now.day]
-# remote_video_date = str(now.strftime("%Y%m%d")).replace('-','')
-# local_video_date = str(now).replace('-','').replace(' ','').replace(':','').replace('.','')
-# print(remote_video_date, local_video_date)
+# SSH 서버 정보
+ssh_host = SSH_HOST
+ssh_port = SSH_PORT
+ssh_username = SSH_USERNAME
+ssh_password = SSH_PASSWORD
 
 
-# local_video_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228014729041799.mp4"
-# local_audio_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228014729041799.wav"
+class SSHManager:
+	def __init__(self):
+		self.host = SSH_HOST
+		self.port = SSH_PORT
+		self.username = SSH_USERNAME
+		self.password = SSH_PASSWORD
+		self.ssh_client = paramiko.SSHClient()
+		self.ssh_client.load_system_host_keys()
+		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		self.sftp = None
+		
+	def open(self):
+		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
+		self.sftp = self.ssh_client.open_sftp()
+		
+	def close(self):
+		if self.sftp:
+			self.sftp.close()
+		self.ssh_client.close()
 
-# import moviepy.editor as mp
 
-# ffmpeg_path = '/usr/bin/ffmpeg'
+	def remove_folder_contents(self, folder_path):
+		if self.sftp:
+			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+			remote_items = self.sftp.listdir(folder_path)
 
-# input_file = "input.mp4"
-# output_file = "C:/Users/user/Desktop/log/log/web/client/public/temp/output.mp4"
+			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
+			for item in remote_items:
+				remote_item_path = os.path.join(folder_path, item)
+				
+                # 원격 항목의 속성 가져오기
+				remote_item_attr = self.sftp.stat(remote_item_path)
+				
+				if stat.S_ISDIR(remote_item_attr.st_mode):
+					self.remove_folder_contents(remote_item_path)
+				else:
+					self.sftp.remove(remote_item_path)
 
-# mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path,  local_audio_path)
 
-# import moviepy.editor as mp
+	def delete_folder(self, folder_path):
+		if self.sftp:
+			self.remove_folder_contents(folder_path)
+			self.sftp.rmdir(folder_path)
 
-# local_video_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228185941477681.mp4"
-# local_audio_path = "C:/Users/user/Desktop/log/log/web/client/public/temp/olduser20240228185941477681.mp3"
 
-# mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
+ssh_manager = SSHManager()
 
-from models import db, User, videoInfo, videoLog, socialNetwork
+ssh_manager.open()
 
-new_log = videoInfo(username=user_id, video_id=video_info['video_id'], video_date=video_date, video_url=video_info['video_url'], cover_image=video_info['cover_image'], original_text=session['original_text'], summary=summary, emotion=session['emotion'], hashtag=hashtags, share=int(switches['public']))
-db.session.add(new_log)
-db.session.commit()
+# 삭제할 폴더 경로
+remote_folder_path = f'D:/log/loguser'
+ssh_manager.delete_folder(remote_folder_path)
+
+# SFTP 세션 닫기
+ssh_manager.close()
