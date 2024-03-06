@@ -16,19 +16,14 @@ function ManageFriendsPage() {
 
     const [searchResult, setSearchResult] = useState([]);
 
+    const updateFriendList = (newFriendList) => {
+    setFriendList(newFriendList);
+};
+
+
     // console.log(friendList);
     // console.log(pendingReceivedRequests);
     // console.log(pendingSentRequests);
-
-    const updatePendingSentRequests = (friendUsername, isSent) => {
-        if (isSent) {
-            setPendingSentRequests([...pendingSentRequests, friendUsername]);
-        } else {
-            setPendingSentRequests(pendingSentRequests.filter(username => username !== friendUsername));
-        }
-        sessionStorage.setItem('pendingSentRequests', pendingSentRequests);
-    };
-
 
     useEffect(() => {
         //검색중인지 확인
@@ -124,7 +119,7 @@ function ManageFriendsPage() {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <PendingRequests friendList={friendList} pendingReceivedRequests={pendingReceivedRequests} pendingSentRequests={pendingSentRequests} />
+                        <PendingRequests friendList={friendList} updateFriendList={updateFriendList} pendingReceivedRequests={pendingReceivedRequests} pendingSentRequests={pendingSentRequests} />
                         <MyFriends friendList={friendList} />
                     </motion.div>
                 )}
@@ -137,7 +132,7 @@ function ManageFriendsPage() {
                     transition={{ duration: 0.5 }}
                     >
                         <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
-                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
+                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} />
                     </motion.div>
                 )}
  

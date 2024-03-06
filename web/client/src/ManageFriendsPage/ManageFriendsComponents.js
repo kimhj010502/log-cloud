@@ -62,6 +62,7 @@ function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id, onR
             .then(response => {
                 if (response.ok) {
                     friendList.push(friend_username);
+                    sessionStorage.setItem('friendList', JSON.stringify(friendList));
 
                     // remove friend_username from pendingReceivedRequests
                     const index = pendingReceivedRequests.indexOf(friend_username);
@@ -69,6 +70,7 @@ function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id, onR
                     sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(pendingReceivedRequests));
 
                     onRemove();
+                    window.location.reload();
 
                 } else {
                     console.error('Failed to accept friend request');
@@ -136,7 +138,7 @@ export function MyFriends({ friendList }) {
         if (friendList){
             setIsFriends(friendList.length > 0);
         }
-    }, [friendList]);
+    }, [updatedFriendList]);
 
     const removeFriendTag = (friend_username) => {
         const updatedList = updatedFriendList.filter(username => username !== friend_username);
@@ -150,7 +152,7 @@ export function MyFriends({ friendList }) {
             { isFriends && (
                 <div className='friends-box'>
                     {friendList.map((username, index) => (
-                        <FriendProfile friendList={friendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
+                        <FriendProfile friendList={updatedFriendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
                     ))}
                 </div>
             )}
@@ -164,31 +166,37 @@ export function MyFriends({ friendList }) {
 
 function FriendProfile({ friendList, img_src, id, onRemove }) {
     function handleRemoveFriend(friend_username) {
-        // remove friend_username from friendList
-        const index = friendList.indexOf(friend_username);
-        friendList.splice(index, 1);
-        sessionStorage.setItem('friendList', JSON.stringify(friendList));
-        // remove saved friend_username profile image from session storage
-        sessionStorage.removeItem(friend_username);
+        console.log(typeof friendList);
+        console.log(friendList);
 
-        fetch('/remove_friend', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ "friend_username": friend_username }),
-        })
-        .then(response => {
-            if (response.ok) {
-                onRemove();
-            } else {
-                console.error('Failed to remove friend');
-            }
-        })
-        .catch(error => {
-            console.error('Error removing friend:', error);
-        });
+        // remove friend_username from friendList
+        if (friendList.includes(friend_username)) {
+            const index = friendList.indexOf(friend_username);
+            friendList.splice(index, 1);
+            sessionStorage.setItem('friendList', JSON.stringify(friendList));
+            // remove saved friend_username profile image from session storage
+            sessionStorage.removeItem(friend_username);
+
+            fetch('/remove_friend', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "friend_username": friend_username }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    onRemove();
+                } else {
+                    console.error('Failed to remove friend');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing friend:', error);
+            });
+        }
+
     }
 
     return (
@@ -209,26 +217,34 @@ function FriendProfile({ friendList, img_src, id, onRemove }) {
 
 // search result
 export function SearchingMyFriends({ friendList, searchString }) {
-    const [isFriends, setIsFriends] = useState(true);
+    const [isFriends, setIsFriends] = useState(friendList.length > 0);
     const [searchResult, setSearchResult] = useState([]);
 
+    const [updatedFriendList, setUpdatedFriendList] = useState(friendList);
+
     useEffect(() => {
-        if (friendList){
-            // setIsFriends(friendList.length > 0);
-            const result = friendList.filter(friend => friend.toLowerCase().includes(searchString.toLowerCase()));
+        if (updatedFriendList){
+            const result = updatedFriendList.filter(friend => friend.toLowerCase().includes(searchString.toLowerCase()));
             setSearchResult(result);
-            // setIsFriends(result.length > 0)
         }
-    }, [friendList, searchString]);
+        else {
+            setIsFriends(false);
+        }
+    }, [updatedFriendList, searchString]);
+
+    const removeFriendTag = (friend_username) => {
+        const updatedList = updatedFriendList.filter(username => username !== friend_username);
+        setUpdatedFriendList(updatedList);
+    }
 
     return (
         <div className='searching-my-friends-box'>
             <div className='searching-my-friends-header'>my friends</div>
 
-            { searchResult.length > 0 ? (
+            { isFriends ? (
                 <div className='searching-friends-box'>
                     {searchResult.map((username, index) => (
-                        <FriendProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
+                        <FriendProfile friendList={updatedFriendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
                     ))}
                 </div>
             ) : (
@@ -239,7 +255,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
 }
 
 
-export function SearchingMoreResults({ searchResult, pendingSentRequests, updatePendingSentRequests }) {
+export function SearchingMoreResults({ searchResult, pendingSentRequests }) {
     const [isMoreResults, setIsMoreResults] = useState(false);
 
     useEffect(() => {
@@ -255,7 +271,7 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests, update
             { isMoreResults ? (
                 <div className='searching-results-box'>
                     {searchResult.map((username, index) => (
-                        <MoreResultProfile key={index} img_src={sessionStorage.getItem(username)} id={username} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
+                        <MoreResultProfile key={index} img_src={sessionStorage.getItem(username)} id={username} pendingSentRequests={pendingSentRequests} />
                     ))}
                 </div>
             ) : (
@@ -266,7 +282,7 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests, update
 }
 
 
-function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePendingSentRequests }) {
+function MoreResultProfile({ img_src, id, request, pendingSentRequests }) {
     const [requestSent, setRequestSent] = useState(false);
     const [profileImg, setProfileImg] = useState(img_src);
 
@@ -307,7 +323,8 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
             })
             .then(response => {
                 if (response.ok) {
-                    updatePendingSentRequests(id, true);
+                    pendingSentRequests.push(id);
+                    sessionStorage.setItem('pendingSentRequests', JSON.stringify(pendingSentRequests));
                 } else {
                     console.error('Failed to send friend request');
                 }
@@ -330,7 +347,10 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
             })
             .then(response => {
                 if (response.ok) {
-                    updatePendingSentRequests(id, false);
+                    // remove friend_username from pendingSentRequests
+                    const index = pendingSentRequests.indexOf(id);
+                    pendingSentRequests.splice(index, 1);
+                    sessionStorage.setItem('pendingSentRequests', JSON.stringify(pendingSentRequests));
                 } else {
                     console.log('Failed to unsend friend request');
                 }
@@ -344,7 +364,7 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
     return (
         <div className='searching-result-box'>
             <div className="result-img">
-                <img className="profile-img" src={img_src} alt="profile img"/>
+                <img className="profile-img" src={profileImg} alt="profile img"/>
             </div>
 
             <div className='result-id'>
