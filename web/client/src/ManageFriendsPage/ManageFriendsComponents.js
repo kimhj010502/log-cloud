@@ -18,13 +18,10 @@ export function ManageFriendsHeader() {
 
 export function PendingRequests({ friendList, pendingReceivedRequests, pendingSentRequests }) {
     const [isRequests, setIsRequests] = useState(false);
-    console.log(friendList);
 
-    console.log(typeof friendList);
     useEffect(() => {
         if (pendingReceivedRequests){
             setIsRequests(pendingReceivedRequests.length > 0);
-            console.log(pendingReceivedRequests);
         }
     }, [pendingReceivedRequests]);
 
@@ -262,6 +259,23 @@ export function SearchingMoreResults({ searchResult, pendingSentRequests, update
 
 function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePendingSentRequests }) {
     const [requestSent, setRequestSent] = useState(false);
+    const [profileImg, setProfileImg] = useState(img_src);
+
+    useEffect( () => {
+        async function fetchProfileImg(){
+            try {
+                const response = await getProfileImage(id)
+                sessionStorage.setItem(id, response);
+                setProfileImg(response);
+                console.log("got " + id + "'s profile image");
+            } catch (error) {
+                console.log("Error getting profile image of: " + id);
+            }
+        }
+        if (!profileImg) {
+            fetchProfileImg();
+        }
+    }, [])
 
     useEffect(() => {
         if (pendingSentRequests.includes(id)) {
