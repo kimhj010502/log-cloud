@@ -63,6 +63,28 @@ function LoginPage({ updateIsAuthorized }) {
                     // sessionStorage.setItem('email', data.email);
                     sessionStorage.setItem('myProfileImg', await getProfileImage(data.username));
 
+                    // get friend's profile images
+                    const friendInfo = await getFriendList();
+
+                    sessionStorage.setItem('friendList', JSON.stringify(friendInfo.friendList));
+                    sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(friendInfo.pendingReceivedRequests));
+                    sessionStorage.setItem('pendingSentRequests', JSON.stringify(friendInfo.pendingSentRequests));
+
+                    for (const user of friendInfo.friendList) {
+                        if (!sessionStorage[user]) {
+                            sessionStorage.setItem(user, await getProfileImage(user));
+                            console.log("got "+user+"'s profile image");
+                        }
+                    }
+
+                    for (const user of friendInfo.pendingReceivedRequests) {
+                        if (!sessionStorage[user]) {
+                            sessionStorage.setItem(user, await getProfileImage(user));
+                            console.log("got "+user+"'s profile image");
+                        }
+                    }
+
+                    console.log("successful login");
                     updateIsAuthorized(true);
 
                     navigate("/", { replace: true });
@@ -148,6 +170,29 @@ function LoginButton({ handleLogin }) {
             </div>
         </div>
     )
+}
+
+export async function getFriendList() {
+    try {
+        console.log("fetching friend info")
+        const response = await fetch('/get_friend_list', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            // body: JSON.stringify({ username: sessionStorage.getItem('username') })
+        });
+        if (!response.ok) {
+            console.log('Error fetching friend data');
+        }
+        const data = await response.json();
+        console.log(data);
+        return {friendList: data.friends, pendingReceivedRequests: data.pending_received_requests, pendingSentRequests: data.pending_sent_requests};
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
 }
 
 export default LoginPage

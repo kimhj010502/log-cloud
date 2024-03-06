@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeftOutlined } from '@ant-design/icons'
+import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
 export function ManageFriendsHeader() {
     return (
@@ -15,12 +16,15 @@ export function ManageFriendsHeader() {
 }
 
 
-export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }) {
-    const [isRequests, setIsRequests] = useState(false)
+export function PendingRequests({ friendList, pendingReceivedRequests, pendingSentRequests }) {
+    const [isRequests, setIsRequests] = useState(false);
+    console.log(friendList);
 
+    console.log(typeof friendList);
     useEffect(() => {
         if (pendingReceivedRequests){
             setIsRequests(pendingReceivedRequests.length > 0);
+            console.log(pendingReceivedRequests);
         }
     }, [pendingReceivedRequests]);
 
@@ -28,42 +32,46 @@ export function PendingRequests({ pendingReceivedRequests, pendingSentRequests }
         <div className='pending-requests-box'>
             <div className='pending-requests-header'>pending requests</div>
 
-            { isRequests && (
+            { isRequests ? (
                 <div className='requests-box'>
                     {pendingReceivedRequests.map((username, index) => (
-                        <RequestsProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
+                        <RequestsProfile friendList={friendList} pendingReceivedRequests={pendingReceivedRequests} key={index} img_src={sessionStorage.getItem(username)} id={username} />
                     ))}
                 </div>
-            )}
-
-            { !isRequests && (
+            ) : (
                 <div className='no-request'>no requests yet..</div>
             )}
         </div>
     )
 }
 
-function RequestsProfile({ img_src, id }) {
-    function handleAcceptFriendRequest(friend_username) {
+function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id }) {
+    async function handleAcceptFriendRequest(friend_username) {
         fetch('/accept_friend_request', {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ "friend_username": friend_username }),
+            body: JSON.stringify({"friend_username": friend_username}),
         })
-        .then(response => {
-            if (response.ok) {
-                // remove current <accept-box> tag
-                window.location.reload();
-            } else {
-                console.error('Failed to accept friend request');
-            }
-        })
-        .catch(error => {
-            console.error('Error accepting friend request:', error);
-        });
+            .then(response => {
+                if (response.ok) {
+                    friendList.push(friend_username);
+
+                    // remove friend_username from pendingReceivedRequests
+                    const index = pendingReceivedRequests.indexOf(friend_username);
+                    pendingReceivedRequests.splice(index, 1);
+
+                    window.location.reload();
+                } else {
+                    console.error('Failed to accept friend request');
+                }
+            })
+            .catch(error => {
+                console.error('Error accepting friend request:', error);
+            });
+
     }
 
     function handleDeclineFriendRequest(friend_username) {
@@ -77,7 +85,13 @@ function RequestsProfile({ img_src, id }) {
         })
         .then(response => {
             if (response.ok) {
-                // remove current <accept-box> tag
+                // remove friend_username from pendingReceivedRequests
+                const index = pendingReceivedRequests.indexOf(friend_username);
+                pendingReceivedRequests.splice(index, 1);
+
+                // remove saved friend_username profile image from session storage
+                sessionStorage.removeItem(friend_username);
+
                 window.location.reload();
             } else {
                 console.error('Failed to reject friend request');
@@ -109,12 +123,18 @@ function RequestsProfile({ img_src, id }) {
 
 export function MyFriends({ friendList }) {
     const [isFriends, setIsFriends] = useState(false);
+    const [updatedFriendList, setUpdatedFriendList] = useState(friendList);
 
     useEffect(() => {
         if (friendList){
             setIsFriends(friendList.length > 0);
         }
     }, [friendList]);
+
+    const removeFriendTag = (friend_username) => {
+        const updatedList = updatedFriendList.filter(username => username !== friend_username);
+        setUpdatedFriendList(updatedList);
+    }
 
     return (
         <div className='my-friends-box'>
@@ -123,7 +143,7 @@ export function MyFriends({ friendList }) {
             { isFriends && (
                 <div className='friends-box'>
                     {friendList.map((username, index) => (
-                        <FriendProfile key={index} img_src={sessionStorage.getItem(username)} id={username} />
+                        <FriendProfile friendList={friendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
                     ))}
                 </div>
             )}
@@ -135,8 +155,15 @@ export function MyFriends({ friendList }) {
     )
 }
 
-function FriendProfile({ img_src, id }) {
+function FriendProfile({ friendList, img_src, id, onRemove }) {
     function handleRemoveFriend(friend_username) {
+        // remove friend_username from friendList
+        const index = friendList.indexOf(friend_username);
+        friendList.splice(index, 1);
+        sessionStorage.setItem('friendList', JSON.stringify(friendList));
+        // remove saved friend_username profile image from session storage
+        sessionStorage.removeItem(friend_username);
+
         fetch('/remove_friend', {
             method: 'POST',
             credentials: 'include',
@@ -147,8 +174,8 @@ function FriendProfile({ img_src, id }) {
         })
         .then(response => {
             if (response.ok) {
-                // remove current <FriendProfile> tag
-                window.location.reload();
+                // window.location.reload();
+                onRemove();
             } else {
                 console.error('Failed to remove friend');
             }
@@ -245,6 +272,8 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
     const handleSendRequest = () => {
         if (!requestSent) {
             console.log("send request");
+            setRequestSent(true);
+
             fetch('/send_friend_request', {
                 method: 'POST',
                 credentials: 'include',
@@ -255,7 +284,6 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
             })
             .then(response => {
                 if (response.ok) {
-                    setRequestSent(true);
                     updatePendingSentRequests(id, true);
                 } else {
                     console.error('Failed to send friend request');
@@ -267,6 +295,8 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
 
         } else {
             console.log("unsend friend requst");
+            setRequestSent(false);
+
             fetch('/unsend_friend_request', {
                 method: 'POST',
                 credentials: 'include',
@@ -277,7 +307,6 @@ function MoreResultProfile({ img_src, id, request, pendingSentRequests, updatePe
             })
             .then(response => {
                 if (response.ok) {
-                    setRequestSent(false);
                     updatePendingSentRequests(id, false);
                 } else {
                     console.log('Failed to unsend friend request');
