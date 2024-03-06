@@ -25,6 +25,13 @@ export function PendingRequests({ friendList, pendingReceivedRequests, pendingSe
         }
     }, [pendingReceivedRequests]);
 
+    const [updatedPendingReceivedRequests, setUpdatedPendingReceivedRequests] = useState(pendingReceivedRequests);
+
+    const removeRequestTag = (friend_username) => {
+        const updatedList = updatedPendingReceivedRequests.filter(username => username !== friend_username);
+        setUpdatedPendingReceivedRequests(updatedList);
+    }
+
     return (
         <div className='pending-requests-box'>
             <div className='pending-requests-header'>pending requests</div>
@@ -32,7 +39,7 @@ export function PendingRequests({ friendList, pendingReceivedRequests, pendingSe
             { isRequests ? (
                 <div className='requests-box'>
                     {pendingReceivedRequests.map((username, index) => (
-                        <RequestsProfile friendList={friendList} pendingReceivedRequests={pendingReceivedRequests} key={index} img_src={sessionStorage.getItem(username)} id={username} />
+                        <RequestsProfile friendList={friendList} pendingReceivedRequests={pendingReceivedRequests} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeRequestTag()}  />
                     ))}
                 </div>
             ) : (
@@ -42,7 +49,7 @@ export function PendingRequests({ friendList, pendingReceivedRequests, pendingSe
     )
 }
 
-function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id }) {
+function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id, onRemove }) {
     async function handleAcceptFriendRequest(friend_username) {
         fetch('/accept_friend_request', {
             method: 'POST',
@@ -59,8 +66,10 @@ function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id }) {
                     // remove friend_username from pendingReceivedRequests
                     const index = pendingReceivedRequests.indexOf(friend_username);
                     pendingReceivedRequests.splice(index, 1);
+                    sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(pendingReceivedRequests));
 
-                    window.location.reload();
+                    onRemove();
+
                 } else {
                     console.error('Failed to accept friend request');
                 }
@@ -85,11 +94,12 @@ function RequestsProfile({ friendList, pendingReceivedRequests, img_src, id }) {
                 // remove friend_username from pendingReceivedRequests
                 const index = pendingReceivedRequests.indexOf(friend_username);
                 pendingReceivedRequests.splice(index, 1);
+                sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(pendingReceivedRequests));
 
                 // remove saved friend_username profile image from session storage
                 sessionStorage.removeItem(friend_username);
 
-                window.location.reload();
+                onRemove();
             } else {
                 console.error('Failed to reject friend request');
             }
@@ -171,7 +181,6 @@ function FriendProfile({ friendList, img_src, id, onRemove }) {
         })
         .then(response => {
             if (response.ok) {
-                // window.location.reload();
                 onRemove();
             } else {
                 console.error('Failed to remove friend');
