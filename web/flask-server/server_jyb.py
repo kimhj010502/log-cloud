@@ -283,12 +283,12 @@ def get_friend_list(request, session):
 	print("pending_received request_list:", pending_received_request_list)
 	print("pending_sent request_list:", pending_sent_request_list)
 	
-	if friend_list or pending_received_request_list or pending_sent_request_list:
-		return jsonify({"friends": friend_list,
-						"pending_received_requests": pending_received_request_list,
-						"pending_sent_requests": pending_sent_request_list}), 200
-	else:
-		return jsonify("Nothing to send"), 404
+	# if friend_list or pending_received_request_list or pending_sent_request_list:
+	return jsonify({"friends": friend_list,
+					"pending_received_requests": pending_received_request_list,
+					"pending_sent_requests": pending_sent_request_list}), 200
+	# else:
+	# 	return jsonify("Nothing to send"), 404
 
 
 def search_user(request, session):

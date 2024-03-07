@@ -70,17 +70,21 @@ function LoginPage({ updateIsAuthorized }) {
                     sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(friendInfo.pendingReceivedRequests));
                     sessionStorage.setItem('pendingSentRequests', JSON.stringify(friendInfo.pendingSentRequests));
 
-                    for (const user of friendInfo.friendList) {
-                        if (!sessionStorage[user]) {
-                            sessionStorage.setItem(user, await getProfileImage(user));
-                            console.log("got "+user+"'s profile image");
+                    if (friendInfo.friendList) {
+                        for (const user of friendInfo.friendList) {
+                            if (!sessionStorage[user]) {
+                                sessionStorage.setItem(user, await getProfileImage(user));
+                                console.log("got "+user+"'s profile image");
+                            }
                         }
                     }
 
-                    for (const user of friendInfo.pendingReceivedRequests) {
-                        if (!sessionStorage[user]) {
-                            sessionStorage.setItem(user, await getProfileImage(user));
-                            console.log("got "+user+"'s profile image");
+                    if (friendInfo.pendingReceivedRequests) {
+                        for (const user of friendInfo.pendingReceivedRequests) {
+                            if (!sessionStorage[user]) {
+                                sessionStorage.setItem(user, await getProfileImage(user));
+                                console.log("got "+user+"'s profile image");
+                            }
                         }
                     }
 
