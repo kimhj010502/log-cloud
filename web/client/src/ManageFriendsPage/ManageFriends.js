@@ -10,21 +10,19 @@ function ManageFriendsPage() {
     const [friendUsername, setFriendUsername] = useState("");
     const [isSearching, setIsSearching] = useState(false);
 
-    const [friendList, setFriendList] = useState([]);
-    const [pendingReceivedRequests, setPendingReceivedRequests] = useState([]);
-    const [pendingSentRequests, setPendingSentRequests] = useState([]);
+    const [friendList, setFriendList] = useState(JSON.parse(sessionStorage.getItem('friendList')));
+    const [pendingReceivedRequests, setPendingReceivedRequests] = useState(JSON.parse(sessionStorage.getItem('pendingReceivedRequests')));
+    const [pendingSentRequests, setPendingSentRequests] = useState(JSON.parse(sessionStorage.getItem('pendingSentRequests')));
 
     const [searchResult, setSearchResult] = useState([]);
 
-
-    const updatePendingSentRequests = (friendUsername, isSent) => {
-        if (isSent) {
-            setPendingSentRequests([...pendingSentRequests, friendUsername]);
-        } else {
-            setPendingSentRequests(pendingSentRequests.filter(username => username !== friendUsername));
-        }
+    const updateFriendList = (newFriendList) => {
+        setFriendList(newFriendList);
     };
 
+    // console.log(friendList);
+    // console.log(pendingReceivedRequests);
+    // console.log(pendingSentRequests);
 
     useEffect(() => {
         //검색중인지 확인
@@ -36,41 +34,6 @@ function ManageFriendsPage() {
         }
     }, [friendUsername]);
 
-    useEffect( () => {
-        async function fetchFriendInfo() {
-            try {
-                const response = await fetch('/get_friend_list', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    // body: JSON.stringify({ username: sessionStorage.getItem('username') })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    // console.log(data);
-                    setFriendList(data.friends);
-                    setPendingReceivedRequests(data.pending_received_requests);
-                    setPendingSentRequests(data.pending_sent_requests);
-
-                    for (const user of data.friends) {
-                        sessionStorage.setItem(user, await getProfileImage(user));
-                    }
-                    for (const user of data.pending_received_requests) {
-                        sessionStorage.setItem(user, await getProfileImage(user));
-                    }
-                } else {
-                    console.log('Error fetching friend data');
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        fetchFriendInfo();
-
-    }, []);
 
     useEffect(() => {
         async function fetchSearchResult() {
@@ -155,7 +118,7 @@ function ManageFriendsPage() {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <PendingRequests pendingReceivedRequests={pendingReceivedRequests} pendingSentRequests={pendingSentRequests} />
+                        <PendingRequests friendList={friendList} updateFriendList={updateFriendList} pendingReceivedRequests={pendingReceivedRequests} pendingSentRequests={pendingSentRequests} />
                         <MyFriends friendList={friendList} />
                     </motion.div>
                 )}
@@ -168,7 +131,7 @@ function ManageFriendsPage() {
                     transition={{ duration: 0.5 }}
                     >
                         <SearchingMyFriends friendList={friendList} searchString={friendUsername} />
-                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} updatePendingSentRequests={updatePendingSentRequests} />
+                        <SearchingMoreResults searchResult={searchResult} pendingSentRequests={pendingSentRequests} />
                     </motion.div>
                 )}
  
@@ -180,4 +143,4 @@ function ManageFriendsPage() {
     )
 }
 
-export default ManageFriendsPage
+export default ManageFriendsPage;
