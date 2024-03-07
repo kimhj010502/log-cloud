@@ -27,8 +27,8 @@ export function PendingRequests({ friendList, pendingReceivedRequests, pendingSe
 
     const [updatedPendingReceivedRequests, setUpdatedPendingReceivedRequests] = useState(pendingReceivedRequests);
 
-    const removeRequestTag = (friend_username) => {
-        const updatedList = updatedPendingReceivedRequests.filter(username => username !== friend_username);
+    const removeRequestTag = (username) => {
+        const updatedList = updatedPendingReceivedRequests.filter(user => user !== username);
         setUpdatedPendingReceivedRequests(updatedList);
     }
 
@@ -135,13 +135,12 @@ export function MyFriends({ friendList }) {
     const [updatedFriendList, setUpdatedFriendList] = useState(friendList);
 
     useEffect(() => {
-        if (friendList){
-            setIsFriends(friendList.length > 0);
-        }
+        setIsFriends(updatedFriendList.length > 0);
+
     }, [updatedFriendList]);
 
-    const removeFriendTag = (friend_username) => {
-        const updatedList = updatedFriendList.filter(username => username !== friend_username);
+    const removeFriendTag = (index) => {
+        const updatedList = [...updatedFriendList];
         setUpdatedFriendList(updatedList);
     }
 
@@ -151,8 +150,13 @@ export function MyFriends({ friendList }) {
 
             { isFriends && (
                 <div className='friends-box'>
-                    {friendList.map((username, index) => (
-                        <FriendProfile friendList={updatedFriendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
+                    {updatedFriendList.map((username, index) => (
+                        <FriendProfile key={username}
+                                       friendList={updatedFriendList}
+                                       index={index}
+                                       img_src={sessionStorage.getItem(username)}
+                                       username={username}
+                                       onRemove={() => removeFriendTag(index)} />
                     ))}
                 </div>
             )}
@@ -164,15 +168,15 @@ export function MyFriends({ friendList }) {
     )
 }
 
-function FriendProfile({ friendList, img_src, id, onRemove }) {
+function FriendProfile({ friendList, img_src, username, onRemove }) {
     function handleRemoveFriend(friend_username) {
-        console.log(typeof friendList);
-        console.log(friendList);
+        // const friendList = JSON.parse(sessionStorage.getItem('friendList'));
 
         // remove friend_username from friendList
         if (friendList.includes(friend_username)) {
             const index = friendList.indexOf(friend_username);
             friendList.splice(index, 1);
+            console.log(friendList);
             sessionStorage.setItem('friendList', JSON.stringify(friendList));
             // remove saved friend_username profile image from session storage
             sessionStorage.removeItem(friend_username);
@@ -206,10 +210,10 @@ function FriendProfile({ friendList, img_src, id, onRemove }) {
             </div>
 
             <div className='friend-id'>
-                {id}
+                {username}
             </div>
 
-            <div className='delete-button' onClick={() => handleRemoveFriend(id)}>×</div>
+            <div className='delete-button' onClick={() => handleRemoveFriend(username)}>×</div>
         </div>
     )
 }
