@@ -17,9 +17,8 @@ function ManageFriendsPage() {
     const [searchResult, setSearchResult] = useState([]);
 
     const updateFriendList = (newFriendList) => {
-    setFriendList(newFriendList);
-};
-
+        setFriendList(newFriendList);
+    };
 
     // console.log(friendList);
     // console.log(pendingReceivedRequests);

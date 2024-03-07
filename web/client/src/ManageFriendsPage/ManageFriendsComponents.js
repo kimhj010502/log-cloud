@@ -136,7 +136,6 @@ export function MyFriends({ friendList }) {
 
     useEffect(() => {
         setIsFriends(updatedFriendList.length > 0);
-
     }, [updatedFriendList]);
 
     const removeFriendTag = (index) => {
@@ -248,7 +247,7 @@ export function SearchingMyFriends({ friendList, searchString }) {
             { isFriends ? (
                 <div className='searching-friends-box'>
                     {searchResult.map((username, index) => (
-                        <FriendProfile friendList={updatedFriendList} key={index} img_src={sessionStorage.getItem(username)} id={username} onRemove={() => removeFriendTag()} />
+                        <FriendProfile friendList={updatedFriendList} key={index} img_src={sessionStorage.getItem(username)} username={username} onRemove={() => removeFriendTag()} />
                     ))}
                 </div>
             ) : (
