@@ -211,15 +211,15 @@ def remove_registered_user(request, session):
 		
 
 
-		# 로컬 폴더 경로
-		local_folder_path = f'web/client/public/temp/{user_id}'
+		# # 로컬 폴더 경로
+		# local_folder_path = f'web/client/public/temp/{user_id}'
 
-		delete_local_folder(local_folder_path)
-		print('로컬 폴더 삭제 완료')
+		# delete_local_folder(local_folder_path)
+		# print('로컬 폴더 삭제 완료')
 
-		# 삭제할 폴더 경로
-		remote_folder_path = f'D:/log/{user_id}'
-		ssh_manager.delete_folder(remote_folder_path)
+		# # 삭제할 폴더 경로
+		# remote_folder_path = f'D:/log/{user_id}'
+		# ssh_manager.delete_folder(remote_folder_path)
 
 		# SFTP 세션 닫기
 		ssh_manager.close()
@@ -255,17 +255,17 @@ def login_user(request, bcrypt):
 	session["user_id"] = username
 	print("session id:", session["user_id"])
 
-	# 개인 폴더 복사하기
-	ssh_manager.open()
+	# # 개인 폴더 복사하기
+	# ssh_manager.open()
 
-	# 복사할 원격 폴더 경로
-	remote_folder_path = f'D:/log/{username}'
+	# # 복사할 원격 폴더 경로
+	# remote_folder_path = f'D:/log/{username}'
 
-	# 로컬 폴더 경로
-	local_folder_path = f'web/client/public/temp/{username}'
+	# # 로컬 폴더 경로
+	# local_folder_path = f'web/client/public/temp/{username}'
 
-	# 원격 폴더 내용을 로컬로 복사
-	ssh_manager.get_remote_folder(remote_folder_path, local_folder_path)
+	# # 원격 폴더 내용을 로컬로 복사
+	# ssh_manager.get_remote_folder(remote_folder_path, local_folder_path)
 	
 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
@@ -276,11 +276,11 @@ def logout_user(request, session):
 	if user_id:
 		session.clear()
 
-		# 로컬 폴더 경로
-		local_folder_path = f'web/client/public/temp/{user_id}'
+		# # 로컬 폴더 경로
+		# local_folder_path = f'web/client/public/temp/{user_id}'
 
-		delete_local_folder(local_folder_path)
-		print('로컬 폴더 삭제 완료')
+		# delete_local_folder(local_folder_path)
+		# print('로컬 폴더 삭제 완료')
 		
 		return jsonify({"msg": "Successful user logout"}), 200
 	else:
@@ -333,7 +333,7 @@ def record_video(request, session):
 			local_file_name = user_id + local_video_date
 			remote_file_name = user_id + remote_video_date
 
-			# 임시 저장 경로 (원하는 경로와 파일명으로 변경)
+			# 임시 저장 경로 (원하는 경로와 파일명으로 변경) -> 배포 시 임시 저장 안함
 			local_image_path = f'web/client/public/temp/{local_file_name}.png'
 			local_video_path = f'web/client/public/temp/{local_file_name}.mp4'
 			local_audio_path = f'web/client/public/temp/{local_file_name}.wav'
@@ -479,25 +479,23 @@ def select_option(request, session):
 			video_info['video_file_path'] = video_file_path
 
 		# 텍스트 추출 (STT)
-		if switches["summary"] | switches["hashtag"]:
-			local_audio_path = local_path[2]
+		local_audio_path = local_path[2]
 
-			r = sr.Recognizer()
-			kr_audio = sr.AudioFile(local_audio_path)
+		r = sr.Recognizer()
+		kr_audio = sr.AudioFile(local_audio_path)
 
-			with kr_audio as source:
-				audio = r.record(source)
+		with kr_audio as source:
+			audio = r.record(source)
 
+		try:
+			text = r.recognize_google(audio, language='ko-KR') #-- 한글 언어 사용
+
+		except:
 			try:
-				text = r.recognize_google(audio, language='ko-KR') #-- 한글 언어 사용
-
+				text = r.recognize_sphinx(audio, language='ko-KR')
 			except:
-				try:
-					text = r.recognize_sphinx(audio, language='ko-KR')
-				except:
-					text = ''  # 빈 문자열로 설정
-		else:
-			text = ''
+				text = ''  # 빈 문자열로 설정
+
 
 		session['original_text'] = text
 		print('text: ', text)

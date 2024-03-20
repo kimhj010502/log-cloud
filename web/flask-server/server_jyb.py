@@ -50,33 +50,6 @@ def check_username_availability(request):
 		return jsonify({'available': True})
 
 
-def register_user(request, bcrypt):
-	try:
-		username = request.json['username']
-		email = request.json['email']
-		password = request.json['password']
-		
-		# Check if user already exists with username
-		user_exists = User.query.filter_by(email=email).first() is not None
-		
-		if user_exists:
-			return jsonify({'message': 'User already exists'}), 409
-		
-		hashed_password = bcrypt.generate_password_hash(password)
-		
-		# Insert user into the database
-		new_user = User(username=username, email=email, password=hashed_password)
-		db.session.add(new_user)
-		db.session.commit()
-		
-		return jsonify({
-			'username': new_user.username,
-			'email': new_user.email
-		})
-	except Exception as e:
-		print(f"Error in signup: {str(e)}")
-
-
 def change_user_password(request, session, bcrypt):
 	user_id = session.get("user_id")
 	try:
@@ -105,77 +78,104 @@ def change_user_password(request, session, bcrypt):
 		return jsonify({"message": "Unauthorized"}), 401
 
 
-def remove_registered_user(request, session):
-	user_id = session.get("user_id")
-	
-	if not user_id:
-		return jsonify({"error": "Unauthorized"}), 401
-	
-	user = User.query.filter_by(username=user_id).first()
-	
-	if not user:
-		return jsonify({"error": "User not found"}), 404
-	
-	try:
-		with db.session.begin_nested():
-			# Delete user's videos from video_info table
-			video_info_to_delete = videoInfo.query.filter_by(username=user.username).delete()
-			
-			# Delete user's video logs from video_log table
-			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
-			
-			# Delete user from social_network table (both username1 and username2)
-			social_network_to_delete = socialNetwork.query.filter(
-				(socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
-			
-			# + additional deletion operation: remove all comments associated with the account
-			# + additional deletion operation: remove all likes associated with the account
-			
-			# Delete user from user_account table
-			db.session.delete(user)
-		
-		db.session.commit()
-		session.clear()
-		return jsonify({"message": "Account deleted successfully"}), 200
-	
-	except IntegrityError:
-		db.session.rollback()  # Rollback in case of an error
-		return jsonify({"error": "Database error"}), 500
+# def register_user(request, bcrypt):
+# 	try:
+# 		username = request.json['username']
+# 		email = request.json['email']
+# 		password = request.json['password']
+#
+# 		# Check if user already exists with username
+# 		user_exists = User.query.filter_by(email=email).first() is not None
+#
+# 		if user_exists:
+# 			return jsonify({'message': 'User already exists'}), 409
+#
+# 		hashed_password = bcrypt.generate_password_hash(password)
+#
+# 		# Insert user into the database
+# 		new_user = User(username=username, email=email, password=hashed_password)
+# 		db.session.add(new_user)
+# 		db.session.commit()
+#
+# 		return jsonify({
+# 			'username': new_user.username,
+# 			'email': new_user.email
+# 		})
+# 	except Exception as e:
+# 		print(f"Error in signup: {str(e)}")
 
 
-def login_user(request, bcrypt):
-	username = request.json['username']
-	password = request.json['password']
-	
-	# if not username:
-	# 	return jsonify({"msg": "Missing username parameter"}), 400
-	# if not password:
-	# 	return jsonify({"msg": "Missing password parameter"}), 400
-	
-	# fetch user data by username from user_info_db : user_account table
-	user = User.query.filter_by(username=username).first()
-	
-	if user is None:
-		return jsonify({"error": "Unauthorized"}), 401
-	
-	if not bcrypt.check_password_hash(user.password, password):
-		return jsonify({"error": "Unauthorized: Wrong password"}), 401
-	
-	# set client-side session cookie
-	session["user_id"] = username
-	print("session id:", session["user_id"])
-	
-	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
-
-
-def logout_user(request, session):
-	user_id = session.get("user_id")
-	if user_id:
-		session.clear()
-		return jsonify({"msg": "Successful user logout"}), 200
-	else:
-		return jsonify({"error": "Unauthorized"}), 401
-
+# def remove_registered_user(request, session):
+# 	user_id = session.get("user_id")
+#
+# 	if not user_id:
+# 		return jsonify({"error": "Unauthorized"}), 401
+#
+# 	user = User.query.filter_by(username=user_id).first()
+#
+# 	if not user:
+# 		return jsonify({"error": "User not found"}), 404
+#
+# 	try:
+# 		with db.session.begin_nested():
+# 			# Delete user's videos from video_info table
+# 			video_info_to_delete = videoInfo.query.filter_by(username=user.username).delete()
+#
+# 			# Delete user's video logs from video_log table
+# 			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
+#
+# 			# Delete user from social_network table (both username1 and username2)
+# 			social_network_to_delete = socialNetwork.query.filter(
+# 				(socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
+#
+# 			# + additional deletion operation: remove all comments associated with the account
+# 			# + additional deletion operation: remove all likes associated with the account
+#
+# 			# Delete user from user_account table
+# 			db.session.delete(user)
+#
+# 		db.session.commit()
+# 		session.clear()
+# 		return jsonify({"message": "Account deleted successfully"}), 200
+#
+# 	except IntegrityError:
+# 		db.session.rollback()  # Rollback in case of an error
+# 		return jsonify({"error": "Database error"}), 500
+#
+#
+# def login_user(request, bcrypt):
+# 	username = request.json['username']
+# 	password = request.json['password']
+#
+# 	# if not username:
+# 	# 	return jsonify({"msg": "Missing username parameter"}), 400
+# 	# if not password:
+# 	# 	return jsonify({"msg": "Missing password parameter"}), 400
+#
+# 	# fetch user data by username from user_info_db : user_account table
+# 	user = User.query.filter_by(username=username).first()
+#
+# 	if user is None:
+# 		return jsonify({"error": "Unauthorized"}), 401
+#
+# 	if not bcrypt.check_password_hash(user.password, password):
+# 		return jsonify({"error": "Unauthorized: Wrong password"}), 401
+#
+# 	# set client-side session cookie
+# 	session["user_id"] = username
+# 	print("session id:", session["user_id"])
+#
+# 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
+#
+#
+# def logout_user(request, session):
+# 	user_id = session.get("user_id")
+# 	if user_id:
+# 		session.clear()
+# 		return jsonify({"msg": "Successful user logout"}), 200
+# 	else:
+# 		return jsonify({"error": "Unauthorized"}), 401
+#
 
 def get_current_user(request, session):
 	user_id = session.get("user_id")
@@ -283,12 +283,12 @@ def get_friend_list(request, session):
 	print("pending_received request_list:", pending_received_request_list)
 	print("pending_sent request_list:", pending_sent_request_list)
 	
-	if friend_list or pending_received_request_list or pending_sent_request_list:
-		return jsonify({"friends": friend_list,
-						"pending_received_requests": pending_received_request_list,
-						"pending_sent_requests": pending_sent_request_list}), 200
-	else:
-		return jsonify("Nothing to send"), 404
+	# if friend_list or pending_received_request_list or pending_sent_request_list:
+	return jsonify({"friends": friend_list,
+					"pending_received_requests": pending_received_request_list,
+					"pending_sent_requests": pending_sent_request_list}), 200
+	# else:
+	# 	return jsonify("Nothing to send"), 404
 
 
 def search_user(request, session):

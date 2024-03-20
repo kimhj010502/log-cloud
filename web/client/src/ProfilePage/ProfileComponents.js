@@ -81,6 +81,7 @@ export async function getProfileImage(username) {
     }
 }
 
+
 export function ProfileImg() {
     const [username, setUsername] = useState(sessionStorage.getItem('username'));
     const [selectedImage, setSelectedImage] = useState(null);
@@ -89,6 +90,7 @@ export function ProfileImg() {
     const [userCreatedAt, setUserCreatedAt] = useState(sessionStorage.getItem('createdAt'));
 
     useEffect(() => {
+        // get user information if it cannot be found in session
         async function fetchData() {
             if (!username || !userCreatedAt) {
                 const user = await getUserInfo();
@@ -108,7 +110,6 @@ export function ProfileImg() {
         }
         fetchData();
     }, [profileImgSrc]);
-
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -138,8 +139,8 @@ export function ProfileImg() {
 
             if (response.ok) {
                 const newImage = URL.createObjectURL(resizedImageFile)
-                sessionStorage.setItem('myProfileImg', newImage);
                 setProfileImgSrc(newImage);
+                sessionStorage.setItem('myProfileImg', newImage);
                 alert("Successfully uploaded!");
                 window.location.reload();
             }
@@ -196,7 +197,6 @@ async function handleLogout(updateIsAuthorized) {
         }
         else {
             const data = await response.json();
-            // console.log('Logging out...');
             console.log(data);
             sessionStorage.clear();
             console.log(updateIsAuthorized);
@@ -210,8 +210,6 @@ async function handleLogout(updateIsAuthorized) {
 
 
 export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) {
-
-
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
     };
@@ -224,7 +222,7 @@ export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) 
 
     return (
         <div className='buttons-box'>
-            <Link to={'/manage-friends'} className="profile-link">
+            <Link to={'/manage-friends'} className="profile-link" >
                 <div className='profile-button'>manage friends</div>
             </Link>
 
