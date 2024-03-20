@@ -13,13 +13,13 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 # 파일 경로
-file_name1 = 'photo2'
-file_name2 = 'video_ex2'
+file_name1 = 'test_image'
+file_name2 = 'test_video'
 local_image_path = f'C:/Git/log/web/flask-server/{file_name1}.jpg'
 local_video_path = f'C:/Git/log/web/flask-server/{file_name2}.mp4'
 # 저장 경로 (원하는 경로와 파일명으로 변경)
-remote_image_path = f'D:/log/video/olduser20240222.jpg'
-remote_video_path = f'D:/log/video/olduser20240222.mp4'
+remote_image_path = f'D:/log/h/h20240305.jpg'
+remote_video_path = f'D:/log/h/h20240305.mp4'
 
 
 # SCP 연결
