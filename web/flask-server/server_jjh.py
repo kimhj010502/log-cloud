@@ -51,21 +51,34 @@ def get_list(db_data):
 	return list_tmp
 
 
-def get_images(image_list, image_type):
+def get_local_images(image_list, image_type):
 	images = []
-	
-	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-	with ssh_client.open_sftp() as sftp:
-		for img in image_list:
-			with sftp.file(img, 'rb') as file:
-				image_data = base64.b64encode(file.read()).decode('utf-8')
-				image_data = 'data:image/' + image_type + ';base64,' + image_data
-				images.append(image_data)
-	
-	sftp.close()
-	ssh_client.close()
-	
+
+	for img in image_list:
+		img = 'C:/Git/log/web/client/public/temp/' + "/".join(img.split('/')[-2:])
+		with open(img, 'rb') as file:
+			image_data = base64.b64encode(file.read()).decode('utf-8')
+			image_data = 'data:image/' + image_type + ';base64,' + image_data
+			images.append(image_data)
+			
 	return images
+
+
+def get_images(image_list, image_type):
+   images = []
+   
+   ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+   with ssh_client.open_sftp() as sftp:
+      for img in image_list:
+         with sftp.file(img, 'rb') as file:
+            image_data = base64.b64encode(file.read()).decode('utf-8')
+            image_data = 'data:image/' + image_type + ';base64,' + image_data
+            images.append(image_data)
+   
+   sftp.close()
+   ssh_client.close()
+   
+   return images
 
 
 def get_video(video_url):
@@ -75,6 +88,13 @@ def get_video(video_url):
 			video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
 	sftp.close()
 	ssh_client.close()
+	return video_file
+
+
+def get_local_video(video_url):
+	video = 'C:/Git/log/web/client/public/temp/' + "/".join(video_url.split('/')[-2:])
+	with open(video, 'rb') as file:
+		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
 	return video_file
 
 

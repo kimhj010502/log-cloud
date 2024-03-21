@@ -31,7 +31,6 @@ function SocialFeedPage() {
     console.log(location.state);
 
     const [data, setData] = useState([{}])
-    const[like, setLike] = data.isLike;
 
     useEffect(() => {
         setLoading(true);
@@ -47,6 +46,8 @@ function SocialFeedPage() {
             });
     }, []);
 
+    console.log("0321",data);
+    const[like, setLike] = "True"; /* data.isLike */
     const [page, setPage] = useState('social-detail')
     const [prevPage, setPrevPage] = useState('social-feed')
 
