@@ -29,7 +29,7 @@ export function MyComment({ data, setPage, prevPage, setPrevPage }) {
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
                             {data.commentList && data.commentList.map((cont) => (
-                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                <Comment img_src={sessionStorage.getItem(cont.id)? sessionStorage.getItem(cont.id): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
                             ))
                             }
                         </div>

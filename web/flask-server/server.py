@@ -161,42 +161,42 @@ from server_jjh import analysisReport, searchResult, social, socialDetail, comme
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
-   return analysisReport(request, session)
+   return analysisReport(request, session, ssh_manager)
 
 
 @app.route('/searchresult', methods=['POST','GET'])
 def searchResult_route():
-   return searchResult(request, session)
+   return searchResult(request, session, ssh_manager)
 
 
 @app.route("/social")
 def social_route():
-	return social(request, session)
+	return social(request, session, ssh_manager)
 
 
 @app.route("/socialdetail", methods=['POST','GET'])
 def socialDetail_route():
-	return socialDetail(request, session)
+	return socialDetail(request, session, ssh_manager)
 
 
 @app.route("/comments", methods=['POST','GET'])
 def comments_route():
-	return comments(request, session)
+	return comments(request, session, ssh_manager)
 
 
 @app.route("/hearts", methods=['POST','GET'])
 def hearts_route():
-	return hearts(request, session)
+	return hearts(request, session, ssh_manager)
 
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month_route():
-	return get_log_overview_of_month(request)
+	return get_log_overview_of_month(request, ssh_manager)
 
 
 @app.route("/logdetail", methods=['POST','GET'])
 def log_detail_route():
-	return log_detail(request, session)
+	return log_detail(request, session, ssh_manager)
 
 
 

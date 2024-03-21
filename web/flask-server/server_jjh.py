@@ -64,19 +64,15 @@ def get_local_images(image_list, image_type):
 	return images
 
 
-def get_images(image_list, image_type):
+def get_images(image_list, image_type, ssh_manager):
    images = []
    
-   ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-   with ssh_client.open_sftp() as sftp:
+   with ssh_manager.sftp as sftp:
       for img in image_list:
          with sftp.file(img, 'rb') as file:
             image_data = base64.b64encode(file.read()).decode('utf-8')
             image_data = 'data:image/' + image_type + ';base64,' + image_data
             images.append(image_data)
-   
-   sftp.close()
-   ssh_client.close()
    
    return images
 
@@ -98,19 +94,13 @@ def get_local_video(video_url):
 	return video_file
 
 
-def get_likes(videoId):
+def get_likes(videoId, ssh_manager):
 	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
 	likes_list = []
 	for i in like_ids:
 		likes_list.append(i[0])
 	
-	join_table = likeLog.query.join(User, likeLog.username == User.username).filter(likeLog.video_id == videoId)
-	like_profile = get_list(join_table.with_entities(User.profile_img).all())
-	like_profile_image = get_images(like_profile, 'jpg')
-	
-	data = [{'id': id, 'profile': profile} for id, profile in zip(likes_list, like_profile_image)]
-	
-	return likes_list, data
+	return likes_list
 
 
 def get_comments(videoId):
@@ -124,11 +114,9 @@ def get_comments(videoId):
 	
 	join_table = commentLog.query.join(User, commentLog.username == User.username).filter(
 		commentLog.video_id == videoId).order_by(commentLog.date)
-	comment_profile = get_list(join_table.with_entities(User.profile_img).all())
-	comment_profile_image = get_images(comment_profile, 'jpg')
 	
 	data = [{'id': id, 'comments': comment, 'profile': profile} for id, comment, profile in
-			zip(commentId_list, comments_list, comment_profile_image)]
+			zip(commentId_list, comments_list)]
 	
 	return data
 
@@ -141,7 +129,7 @@ def did_u_like(videoId, username, likeList):
 
 
 # PAGE FUNCTION
-def analysisReport(request, session):
+def analysisReport(request, session, ssh_manager):
 	user_id = session.get('user_id')
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
@@ -206,7 +194,7 @@ def analysisReport(request, session):
 	return jsonify(data)
 
 
-def searchResult(request, session):
+def searchResult(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -254,14 +242,14 @@ def searchResult(request, session):
 	if not user_id or len(coverImg_list) == 0:
 		return jsonify({"error": "Image not found"}), 404
 	
-	image_data_list = get_images(coverImg_list, 'png')
+	image_data_list = get_images(coverImg_list, 'png', ssh_manager)
 	
 	data = [{'date': date, 'coverImg': coverImg} for date, coverImg in zip(date_list, image_data_list)]
 	
 	return jsonify(data)
 
 
-def social(request, session):
+def social(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -292,16 +280,15 @@ def social(request, session):
 		desc(videoInfo.date))
 	profile_list = get_list(join_table.with_entities(User.profile_img).all())
 	
-	cover_image = get_images(coverImg_list, 'png')
-	profile_image = get_images(profile_list, 'jpg')
+	cover_image = get_images(coverImg_list, 'png', ssh_manager)
 	
-	data = [{'date': date, 'coverImg': coverImg, 'profileUsername': username, 'profileImg': profile} for
-			date, coverImg, username, profile in zip(date_list, cover_image, profileusername_list, profile_image)]
+	data = [{'date': date, 'coverImg': coverImg, 'profileUsername': username} for
+			date, coverImg, username in zip(date_list, cover_image, profileusername_list)]
 	
 	return jsonify(data)
 
 
-def socialDetail(request, session):
+def socialDetail(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -318,7 +305,7 @@ def socialDetail(request, session):
 	video_url = video_detail.with_entities(videoInfo.video_url).all()[0][0]
 	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
 	
-	likeList, likeImage = get_likes(video_id)
+	likeList = get_likes(video_id)
 	commentsList = get_comments(video_id)
 	
 	video_file = get_video(video_url)
@@ -330,7 +317,6 @@ def socialDetail(request, session):
 			"emotion": emotion,
 			"video": video_file,
 			"likeList": likeList,
-			"likeImage": likeImage,
 			"commentList": commentsList,
 			"videoId": video_id,
 			"isLike": is_like}
@@ -338,7 +324,7 @@ def socialDetail(request, session):
 	return jsonify(data)
 
 
-def comments(request, session):
+def comments(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -354,7 +340,7 @@ def comments(request, session):
 	return ""
 
 
-def hearts(request, session):
+def hearts(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -376,7 +362,7 @@ def hearts(request, session):
 
 
 
-def log_detail(request, session):
+def log_detail(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -386,7 +372,7 @@ def log_detail(request, session):
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
 	video_file = get_video(video_detail.video_url)
-	likeList, likeImage = get_likes(video_id)
+	likeList = get_likes(video_id)
 	commentsList = get_comments(video_id)
 	is_like = did_u_like(video_id, user_id, likeList)
 	
@@ -397,7 +383,6 @@ def log_detail(request, session):
 			"privacy": video_detail.share,
 			"emotion": video_detail.emotion,
 			"likeList": likeList,
-			"likeImage": likeImage,
 			"videoId": video_id,
 			"commentList": commentsList,
 			"isLike": is_like}
@@ -405,7 +390,7 @@ def log_detail(request, session):
 
 
 
-def get_log_overview_of_month(request):
+def get_log_overview_of_month(request, ssh_manager):
 	username = request.json['username']
 	month = request.json['month']
 	year = request.json['year']
@@ -431,7 +416,7 @@ def get_log_overview_of_month(request):
 			coverImg_list.append(video.cover_image)
 			videoId_list.append(video.video_id)
 
-		coverImage = get_images(coverImg_list, 'png')
+		coverImage = get_images(coverImg_list, 'png', ssh_manager)
 
 		video_info_list = [{ 'date': date, 'coverImage': img, 'videoId': videoId } for date, img, videoId in zip(date_list, coverImage, videoId_list)]
 
