@@ -10,6 +10,7 @@ import pymysql
 
 from PIL import Image
 import io
+import base64
 
 from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
@@ -135,8 +136,6 @@ def delete_local_folder(folder_path):
         shutil.rmtree(folder_path)
     except Exception as e:
         print(f"Error deleting folder {folder_path}: {e}")
-	
-
 
 
 '''server.jyb 수정 시작'''
@@ -211,15 +210,15 @@ def remove_registered_user(request, session, ssh_manager):
 		
 
 
-		# # 로컬 폴더 경로
-		# local_folder_path = f'web/client/public/temp/{user_id}'
+		# 로컬 폴더 경로
+		local_folder_path = f'web/temp/{user_id}'
 
-		# delete_local_folder(local_folder_path)
-		# print('로컬 폴더 삭제 완료')
+		delete_local_folder(local_folder_path)
+		print('로컬 폴더 삭제 완료')
 
-		# # 삭제할 폴더 경로
-		# remote_folder_path = f'D:/log/{user_id}'
-		# ssh_manager.delete_folder(remote_folder_path)
+		# 삭제할 폴더 경로
+		remote_folder_path = f'D:/log/{user_id}'
+		ssh_manager.delete_folder(remote_folder_path)
 
 		# SFTP 세션 닫기
 		ssh_manager.close()
@@ -255,17 +254,17 @@ def login_user(request, bcrypt, ssh_manager):
 	session["user_id"] = username
 	print("session id:", session["user_id"])
 
-	# # 개인 폴더 복사하기
-	# ssh_manager.open()
+	# 개인 폴더 복사하기
+	ssh_manager.open()
 
-	# # 복사할 원격 폴더 경로
-	# remote_folder_path = f'D:/log/{username}'
+	# 복사할 원격 폴더 경로
+	remote_folder_path = f'D:/log/{username}'
 
-	# # 로컬 폴더 경로
-	# local_folder_path = f'web/client/public/temp/{username}'
+	# 로컬 폴더 경로
+	local_folder_path = f'web/temp/{username}'
 
-	# # 원격 폴더 내용을 로컬로 복사
-	# ssh_manager.get_remote_folder(remote_folder_path, local_folder_path)
+	# 원격 폴더 내용을 로컬로 복사
+	ssh_manager.get_remote_folder(remote_folder_path, local_folder_path)
 	
 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
@@ -276,11 +275,11 @@ def logout_user(request, session, ssh_manager):
 	if user_id:
 		session.clear()
 
-		# # 로컬 폴더 경로
-		# local_folder_path = f'web/client/public/temp/{user_id}'
+		# 로컬 폴더 경로
+		local_folder_path = f'web/temp/{user_id}'
 
-		# delete_local_folder(local_folder_path)
-		# print('로컬 폴더 삭제 완료')
+		delete_local_folder(local_folder_path)
+		print('로컬 폴더 삭제 완료')
 		
 		return jsonify({"msg": "Successful user logout"}), 200
 	else:
@@ -302,6 +301,16 @@ def add_log(request, session, ssh_manager):
 	except Exception as e:
 		print(f"Error in add log: {str(e)}")
 
+def get_local_image(img_path, image_type):
+	with open(img_path, 'rb') as file:
+		image_data = base64.b64encode(file.read()).decode('utf-8')
+		image_data = 'data:image/' + image_type + ';base64,' + image_data
+		return image_data
+	
+def get_local_video(video_path):
+	with open(video_path, 'rb') as file:
+		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
+		return video_file
 
 def get_date():
 	now = datetime.now()
@@ -334,9 +343,9 @@ def record_video(request, session, ssh_manager):
 			remote_file_name = user_id + remote_video_date
 
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경) -> 배포 시 임시 저장 안함
-			local_image_path = f'web/client/public/temp/{local_file_name}.png'
-			local_video_path = f'web/client/public/temp/{local_file_name}.mp4'
-			local_audio_path = f'web/client/public/temp/{local_file_name}.wav'
+			local_image_path = f'web/temp/temp/{local_file_name}.png'
+			local_video_path = f'web/temp/temp/{local_file_name}.mp4'
+			local_audio_path = f'web/temp/temp/{local_file_name}.wav'
 			
 			session['local_path'] = [local_image_path, local_video_path, local_audio_path]
 			session['local_file_name'] = local_file_name
@@ -352,14 +361,14 @@ def record_video(request, session, ssh_manager):
 			mp4_to_mp3(local_video_path, local_audio_path)
 
 			# 세션값 추가
-			video_file_path = f'temp/{local_file_name}.mp4'
+			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}.mp4')
 			response_data = {'username':user_id, 'date': remote_video_date, 'video_id': remote_file_name, 'video_url': remote_video_path, 'cover_image': remote_image_path}
 			session["video_info"] = response_data
 			#session["local_audio_path"] = local_audio_path
 
 
 			return_data = {'video_info': {'upload_date': upload_date, 'video_file_path': video_file_path }}
-			print("반환 데이터", return_data)
+			# print("반환 데이터", return_data)
 			return jsonify(return_data)
 		
 		else:
@@ -453,7 +462,7 @@ def add_bgm(video_path, result_path):
 
 def select_option(request, session, ssh_manager):
 	user_id = session.get("user_id")
-	print('request', request.json)
+	#print('request', request.json)
 
 	try:
 		video_info = request.json['video_info']
@@ -472,10 +481,10 @@ def select_option(request, session, ssh_manager):
 		if switches["bgm"]:
 			print('bgm 함수 실행')
 			local_video_path = local_path[1]
-			local_result_path = f'web/client/public/temp/{local_file_name}_bgm.mp4' #bgm 추가한 영상
+			local_result_path = f'web/temp/temp/{local_file_name}_bgm.mp4' #bgm 추가한 영상
 			add_bgm(local_video_path, local_result_path)
 			session['local_path'] = [local_path[0], local_result_path, local_path[2], local_path[1]] #세선 업데이트
-			video_file_path = f'temp/{local_file_name}_bgm.mp4'
+			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}_bgm.mp4')
 			video_info['video_file_path'] = video_file_path
 
 		# 텍스트 추출 (STT)
@@ -520,7 +529,7 @@ def select_option(request, session, ssh_manager):
 
 		# return jsonify(return_data)
 		return_data = {'video_info': video_info, 'switches': switches, 'summary': summary, 'hashtags': hashtags } # 'video_file_path': video_file_path, 
-		print('반환 데이터: ', return_data)
+		#print('반환 데이터: ', return_data)
 		return jsonify(return_data)
 
 	except Exception as e:
@@ -529,7 +538,7 @@ def select_option(request, session, ssh_manager):
 
 def save_log(request, session, ssh_manager):
 	user_id = session.get("user_id")
-	print('request', request.json)
+	#print('request', request.json)
 
 	try:
 		print('저장 시작')
@@ -541,6 +550,7 @@ def save_log(request, session, ssh_manager):
 		local_path = session.get('local_path')
 
 		#이미지 캡처
+		print('----------', local_path)
 		cap = cv2.VideoCapture(local_path[1])
 		ret, frame = cap.read()
 
@@ -549,33 +559,35 @@ def save_log(request, session, ssh_manager):
 			print('썸네일 저장')
 		cap.release()
 
-		# ssh_manager.open()
+		ssh_manager.open()
+		print('ssh_manager',ssh_manager)
 
-		# 파일을 SCP로 원격 서버에 업로드
-		# ssh_manager.save_file(local_path[0], video_info['cover_image'])
-		# ssh_manager.save_file(local_path[1], video_info['video_url'])
+		#파일을 SCP로 원격 서버에 업로드
+		print('원격 서버에 업로드',local_path[0], video_info['cover_image'])
+		ssh_manager.save_file(local_path[0], video_info['cover_image'])
+		ssh_manager.save_file(local_path[1], video_info['video_url'])
 
-		# SCP 연결
-		ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+		# # SCP 연결
+		# ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
 
-		print("로컬 저장 경로", local_path)
+		# print("로컬 저장 경로", local_path)
+		# print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
+
+		# # 파일을 SCP로 원격 서버에 업로드
+		# with ssh_client.open_sftp() as sftp:
+		# 	sftp.put(local_path[0], video_info['cover_image'])
+		# 	sftp.put(local_path[1], video_info['video_url'])
+
+		# # SSH 연결 종료
+		# ssh_client.close()
+		# print('SSH 연결 종료')
+
 		print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
 
-		# 파일을 SCP로 원격 서버에 업로드
-		with ssh_client.open_sftp() as sftp:
-			sftp.put(local_path[0], video_info['cover_image'])
-			sftp.put(local_path[1], video_info['video_url'])
+		local_file_path = [f"web/temp/{user_id}/{video_info['video_id']}.png", f"web/temp/{user_id}/{video_info['video_id']}.mp4"]
 
-		# SSH 연결 종료
-		ssh_client.close()
-		print('SSH 연결 종료')
-
-		print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
-
-		local_file_path = [f"web/client/public/temp/{user_id}/{video_info['video_id']}.png", f"web/client/public/temp/{user_id}/{video_info['video_id']}.mp4"]
-
-		ssh_manager.get_remote_file(video_info['cover_image'], local_file_path[0])
-		ssh_manager.get_remote_file(video_info['video_url'], local_file_path[1])
+		shutil.move(local_path[0], local_file_path[0])
+		shutil.move(local_path[1], local_file_path[1])
 		
 		#SQL 저장
 		prev_log = videoInfo.query.filter_by(video_id=video_info['video_id']).first()
@@ -592,8 +604,15 @@ def save_log(request, session, ssh_manager):
 		print('저장 끝')
 
 		#임시 파일 삭제
+		print('임시 파일 패스')
 		for path in session['local_path']:
-			os.remove(path)
+			print(path)
+		print('임시 파일 패스 출력 끝')
+		
+		for path in session['local_path']:
+			print(path, '삭제')
+			if os.path.isfile(path):
+				os.remove(path)
 		# os.remove(f'web/temp/{file_name}.mp4')
 
 		return jsonify({'Finish': 'SAVE'})

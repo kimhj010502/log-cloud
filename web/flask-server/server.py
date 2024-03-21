@@ -122,6 +122,7 @@ class SSHManager:
 					
 	def save_file(self, local_path, remote_path):
 		if self.sftp:
+			print('저장완')
 			self.sftp.put(local_path, remote_path)
 
 	def get_remote_file(self, remote_file_path, local_file_path):

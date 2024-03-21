@@ -383,7 +383,17 @@ def log_detail(request, session):
 			"isLike": is_like}
 
 
+def get_local_images(image_list, image_type):
+   images = []
 
+   for img in image_list:
+      img = 'web/temp/' + "/".join(img.split('/')[-2:])
+      with open(img, 'rb') as file:
+         image_data = base64.b64encode(file.read()).decode('utf-8')
+         image_data = 'data:image/' + image_type + ';base64,' + image_data
+         images.append(image_data)
+         
+   return images
 
 def get_log_overview_of_month(request):
 	username = request.json['username']
@@ -411,7 +421,7 @@ def get_log_overview_of_month(request):
 			coverImg_list.append(video.cover_image)
 			videoId_list.append(video.video_id)
 
-		coverImage = get_images(coverImg_list, 'png')
+		coverImage = get_local_images(coverImg_list, 'png')
 
 		video_info_list = [{ 'date': date, 'coverImage': img, 'videoId': videoId } for date, img, videoId in zip(date_list, coverImage, videoId_list)]
 
