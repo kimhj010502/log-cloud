@@ -334,6 +334,7 @@ def record_video(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	try:
 		if 'video' in request.files:
+			print('video 받음')
 			# 파일 경로
 			video_file = request.files['video']
 

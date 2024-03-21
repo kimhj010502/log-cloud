@@ -24,8 +24,8 @@ export function MyLike({ data, setPage, setPrevPage }) {
 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
-                        {data.likeList && data.likeImage.map((cont) => (
-                            <Like img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} />
+                        {data.likeList.map((cont) => (
+                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont.id: null} />
                         ))
                         }
                     </div>
