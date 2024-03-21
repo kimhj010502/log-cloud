@@ -27,7 +27,7 @@ function SocialPage() {
 
     return (
         <div className="social-page">
-            <Link to={'/'} class="home-link">
+            <Link to={'/'} className="home-link">
                 <h1>log your memory</h1>
             </Link>
 
