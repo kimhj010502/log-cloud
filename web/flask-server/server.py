@@ -1,6 +1,7 @@
 import calendar
 import os
 from uuid import uuid4
+import stat
 
 from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
 from flask_bcrypt import Bcrypt
@@ -17,7 +18,7 @@ from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
 from datetime import datetime, timedelta
-import pandas as pd
+# import pandas as pd
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
@@ -46,24 +47,114 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
+
+class SSHManager:
+	def __init__(self):
+		self.host = SSH_HOST
+		self.port = SSH_PORT
+		self.username = SSH_USERNAME
+		self.password = SSH_PASSWORD
+		self.ssh_client = paramiko.SSHClient()
+		self.ssh_client.load_system_host_keys()
+		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		self.sftp = None
+		
+	def open(self):
+		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
+		self.sftp = self.ssh_client.open_sftp()
+		
+	def close(self):
+		if self.sftp:
+			self.sftp.close()
+		self.ssh_client.close()
+		
+	def create_remote_folder(self, folder_path):
+		if self.sftp:
+			self.sftp.mkdir(folder_path)
+
+	def remove_folder_contents(self, folder_path):
+		if self.sftp:
+			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+			remote_items = self.sftp.listdir(folder_path)
+
+			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
+			for item in remote_items:
+				remote_item_path = os.path.join(folder_path, item)
+				
+                # 원격 항목의 속성 가져오기
+				remote_item_attr = self.sftp.stat(remote_item_path)
+				
+				if stat.S_ISDIR(remote_item_attr.st_mode):
+					self.remove_folder_contents(remote_item_path)
+				else:
+					self.sftp.remove(remote_item_path)
+
+
+	def delete_folder(self, folder_path):
+		if self.sftp:
+			self.remove_folder_contents(folder_path)
+			self.sftp.rmdir(folder_path)
+			
+	def get_remote_folder(self, remote_folder_path, local_folder_path):
+		if self.sftp:
+            # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
+			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+			remote_items = self.sftp.listdir(remote_folder_path)
+
+			# 로컬 폴더가 없으면 생성
+			if not os.path.exists(local_folder_path):
+				os.makedirs(local_folder_path)
+
+			# 각 항목을 반복하면서 처리
+			for item in remote_items:
+				remote_item_path = os.path.join(remote_folder_path, item)
+				local_item_path = os.path.join(local_folder_path, item)
+
+				# 원격 항목의 속성 가져오기
+				remote_item_attr = self.sftp.stat(remote_item_path)
+
+				# 만약 폴더라면 재귀적으로 다시 호출
+				if stat.S_ISDIR(remote_item_attr.st_mode):
+					self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
+				else:
+					# 파일이라면 복사
+					self.sftp.get(remote_item_path, local_item_path)
+					
+	def save_file(self, local_path, remote_path):
+		if self.sftp:
+			self.sftp.put(local_path, remote_path)
+
+	def get_remote_file(self, remote_file_path, local_file_path):
+		if self.sftp:
+			# 로컬 폴더가 없으면 생성
+			local_folder_path = os.path.dirname(local_file_path)
+			if not os.path.exists(local_folder_path):
+				os.makedirs(local_folder_path)
+
+            # 파일 복사
+			self.sftp.get(remote_file_path, local_file_path)
+
+ssh_manager = SSHManager()
+
+
 from server_khj import record_video, select_option, add_log, save_log, \
 	register_user, remove_registered_user, login_user, logout_user
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
-	return add_log(request, session)
+	return add_log(request, session, ssh_manager)
 
 @app.route('/record', methods=['POST'])
 def record_video_route():
-	return record_video(request, session)
+	return record_video(request, session, ssh_manager)
 
 @app.route('/upload', methods=['POST'])
 def select_option_route():
-	return select_option(request, session)
+	return select_option(request, session, ssh_manager)
 
 @app.route('/save', methods=['POST'])
 def save_log_route():
-	return save_log(request, session)
+	return save_log(request, session, ssh_manager)
 
 
 from server_jjh import analysisReport, searchResult, social, socialDetail, comments, hearts, get_log_overview_of_month, log_detail
@@ -139,7 +230,7 @@ def check_username_availability_route():
 
 @app.route('/registration', methods=['POST'])
 def register_user_route():
-	return register_user(request, bcrypt)
+	return register_user(request, bcrypt, ssh_manager)
 
 
 @app.route('/change_password', methods=['POST'])
@@ -149,17 +240,17 @@ def change_user_password_route():
 
 @app.route('/delete_account', methods=['POST'])
 def remove_registered_user_route():
-	return remove_registered_user(request, session)
+	return remove_registered_user(request, session, ssh_manager)
 
 
 @app.route('/login', methods=['POST'])
 def login_user_route():
-	return login_user(request, bcrypt)
+	return login_user(request, bcrypt, ssh_manager)
 
 
 @app.route('/logout', methods=['GET'])
 def logout_user_route():
-	return logout_user(request, session)
+	return logout_user(request, session, ssh_manager)
 	
 
 @app.route("/@me")

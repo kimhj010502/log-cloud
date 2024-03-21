@@ -42,91 +42,91 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-class SSHManager:
-	def __init__(self):
-		self.host = SSH_HOST
-		self.port = SSH_PORT
-		self.username = SSH_USERNAME
-		self.password = SSH_PASSWORD
-		self.ssh_client = paramiko.SSHClient()
-		self.ssh_client.load_system_host_keys()
-		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		self.sftp = None
+# class SSHManager:
+# 	def __init__(self):
+# 		self.host = SSH_HOST
+# 		self.port = SSH_PORT
+# 		self.username = SSH_USERNAME
+# 		self.password = SSH_PASSWORD
+# 		self.ssh_client = paramiko.SSHClient()
+# 		self.ssh_client.load_system_host_keys()
+# 		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# 		self.sftp = None
 		
-	def open(self):
-		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
-		self.sftp = self.ssh_client.open_sftp()
+# 	def open(self):
+# 		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
+# 		self.sftp = self.ssh_client.open_sftp()
 		
-	def close(self):
-		if self.sftp:
-			self.sftp.close()
-		self.ssh_client.close()
+# 	def close(self):
+# 		if self.sftp:
+# 			self.sftp.close()
+# 		self.ssh_client.close()
 		
-	def create_remote_folder(self, folder_path):
-		if self.sftp:
-			self.sftp.mkdir(folder_path)
+# 	def create_remote_folder(self, folder_path):
+# 		if self.sftp:
+# 			self.sftp.mkdir(folder_path)
 
-	def remove_folder_contents(self, folder_path):
-		if self.sftp:
-			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-			remote_items = self.sftp.listdir(folder_path)
+# 	def remove_folder_contents(self, folder_path):
+# 		if self.sftp:
+# 			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+# 			remote_items = self.sftp.listdir(folder_path)
 
-			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
-			for item in remote_items:
-				remote_item_path = os.path.join(folder_path, item)
+# 			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
+# 			for item in remote_items:
+# 				remote_item_path = os.path.join(folder_path, item)
 				
-                # 원격 항목의 속성 가져오기
-				remote_item_attr = self.sftp.stat(remote_item_path)
+#                 # 원격 항목의 속성 가져오기
+# 				remote_item_attr = self.sftp.stat(remote_item_path)
 				
-				if stat.S_ISDIR(remote_item_attr.st_mode):
-					self.remove_folder_contents(remote_item_path)
-				else:
-					self.sftp.remove(remote_item_path)
+# 				if stat.S_ISDIR(remote_item_attr.st_mode):
+# 					self.remove_folder_contents(remote_item_path)
+# 				else:
+# 					self.sftp.remove(remote_item_path)
 
 
-	def delete_folder(self, folder_path):
-		if self.sftp:
-			self.remove_folder_contents(folder_path)
-			self.sftp.rmdir(folder_path)
+# 	def delete_folder(self, folder_path):
+# 		if self.sftp:
+# 			self.remove_folder_contents(folder_path)
+# 			self.sftp.rmdir(folder_path)
 			
-	def get_remote_folder(self, remote_folder_path, local_folder_path):
-		if self.sftp:
-            # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
-			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-			remote_items = self.sftp.listdir(remote_folder_path)
+# 	def get_remote_folder(self, remote_folder_path, local_folder_path):
+# 		if self.sftp:
+#             # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
+# 			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
+# 			remote_items = self.sftp.listdir(remote_folder_path)
 
-			# 로컬 폴더가 없으면 생성
-			if not os.path.exists(local_folder_path):
-				os.makedirs(local_folder_path)
+# 			# 로컬 폴더가 없으면 생성
+# 			if not os.path.exists(local_folder_path):
+# 				os.makedirs(local_folder_path)
 
-			# 각 항목을 반복하면서 처리
-			for item in remote_items:
-				remote_item_path = os.path.join(remote_folder_path, item)
-				local_item_path = os.path.join(local_folder_path, item)
+# 			# 각 항목을 반복하면서 처리
+# 			for item in remote_items:
+# 				remote_item_path = os.path.join(remote_folder_path, item)
+# 				local_item_path = os.path.join(local_folder_path, item)
 
-				# 원격 항목의 속성 가져오기
-				remote_item_attr = self.sftp.stat(remote_item_path)
+# 				# 원격 항목의 속성 가져오기
+# 				remote_item_attr = self.sftp.stat(remote_item_path)
 
-				# 만약 폴더라면 재귀적으로 다시 호출
-				if stat.S_ISDIR(remote_item_attr.st_mode):
-					self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
-				else:
-					# 파일이라면 복사
-					self.sftp.get(remote_item_path, local_item_path)
+# 				# 만약 폴더라면 재귀적으로 다시 호출
+# 				if stat.S_ISDIR(remote_item_attr.st_mode):
+# 					self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
+# 				else:
+# 					# 파일이라면 복사
+# 					self.sftp.get(remote_item_path, local_item_path)
 					
-	def save_file(self, local_path, remote_path):
-		if self.sftp:
-			self.sftp.put(local_path, remote_path)
+# 	def save_file(self, local_path, remote_path):
+# 		if self.sftp:
+# 			self.sftp.put(local_path, remote_path)
 
-	def get_remote_file(self, remote_file_path, local_file_path):
-		if self.sftp:
-			# 로컬 폴더가 없으면 생성
-			local_folder_path = os.path.dirname(local_file_path)
-			if not os.path.exists(local_folder_path):
-				os.makedirs(local_folder_path)
+# 	def get_remote_file(self, remote_file_path, local_file_path):
+# 		if self.sftp:
+# 			# 로컬 폴더가 없으면 생성
+# 			local_folder_path = os.path.dirname(local_file_path)
+# 			if not os.path.exists(local_folder_path):
+# 				os.makedirs(local_folder_path)
 
-            # 파일 복사
-			self.sftp.get(remote_file_path, local_file_path)
+#             # 파일 복사
+# 			self.sftp.get(remote_file_path, local_file_path)
 
 import shutil
 
@@ -136,12 +136,12 @@ def delete_local_folder(folder_path):
     except Exception as e:
         print(f"Error deleting folder {folder_path}: {e}")
 	
-ssh_manager = SSHManager()
+
 
 
 '''server.jyb 수정 시작'''
 #회원가입 - 개인 폴더 생성
-def register_user(request, bcrypt):
+def register_user(request, bcrypt, ssh_manager):
 	try:
 		username = request.json['username']
 		email = request.json['email']
@@ -178,7 +178,7 @@ def register_user(request, bcrypt):
 		print(f"Error in signup: {str(e)}")
 
 #탈퇴 - 개인 폴더 삭제
-def remove_registered_user(request, session):
+def remove_registered_user(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -233,7 +233,7 @@ def remove_registered_user(request, session):
 		return jsonify({"error": "Database error"}), 500
 
 #로그인 - 임시 개인 폴더 생성
-def login_user(request, bcrypt):
+def login_user(request, bcrypt, ssh_manager):
 	username = request.json['username']
 	password = request.json['password']
 	
@@ -271,7 +271,7 @@ def login_user(request, bcrypt):
 
 
 #로그아웃 - 임시 개인 폴더 삭제
-def logout_user(request, session):
+def logout_user(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	if user_id:
 		session.clear()
@@ -291,7 +291,7 @@ def logout_user(request, session):
 '''server.jyb 수정 끝'''
 
 
-def add_log(request, session):
+def add_log(request, session, ssh_manager):
 	try:
 		upload_date = request.json['upload_date']
 		session["upload_date"] = upload_date
@@ -319,7 +319,7 @@ def mp4_to_mp3(local_video_path, local_audio_path):
 		#mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
 
 
-def record_video(request, session):
+def record_video(request, session, ssh_manager):
 	print('동영상 저장')
 	user_id = session.get("user_id")
 	try:
@@ -452,7 +452,7 @@ def add_bgm(video_path, result_path):
 	subprocess.run(command, shell=True)
 
 
-def select_option(request, session):
+def select_option(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	print('request', request.json)
 
@@ -528,7 +528,7 @@ def select_option(request, session):
 		print(f"Error in record: {str(e)}")
 
 
-def save_log(request, session):
+def save_log(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	print('request', request.json)
 
