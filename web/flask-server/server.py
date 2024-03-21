@@ -10,6 +10,7 @@ from flask_session import Session
 import pymysql
 
 import io
+import base64
 
 from sqlalchemy import extract, asc, or_, desc
 from sqlalchemy.exc import IntegrityError
@@ -134,6 +135,20 @@ class SSHManager:
 
             # 파일 복사
 			self.sftp.get(remote_file_path, local_file_path)
+
+	def get_images(self, image_list, image_type):
+		images = []
+		
+		try:
+			for img in image_list:
+				with self.sftp.file(img, 'rb') as file:
+					image_data = base64.b64encode(file.read()).decode('utf-8')
+					image_data = 'data:image/' + image_type + ';base64,' + image_data
+					images.append(image_data)
+		except Exception as e:
+			print(f"Error getting images: {e}")
+			
+		return images
 
 ssh_manager = SSHManager()
 

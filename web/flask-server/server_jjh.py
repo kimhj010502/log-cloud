@@ -354,7 +354,12 @@ def hearts(request, session):
 	
 	return ""
 
-
+def get_local_video(video_path):
+   video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
+   print('video_path', video_path)
+   with open(video_path, 'rb') as file:
+      video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
+      return video_file
 
 def log_detail(request, session):
 	user_id = session.get("user_id")
@@ -365,7 +370,7 @@ def log_detail(request, session):
 	video_id = request.json['videoId']
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
-	video_file = get_video(video_detail.video_url)
+	video_file = get_local_video(video_detail.video_url)
 	likeList, likeImage = get_likes(video_id)
 	commentsList = get_comments(video_id)
 	is_like = did_u_like(video_id, user_id, likeList)
@@ -394,6 +399,8 @@ def get_local_images(image_list, image_type):
          images.append(image_data)
          
    return images
+
+
 
 def get_log_overview_of_month(request):
 	username = request.json['username']

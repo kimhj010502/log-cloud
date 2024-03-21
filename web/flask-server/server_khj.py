@@ -308,6 +308,7 @@ def get_local_image(img_path, image_type):
 		return image_data
 	
 def get_local_video(video_path):
+	video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
 	with open(video_path, 'rb') as file:
 		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
 		return video_file
@@ -469,7 +470,7 @@ def select_option(request, session, ssh_manager):
 		emotion = int(request.json['emotion'])
 		session['emotion'] = emotion
 		switches = request.json['switches']
-		summary = 'init'
+		summary = ''
 		hashtags = []
 
 		local_path = session.get("local_path")
@@ -509,17 +510,14 @@ def select_option(request, session, ssh_manager):
 		session['original_text'] = text
 		print('text: ', text)
 
-		if switches["summary"]:
+		if switches["summary"] | switches["hashtag"]:
 			# 요약 모델
 			summary = diary_summary(text)
 			print('summary: ', summary)
 			
 		if switches["hashtag"]:
 			# 해시태그 모델
-			if summary == 'init':
-				hashtags = make_tag(diary_summary(text), emotion)
-
-			elif summary == '':
+			if summary == '':
 				hashtags = [emotion_list[emotion]]
 
 			else:
