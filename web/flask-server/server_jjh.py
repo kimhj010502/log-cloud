@@ -52,29 +52,17 @@ def get_list(db_data):
 
 
 def get_local_images(image_list, image_type):
-	images = []
-
-	for img in image_list:
-		img = 'C:/Git/log/web/client/public/temp/' + "/".join(img.split('/')[-2:])
-		with open(img, 'rb') as file:
-			image_data = base64.b64encode(file.read()).decode('utf-8')
-			image_data = 'data:image/' + image_type + ';base64,' + image_data
-			images.append(image_data)
-			
-	return images
-
-
-def get_images(image_list, image_type, ssh_manager):
    images = []
-   
-   with ssh_manager.sftp as sftp:
-      for img in image_list:
-         with sftp.file(img, 'rb') as file:
-            image_data = base64.b64encode(file.read()).decode('utf-8')
-            image_data = 'data:image/' + image_type + ';base64,' + image_data
-            images.append(image_data)
-   
+
+   for img in image_list:
+      img = 'web/temp/' + "/".join(img.split('/')[-2:])
+      with open(img, 'rb') as file:
+         image_data = base64.b64encode(file.read()).decode('utf-8')
+         image_data = 'data:image/' + image_type + ';base64,' + image_data
+         images.append(image_data)
+         
    return images
+
 
 
 def get_video(video_url):
@@ -87,14 +75,14 @@ def get_video(video_url):
 	return video_file
 
 
-def get_local_video(video_url):
-	video = 'C:/Git/log/web/client/public/temp/' + "/".join(video_url.split('/')[-2:])
-	with open(video, 'rb') as file:
-		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
-	return video_file
+def get_local_video(video_path):
+   video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
+   with open(video_path, 'rb') as file:
+      video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
+      return video_file
 
 
-def get_likes(videoId, ssh_manager):
+def get_likes(videoId):
 	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
 	likes_list = []
 	for i in like_ids:
@@ -115,8 +103,7 @@ def get_comments(videoId):
 	join_table = commentLog.query.join(User, commentLog.username == User.username).filter(
 		commentLog.video_id == videoId).order_by(commentLog.date)
 	
-	data = [{'id': id, 'comments': comment, 'profile': profile} for id, comment, profile in
-			zip(commentId_list, comments_list)]
+	data = [{'id': id, 'comments': comment} for id, comment in zip(commentId_list, comments_list)]
 	
 	return data
 
@@ -242,7 +229,7 @@ def searchResult(request, session, ssh_manager):
 	if not user_id or len(coverImg_list) == 0:
 		return jsonify({"error": "Image not found"}), 404
 	
-	image_data_list = get_images(coverImg_list, 'png', ssh_manager)
+	image_data_list = get_local_images(coverImg_list, 'png')
 	
 	data = [{'date': date, 'coverImg': coverImg} for date, coverImg in zip(date_list, image_data_list)]
 	
@@ -250,6 +237,7 @@ def searchResult(request, session, ssh_manager):
 
 
 def social(request, session, ssh_manager):
+	print(ssh_manager)
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -278,9 +266,9 @@ def social(request, session, ssh_manager):
 	join_table = videoInfo.query.join(User, videoInfo.username == User.username).filter(
 		videoInfo.username.in_(friends_list), videoInfo.date >= start_date, videoInfo.date <= end_date).order_by(
 		desc(videoInfo.date))
-	profile_list = get_list(join_table.with_entities(User.profile_img).all())
 	
-	cover_image = get_images(coverImg_list, 'png', ssh_manager)
+	ssh_manager.open()
+	cover_image = ssh_manager.get_images(coverImg_list, 'png')
 	
 	data = [{'date': date, 'coverImg': coverImg, 'profileUsername': username} for
 			date, coverImg, username in zip(date_list, cover_image, profileusername_list)]
@@ -371,7 +359,7 @@ def log_detail(request, session, ssh_manager):
 	video_id = request.json['videoId']
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
-	video_file = get_video(video_detail.video_url)
+	video_file = get_local_video(video_detail.video_url)
 	likeList = get_likes(video_id)
 	commentsList = get_comments(video_id)
 	is_like = did_u_like(video_id, user_id, likeList)
@@ -388,7 +376,17 @@ def log_detail(request, session, ssh_manager):
 			"isLike": is_like}
 
 
+def get_local_images(image_list, image_type):
+   images = []
 
+   for img in image_list:
+      img = 'web/temp/' + "/".join(img.split('/')[-2:])
+      with open(img, 'rb') as file:
+         image_data = base64.b64encode(file.read()).decode('utf-8')
+         image_data = 'data:image/' + image_type + ';base64,' + image_data
+         images.append(image_data)
+         
+   return images
 
 def get_log_overview_of_month(request, ssh_manager):
 	username = request.json['username']
@@ -416,7 +414,7 @@ def get_log_overview_of_month(request, ssh_manager):
 			coverImg_list.append(video.cover_image)
 			videoId_list.append(video.video_id)
 
-		coverImage = get_images(coverImg_list, 'png', ssh_manager)
+		coverImage = get_local_images(coverImg_list, 'png')
 
 		video_info_list = [{ 'date': date, 'coverImage': img, 'videoId': videoId } for date, img, videoId in zip(date_list, coverImage, videoId_list)]
 

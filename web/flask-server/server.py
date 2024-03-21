@@ -10,6 +10,7 @@ from flask_session import Session
 import pymysql
 
 import io
+import base64
 
 from sqlalchemy import extract, asc, or_, desc
 from sqlalchemy.exc import IntegrityError
@@ -48,91 +49,116 @@ ssh_password = SSH_PASSWORD
 
 
 
+
 class SSHManager:
-	def __init__(self):
-		self.host = SSH_HOST
-		self.port = SSH_PORT
-		self.username = SSH_USERNAME
-		self.password = SSH_PASSWORD
-		self.ssh_client = paramiko.SSHClient()
-		self.ssh_client.load_system_host_keys()
-		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		self.sftp = None
-		
-	def open(self):
-		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
-		self.sftp = self.ssh_client.open_sftp()
-		
-	def close(self):
-		if self.sftp:
-			self.sftp.close()
-		self.ssh_client.close()
-		
-	def create_remote_folder(self, folder_path):
-		if self.sftp:
-			self.sftp.mkdir(folder_path)
+   def __init__(self):
+      self.host = SSH_HOST
+      self.port = SSH_PORT
+      self.username = SSH_USERNAME
+      self.password = SSH_PASSWORD
+      self.ssh_client = paramiko.SSHClient()
+      self.ssh_client.load_system_host_keys()
+      self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+      self.sftp = None
+      
+   def open(self):
+      self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
+      self.sftp = self.ssh_client.open_sftp()
+      
+   def close(self):
+      if self.sftp:
+         self.sftp.close()
+      self.ssh_client.close()
+      
+   def create_remote_folder(self, folder_path):
+      if self.sftp:
+         self.sftp.mkdir(folder_path)
 
-	def remove_folder_contents(self, folder_path):
-		if self.sftp:
-			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-			remote_items = self.sftp.listdir(folder_path)
+   def remove_folder_contents(self, folder_path):
+      if self.sftp:
+         # 원격 폴더 내의 파일 및 폴더 목록 가져오기
+         remote_items = self.sftp.listdir(folder_path)
 
-			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
-			for item in remote_items:
-				remote_item_path = os.path.join(folder_path, item)
-				
+         # 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
+         for item in remote_items:
+            remote_item_path = os.path.join(folder_path, item)
+            
                 # 원격 항목의 속성 가져오기
-				remote_item_attr = self.sftp.stat(remote_item_path)
-				
-				if stat.S_ISDIR(remote_item_attr.st_mode):
-					self.remove_folder_contents(remote_item_path)
-				else:
-					self.sftp.remove(remote_item_path)
+            remote_item_attr = self.sftp.stat(remote_item_path)
+            
+            if stat.S_ISDIR(remote_item_attr.st_mode):
+               self.remove_folder_contents(remote_item_path)
+            else:
+               self.sftp.remove(remote_item_path)
 
 
-	def delete_folder(self, folder_path):
-		if self.sftp:
-			self.remove_folder_contents(folder_path)
-			self.sftp.rmdir(folder_path)
-			
-	def get_remote_folder(self, remote_folder_path, local_folder_path):
-		if self.sftp:
+   def delete_folder(self, folder_path):
+      if self.sftp:
+         self.remove_folder_contents(folder_path)
+         self.sftp.rmdir(folder_path)
+         
+   def get_remote_folder(self, remote_folder_path, local_folder_path):
+      if self.sftp:
             # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
-			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-			remote_items = self.sftp.listdir(remote_folder_path)
+         # 원격 폴더 내의 파일 및 폴더 목록 가져오기
+         remote_items = self.sftp.listdir(remote_folder_path)
 
-			# 로컬 폴더가 없으면 생성
-			if not os.path.exists(local_folder_path):
-				os.makedirs(local_folder_path)
+         # 로컬 폴더가 없으면 생성
+         if not os.path.exists(local_folder_path):
+            os.makedirs(local_folder_path)
 
-			# 각 항목을 반복하면서 처리
-			for item in remote_items:
-				remote_item_path = os.path.join(remote_folder_path, item)
-				local_item_path = os.path.join(local_folder_path, item)
+         # 각 항목을 반복하면서 처리
+         for item in remote_items:
+            remote_item_path = os.path.join(remote_folder_path, item)
+            local_item_path = os.path.join(local_folder_path, item)
 
-				# 원격 항목의 속성 가져오기
-				remote_item_attr = self.sftp.stat(remote_item_path)
+            # 원격 항목의 속성 가져오기
+            remote_item_attr = self.sftp.stat(remote_item_path)
 
-				# 만약 폴더라면 재귀적으로 다시 호출
-				if stat.S_ISDIR(remote_item_attr.st_mode):
-					self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
-				else:
-					# 파일이라면 복사
-					self.sftp.get(remote_item_path, local_item_path)
-					
-	def save_file(self, local_path, remote_path):
-		if self.sftp:
-			self.sftp.put(local_path, remote_path)
+            # 만약 폴더라면 재귀적으로 다시 호출
+            if stat.S_ISDIR(remote_item_attr.st_mode):
+               self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
+            else:
+               # 파일이라면 복사
+               self.sftp.get(remote_item_path, local_item_path)
+               
+   def save_file(self, local_path, remote_path):
+      if self.sftp:
+         print('저장완')
+         self.sftp.put(local_path, remote_path)
 
-	def get_remote_file(self, remote_file_path, local_file_path):
-		if self.sftp:
-			# 로컬 폴더가 없으면 생성
-			local_folder_path = os.path.dirname(local_file_path)
-			if not os.path.exists(local_folder_path):
-				os.makedirs(local_folder_path)
+   def get_remote_file(self, remote_file_path, local_file_path):
+      if self.sftp:
+         # 로컬 폴더가 없으면 생성
+         local_folder_path = os.path.dirname(local_file_path)
+         if not os.path.exists(local_folder_path):
+            os.makedirs(local_folder_path)
 
             # 파일 복사
-			self.sftp.get(remote_file_path, local_file_path)
+         self.sftp.get(remote_file_path, local_file_path)
+
+   def get_images(self, image_list, image_type):
+      images = []
+      
+      try:
+         for img in image_list:
+            with self.sftp.file(img, 'rb') as file:
+               image_data = base64.b64encode(file.read()).decode('utf-8')
+               image_data = 'data:image/' + image_type + ';base64,' + image_data
+               images.append(image_data)
+      except Exception as e:
+         print(f"Error getting images: {e}")
+         
+      return images
+   
+   def get_profile_image(self, user):
+      try:
+         with self.sftp.file(user.profile_img, 'rb') as file:
+            image_data = file.read()
+            return image_data
+      except Exception as e:
+         print(f"Error getting profile image: {e}")
+         return None
 
 ssh_manager = SSHManager()
 
