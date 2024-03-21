@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
+import Loading from '../Routing/Loading'
 import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
-function LoginPage({ updateIsAuthorized }) {
+function LoginPage() {
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
@@ -44,6 +47,8 @@ function LoginPage({ updateIsAuthorized }) {
         }
 
         try {
+            setLoading(true);
+
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -89,7 +94,7 @@ function LoginPage({ updateIsAuthorized }) {
                     }
 
                     console.log("successful login");
-                    updateIsAuthorized(true);
+                    setLoading(false);
 
                     navigate("/", { replace: true });
                 }
@@ -111,6 +116,8 @@ function LoginPage({ updateIsAuthorized }) {
 
     return (
         <div className="login-page">
+            {loading ? <Loading /> : null}
+
             <h1>log your memory</h1>
 
             { isVisible && prevURL === '/signup' && (

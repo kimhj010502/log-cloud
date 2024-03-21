@@ -186,7 +186,7 @@ export function ProfileImg() {
     );
 }
 
-async function handleLogout(updateIsAuthorized) {
+async function handleLogout() {
     try {
         const response = await fetch('/logout', {
             method: 'GET',
@@ -199,7 +199,6 @@ async function handleLogout(updateIsAuthorized) {
             const data = await response.json();
             console.log(data);
             sessionStorage.clear();
-            console.log(updateIsAuthorized);
             // return {username: data.username, createdAt: data.createdAt};
         }
 
@@ -209,15 +208,13 @@ async function handleLogout(updateIsAuthorized) {
 }
 
 
-export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) {
+export function ProfileButtons({ isClicked, setIsClicked }) {
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
     };
 
-    function handleLogoutClick(updateIsAuthorized) {
-        handleLogout(updateIsAuthorized)
-        updateIsAuthorized(false);
-
+    function handleLogoutClick() {
+        handleLogout()
     }
 
     return (
