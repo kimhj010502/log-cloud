@@ -160,20 +160,6 @@ class SSHManager:
          print(f"Error getting profile image: {e}")
          return None
 
-	def get_images(self, image_list, image_type):
-		images = []
-		
-		try:
-			for img in image_list:
-				with self.sftp.file(img, 'rb') as file:
-					image_data = base64.b64encode(file.read()).decode('utf-8')
-					image_data = 'data:image/' + image_type + ';base64,' + image_data
-					images.append(image_data)
-		except Exception as e:
-			print(f"Error getting images: {e}")
-			
-		return images
-
 ssh_manager = SSHManager()
 
 
