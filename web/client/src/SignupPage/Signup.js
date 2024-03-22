@@ -49,6 +49,33 @@ function SignupPage() {
     };
 
     const handleSignup = async() => {
+        if (!username || !email || !password1 || !password2) {
+            alert("All fields are mandatory");
+            return;
+        }
+
+        if (username.length < 3) {
+            alert("Choose a longer username");
+            return;
+        }
+
+        const reservedUsername = ['username','email','temp']
+        if (reservedUsername.includes(username)) {
+            alert("Please choose a different username");
+            return;
+        }
+
+        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert("Email invalid");
+            return;
+        }
+
+        if (password1.length < 4) {
+            alert("Password must be longer than 3 characters");
+            return;
+        }
+
         if (password1 !== password2) {
             alert("Passwords do not match");
             return;
@@ -59,13 +86,8 @@ function SignupPage() {
             return;
         }
 
-        if (!username || !email || !password1 || !password2)
-        {
-            alert("All fields are mandatory");
-            return;
-        }
-
-        if (username && email && password1 && password2) {
+        const pattern = /^[A-Za-z0-9']+$/;
+        if (pattern.test(username) && pattern.test(password1)) {
             try {
                 const response = await fetch('/registration', {
                     method: 'POST',
@@ -83,6 +105,9 @@ function SignupPage() {
             } catch (error) {
                 console.error('Error signing up:', error);
             }
+        }
+        else {
+            alert("Make sure username and password only contains letters and numbers");
         }
 
     };
