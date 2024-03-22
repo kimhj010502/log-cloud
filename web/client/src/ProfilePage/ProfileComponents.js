@@ -199,6 +199,11 @@ async function handleLogout() {
             const data = await response.json();
             console.log(data);
             sessionStorage.clear();
+
+            console.log("로그인으로 이동")
+            window.location.reload();
+            console.log("이동 완료")
+
             // return {username: data.username, createdAt: data.createdAt};
         }
 
@@ -209,6 +214,7 @@ async function handleLogout() {
 
 
 export function ProfileButtons({ isClicked, setIsClicked }) {
+    
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
     };
