@@ -102,8 +102,10 @@ function LoginPage() {
                 }
             } else if (response.status === 401) {
                 alert('Invalid username or password :(');
+                setLoading(false);
             } else {
                 alert('Log in failed :(');
+                setLoading(false);
             }
         } catch (error) {
             console.error('Error logging in:', error);
