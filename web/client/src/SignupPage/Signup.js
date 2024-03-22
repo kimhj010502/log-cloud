@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { useNavigate  } from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Signup.css'
 
@@ -122,7 +122,10 @@ function SignupPage() {
             exit={{ opacity: 0, when: "afterChildren" }}
             transition={{ duration: 0.5 }}
             >
-            <h1>log your memory</h1>
+
+            <Link to={'/'} style={{ textDecoration: 'none' }}>
+                <h1>log your memory</h1>
+            </Link>
 
             <div className='signup-box'>
                 <h2>Create Account</h2>

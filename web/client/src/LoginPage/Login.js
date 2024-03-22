@@ -120,7 +120,9 @@ function LoginPage() {
         <div className="login-page">
             {loading ? <Loading /> : null}
 
-            <h1>log your memory</h1>
+            <Link to={'/'} style={{ textDecoration: 'none' }}>
+                <h1>log your memory</h1>
+            </Link>
 
             { isVisible && prevURL === '/signup' && (
             <AnimatePresence mode='wait'>
