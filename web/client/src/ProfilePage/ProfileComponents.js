@@ -65,8 +65,10 @@ export async function getProfileImage(username) {
         });
         if (response.ok) {
             if (response.status === 200) {
-                const blob = await response.blob();
-                return URL.createObjectURL(blob);
+                // const blob = await response.blob();
+                // return URL.createObjectURL(blob);
+                // console.log(response.body);
+                return response;
             }
         } else if (response.status === 404) { // no image set; use default image
             return 'profile.png';
@@ -233,9 +235,9 @@ export function ProfileButtons({ isClicked, setIsClicked }) {
                 <div className='profile-button'>change password</div>
             </Link>
 
-            <Link to={'/login'} onClick={handleLogoutClick} className='profile-link'>
+            <div onClick={handleLogoutClick} className='profile-link'>
                 <div className='profile-button'>log out</div>
-            </Link>
+            </div>
 
             <div className='profile-button delete-button' onClick={handleDeleteAccountClick}>delete my account</div>
         </div>

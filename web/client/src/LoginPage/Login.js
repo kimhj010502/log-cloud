@@ -96,16 +96,19 @@ function LoginPage() {
                     console.log("successful login");
                     setLoading(false);
 
-                    console.log("홈으로 이동")
+                    console.log("홈으로 이동");
                     window.location.reload();
-                    console.log("이동 완료")
+                    console.log("이동 완료");
                 }
             } else if (response.status === 401) {
+                setLoading(false);
                 alert('Invalid username or password :(');
             } else {
+                setLoading(false);
                 alert('Log in failed :(');
             }
         } catch (error) {
+            setLoading(false);
             console.error('Error logging in:', error);
         }
     };
