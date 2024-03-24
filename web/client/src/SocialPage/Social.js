@@ -6,7 +6,7 @@ import Loading from '../Routing/Loading'
 import { Social } from './SocialComponents'
 import './Social.css';
 
-function SocialPage() {
+function SocialPage({imgSrc}) {
     const [loading, setLoading] = useState(false);
 
     const [data, setData] = useState([{}])
@@ -59,7 +59,7 @@ function SocialPage() {
                 )
             )}
         
-            <Navigation />
+            <Navigation imgSrc={imgSrc}/>
         </div>
 
     );

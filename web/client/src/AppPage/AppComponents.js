@@ -196,7 +196,7 @@ export function CameraButton() {
 }
 
 //내비게이션 바
-export function Navigation() {
+export function Navigation({ imgSrc }) {
     const location = useLocation();
     const page = location.pathname
 
@@ -215,13 +215,11 @@ export function Navigation() {
         sessionStorage.setItem('username', username);
     }
 
-    const [profileImgSrc, setProfileImgSrc] = useState(sessionStorage.getItem('myProfileImg'));
-
-    if (!profileImgSrc) {
-        const userProfileImage = getProfileImage(username);
-        setProfileImgSrc(userProfileImage);
-        sessionStorage.setItem('myProfileImg', userProfileImage);
-    }
+    // if (!profileImgSrc) {
+    //     const userProfileImage = getProfileImage(username);
+    //     setProfileImgSrc(userProfileImage);
+    //     sessionStorage.setItem('myProfileImg', userProfileImage);
+    // }
 
     return (
         <div className="navigation">
@@ -265,12 +263,12 @@ export function Navigation() {
             <Link to={'/profile'}>
             {isProfile && (
                 <div className="profile-select">
-                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
+                <img className="profile-img" src={imgSrc} alt="profile img"/>
             </div>
             )}
             {!isProfile && (
                 <div className="profile">
-                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
+                <img className="profile-img" src={imgSrc} alt="profile img"/>
             </div>
             )}
             </Link>

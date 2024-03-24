@@ -26,7 +26,7 @@ async function fetchData(selectedValue){
 }
 
 
-function SearchResultPage() {
+function SearchResultPage({imgSrc}) {
     const [loading, setLoading] = useState(false);
 
     const location = useLocation();
@@ -76,7 +76,7 @@ function SearchResultPage() {
             </AnimatePresence>
             )}
 
-            <Navigation />
+            <Navigation imgSrc={imgSrc}/>
         </div>
     )
 }

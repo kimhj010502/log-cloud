@@ -5,7 +5,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Navigation } from '../AppPage/AppComponents'
 import './ChangePassword.css'
 
-function ChangePasswordPage() {
+function ChangePasswordPage({ imgSrc }) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword1, setNewPassword1] = useState("");
     const [newPassword2, setNewPassword2] = useState("");
@@ -95,7 +95,7 @@ function ChangePasswordPage() {
                 </motion.div>
             </AnimatePresence>
 
-            <Navigation />
+            <Navigation imgSrc={imgSrc} />
         </div>
     )
 }

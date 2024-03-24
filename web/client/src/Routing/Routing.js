@@ -54,21 +54,21 @@ function Routing() {
         <div className="body">
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={sessionStorage.getItem('username')  ? <App /> : <Navigate to="/login" replace />} />
+                    <Route path='/' element={sessionStorage.getItem('username')  ? <App imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='feed' element={sessionStorage.getItem('username')  ? <Feed /> : <Navigate to="/login" replace />} />
+                    <Route path='feed' element={sessionStorage.getItem('username')  ? <Feed imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='social' element={sessionStorage.getItem('username') ? <Social /> : <Navigate to="/login" replace />} />
-                    <Route path='social-feed' element={sessionStorage.getItem('username') ? <SocialFeed /> : <Navigate to="/login" replace />} />
+                    <Route path='social' element={sessionStorage.getItem('username') ? <Social imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='social-feed' element={sessionStorage.getItem('username') ? <SocialFeed imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='search' element={sessionStorage.getItem('username') ? <Search /> : <Navigate to="/login" replace />} />
-                    <Route path='search-result' element={sessionStorage.getItem('username') ? <SearchResult /> : <Navigate to="/login" replace />} />
+                    <Route path='search' element={sessionStorage.getItem('username') ? <Search imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='search-result' element={sessionStorage.getItem('username') ? <SearchResult imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='analysis' element={sessionStorage.getItem('username') ? <Analysis /> : <Navigate to="/login" replace />} />
+                    <Route path='analysis' element={sessionStorage.getItem('username') ? <Analysis imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='profile' element={sessionStorage.getItem('username') ? <Profile /> : <Navigate to="/login" replace />} />
-                    <Route path='manage-friends' element={sessionStorage.getItem('username') ? <ManageFriends /> : <Navigate to="/login" replace />} />
-                    <Route path='change-password' element={sessionStorage.getItem('username') ? <ChangePassword /> : <Navigate to="/login" replace />} />
+                    <Route path='profile' element={sessionStorage.getItem('username') ? <Profile imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='manage-friends' element={sessionStorage.getItem('username') ? <ManageFriends imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='change-password' element={sessionStorage.getItem('username') ? <ChangePassword imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
                     <Route path='login' element={sessionStorage.getItem('username') ? <Navigate to="/" replace /> : <Login /> } />
                     <Route path='signup' element={sessionStorage.getItem('username') ? <Navigate to="/" replace /> : <Signup /> } />

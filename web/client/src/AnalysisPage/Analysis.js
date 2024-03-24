@@ -24,7 +24,7 @@ async function fetchData(currentYear, currentMonth) {
 }
 
 
-function AnalysisPage() {
+function AnalysisPage({ imgSrc }) {
     const [loading, setLoading] = useState(false);
 
     let date = new Date()
@@ -69,7 +69,7 @@ function AnalysisPage() {
                 </AnimatePresence>
             )}
             
-            <Navigation />
+            <Navigation imgSrc={imgSrc} />
         </div>
 
     );
