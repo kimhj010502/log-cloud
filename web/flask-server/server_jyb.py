@@ -211,7 +211,11 @@ def get_user_profile_image(request, ssh_manager):
 		# 		image_data = file.read()
 		# 		return send_file(io.BytesIO(image_data), mimetype='image/png')
 		ssh_manager.open()
-		return ssh_manager.get_profile_image(user.profile_img)
+		img, status_code = ssh_manager.get_profile_image(user.profile_img)
+		if img:
+			return img, status_code
+		else:
+			return "error in server", 500
 	
 	except Exception as e:
 		print(str(e))

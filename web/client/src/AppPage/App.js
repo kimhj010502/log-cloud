@@ -3,7 +3,7 @@ import './App.css'
 import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 
-function App() {
+function App({ imgSrc }) {
 
     return (
         <div className="app-page">
@@ -14,7 +14,7 @@ function App() {
             <Calendar />
             <CameraButton />
 
-            <Navigation />
+            <Navigation imgSrc={imgSrc} />
         </div>
     )
 }

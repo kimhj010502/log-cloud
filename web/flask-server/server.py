@@ -156,10 +156,10 @@ class SSHManager:
          with self.sftp.file(profile_img, 'rb') as file:
             image_data = base64.b64encode(file.read()).decode('utf-8')
             image_data = 'data:image/jpg;base64,' + image_data
-            return image_data
+            return image_data, 200
       except Exception as e:
          print(f"Error getting profile image: {e}")
-         return None
+         return 'Error setting profile image', 500
 
 ssh_manager = SSHManager()
 
