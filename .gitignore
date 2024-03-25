@@ -22,4 +22,8 @@ web/flask-server/sftp.py
 web/flask-server/ssh_test.py
 web/flask-server/ssh_test_copy.py
 
+<<<<<<< HEAD
 web/temp
+=======
+web/temp
+>>>>>>> ed71ba1ce17f89da28f104331c5c49915fa9faf1

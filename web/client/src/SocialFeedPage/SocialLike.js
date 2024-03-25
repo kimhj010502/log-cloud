@@ -4,7 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, Like } from './SocialLikeComponents'
 import './SocialLike.css';
 
-export function SocialLike({ data, id, profile, setPage, setPrevPage }) {
+export function SocialLike({ data, heartdata, id, profile, setPage, setPrevPage }) {
     return (
         <div className="social-like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
@@ -24,8 +24,8 @@ export function SocialLike({ data, id, profile, setPage, setPrevPage }) {
 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
-                        {data.likeList && data.likeImage.map((cont) => (
-                            <Like img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} />
+                        {heartdata.likeList.map((cont) => (
+                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
                         ))
                         }
                     </div>

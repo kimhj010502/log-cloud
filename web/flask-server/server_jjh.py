@@ -64,7 +64,6 @@ def get_local_images(image_list, image_type):
    return images
 
 
-
 def get_video(video_url):
 	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
 	with ssh_client.open_sftp() as sftp:
@@ -83,7 +82,9 @@ def get_local_video(video_path):
 
 
 def get_likes(videoId):
+	print('get_likes 실행', videoId)
 	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
+	print('like-ids', like_ids)
 	likes_list = []
 	for i in like_ids:
 		likes_list.append(i[0])
@@ -100,15 +101,12 @@ def get_comments(videoId):
 	commentId_list = get_list(comment_ids)
 	comments_list = get_list(comments)
 	
-	join_table = commentLog.query.join(User, commentLog.username == User.username).filter(
-		commentLog.video_id == videoId).order_by(commentLog.date)
-	
 	data = [{'id': id, 'comments': comment} for id, comment in zip(commentId_list, comments_list)]
 	
 	return data
 
 
-def did_u_like(videoId, username, likeList):
+def did_u_like(username, likeList):
 	if username in likeList:
 		return True
 	else:
@@ -276,7 +274,7 @@ def social(request, session, ssh_manager):
 	return jsonify(data)
 
 
-def socialDetail(request, session, ssh_manager):
+def socialDetail(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -293,42 +291,76 @@ def socialDetail(request, session, ssh_manager):
 	video_url = video_detail.with_entities(videoInfo.video_url).all()[0][0]
 	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
 	
-	likeList = get_likes(video_id)
-	commentsList = get_comments(video_id)
-	
 	video_file = get_video(video_url)
-	
-	is_like = did_u_like(video_id, user_id, likeList)
 	
 	data = {"hashtags": hashtags,
 			"summary": summary,
 			"emotion": emotion,
 			"video": video_file,
-			"likeList": likeList,
-			"commentList": commentsList,
-			"videoId": video_id,
-			"isLike": is_like}
+			"videoId": video_id}
 	
 	return jsonify(data)
 
 
-def comments(request, session, ssh_manager):
+def comments(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
 	
 	video_id = request.json.get('videoId')
-	comment = request.json.get('comment')
+	commentsList = get_comments(video_id)
+
+	return commentsList
+
+
+def sendComments(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	video_id = request.json.get('videoId')
+	newComment = request.json.get('newComment')
 	
 	# Insert comment into the database
-	new_comment = commentLog(video_id=video_id, username=user_id, comment=comment)
+	new_comment = commentLog(video_id=video_id, username=user_id, comment=newComment)
 	db.session.add(new_comment)
 	db.session.commit()
+
 	return ""
 
 
-def hearts(request, session, ssh_manager):
+def hearts(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	date = request.json['date']
+	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+	post_user = request.json['id']
+
+	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
+	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
+	print("Heart------------")
+	print(video_id)
+
+	likeList = get_likes(video_id)
+	print("---------------------------")
+	is_like = did_u_like(user_id, likeList)
+	
+
+	data = {"likeList": likeList,
+			"isLike": is_like}
+	
+	print(data)
+
+	return data
+
+
+
+def sendHearts(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -365,9 +397,6 @@ def log_detail(request, session, ssh_manager):
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
 	video_file = get_local_video(video_detail.video_url)
-	likeList = get_likes(video_id)
-	commentsList = get_comments(video_id)
-	is_like = did_u_like(video_id, user_id, likeList)
 	
 	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
 			"video": video_file,
@@ -375,23 +404,9 @@ def log_detail(request, session, ssh_manager):
 			"summary": video_detail.summary,
 			"privacy": video_detail.share,
 			"emotion": video_detail.emotion,
-			"likeList": likeList,
-			"videoId": video_id,
-			"commentList": commentsList,
-			"isLike": is_like}
+			"videoId": video_id}
 
 
-def get_local_images(image_list, image_type):
-   images = []
-
-   for img in image_list:
-      img = 'web/temp/' + "/".join(img.split('/')[-2:])
-      with open(img, 'rb') as file:
-         image_data = base64.b64encode(file.read()).decode('utf-8')
-         image_data = 'data:image/' + image_type + ';base64,' + image_data
-         images.append(image_data)
-         
-   return images
 
 def get_log_overview_of_month(request, ssh_manager):
 	username = request.json['username']
