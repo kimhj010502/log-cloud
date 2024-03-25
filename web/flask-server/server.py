@@ -33,7 +33,7 @@ server_session = Session(app)
 db.init_app(app)
 
 with app.app_context():
-	db.create_all()
+    db.create_all()
 
 
 # SCP 연결 설정
@@ -154,33 +154,34 @@ class SSHManager:
    def get_profile_image(self, profile_img):
       try:
          with self.sftp.file(profile_img, 'rb') as file:
-            image_data = file.read()
-            return image_data
+            image_data = base64.b64encode(file.read()).decode('utf-8')
+            image_data = 'data:image/jpg;base64,' + image_data
+            return image_data, 200
       except Exception as e:
          print(f"Error getting profile image: {e}")
-         return None
+         return 'Error setting profile image', 500
 
 ssh_manager = SSHManager()
 
 
 from server_khj import record_video, select_option, add_log, save_log, \
-	register_user, remove_registered_user, login_user, logout_user
+    register_user, remove_registered_user, login_user, logout_user
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
-	return add_log(request, session, ssh_manager)
+    return add_log(request, session, ssh_manager)
 
 @app.route('/record', methods=['POST'])
 def record_video_route():
-	return record_video(request, session, ssh_manager)
+    return record_video(request, session, ssh_manager)
 
 @app.route('/upload', methods=['POST'])
 def select_option_route():
-	return select_option(request, session, ssh_manager)
+    return select_option(request, session, ssh_manager)
 
 @app.route('/save', methods=['POST'])
 def save_log_route():
-	return save_log(request, session, ssh_manager)
+    return save_log(request, session, ssh_manager)
 
 
 from server_jjh import analysisReport, searchResult, social, socialDetail, comments, hearts, get_log_overview_of_month, log_detail
@@ -197,137 +198,137 @@ def searchResult_route():
 
 @app.route("/social")
 def social_route():
-	return social(request, session, ssh_manager)
+    return social(request, session, ssh_manager)
 
 
 @app.route("/socialdetail", methods=['POST','GET'])
 def socialDetail_route():
-	return socialDetail(request, session, ssh_manager)
+    return socialDetail(request, session, ssh_manager)
 
 
 @app.route("/comments", methods=['POST','GET'])
 def comments_route():
-	return comments(request, session, ssh_manager)
+    return comments(request, session, ssh_manager)
 
 
 @app.route("/hearts", methods=['POST','GET'])
 def hearts_route():
-	return hearts(request, session, ssh_manager)
+    return hearts(request, session, ssh_manager)
 
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month_route():
-	return get_log_overview_of_month(request, ssh_manager)
+    return get_log_overview_of_month(request, ssh_manager)
 
 
 @app.route("/logdetail", methods=['POST','GET'])
 def log_detail_route():
-	return log_detail(request, session, ssh_manager)
+    return log_detail(request, session, ssh_manager)
 
 
 
 
 
 from server_jyb import check_authentication, check_username_availability, change_user_password, \
-	get_current_user, get_user_profile_image, set_profile_image, \
-	send_friend_request, search_user, get_friend_list, unsend_friend_request, \
-	reject_friend_request, accept_friend_request, remove_friend
+    get_current_user, get_user_profile_image, set_profile_image, \
+    send_friend_request, search_user, get_friend_list, unsend_friend_request, \
+    reject_friend_request, accept_friend_request, remove_friend
 
 @app.route("/generateDetails")
 def generate_details():
-	return {"date": "Friday, December 9, 2023",
-			"coverImg": "/route/to/image",
-			"hashtags": ["😍", "이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
-			"summary": "이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 가족 여행으로 시칠리아에 왔어요. 여름의 이탈리아는 매우 더워요. 해변에서 하루종일 수영했어요.",
-			"privacy": "전체 공개",
-			"location": "Sicily, Italy",
-			"emotion": "happy"}
+    return {"date": "Friday, December 9, 2023",
+            "coverImg": "/route/to/image",
+            "hashtags": ["😍", "이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
+            "summary": "이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 가족 여행으로 시칠리아에 왔어요. 여름의 이탈리아는 매우 더워요. 해변에서 하루종일 수영했어요.",
+            "privacy": "전체 공개",
+            "location": "Sicily, Italy",
+            "emotion": "happy"}
 
 
 @app.route('/authentication', methods=['GET'])
 def check_authentication_route():
-	return check_authentication(request, session)
+    return check_authentication(request, session)
 
 
 @app.route('/username_availability', methods=['GET'])
 def check_username_availability_route():
-	return check_username_availability(request)
+    return check_username_availability(request)
 
 
 @app.route('/registration', methods=['POST'])
 def register_user_route():
-	return register_user(request, bcrypt, ssh_manager)
+    return register_user(request, bcrypt, ssh_manager)
 
 
 @app.route('/change_password', methods=['POST'])
 def change_user_password_route():
-	return change_user_password(request, session, bcrypt)
+    return change_user_password(request, session, bcrypt)
 
 
 @app.route('/delete_account', methods=['POST'])
 def remove_registered_user_route():
-	return remove_registered_user(request, session, ssh_manager)
+    return remove_registered_user(request, session, ssh_manager)
 
 
 @app.route('/login', methods=['POST'])
 def login_user_route():
-	return login_user(request, bcrypt, ssh_manager)
+    return login_user(request, bcrypt, ssh_manager)
 
 
 @app.route('/logout', methods=['GET'])
 def logout_user_route():
-	return logout_user(request, session, ssh_manager)
-	
+    return logout_user(request, session, ssh_manager)
+    
 
 @app.route("/@me")
 def get_current_user_route():
-	return get_current_user(request, session)
-	
+    return get_current_user(request, session)
+    
 
 @app.route("/get_profile_image", methods=['POST'])
 def get_user_profile_image_route():
-	return get_user_profile_image(request, ssh_manager)
+    return get_user_profile_image(request, ssh_manager)
 
 
 @app.route("/set_profile_image", methods=['POST'])
 def set_profile_image_route():
-	return set_profile_image(request, session)
+    return set_profile_image(request, session, ssh_manager)
 
 
 @app.route('/get_friend_list', methods=['POST'])
 def friend_information_route():
-	return get_friend_list(request, session)
+    return get_friend_list(request, session)
 
 
 @app.route('/search_user', methods=['POST'])
 def search_user_route():
-	return search_user(request, session)
+    return search_user(request, session)
 
 
 @app.route('/send_friend_request', methods=['POST'])
 def send_friend_request_route():
-	return send_friend_request(request, session)
+    return send_friend_request(request, session)
 
 
 @app.route('/unsend_friend_request', methods=['POST'])
 def unsend_friend_request_route():
-	return unsend_friend_request(request, session)
+    return unsend_friend_request(request, session)
 
 @app.route('/reject_friend_request', methods=['POST'])
 def reject_friend_request_route():
-	return reject_friend_request(request, session)
+    return reject_friend_request(request, session)
 
 
 @app.route('/accept_friend_request', methods=['POST'])
 def accept_friend_request_route():
-	return accept_friend_request(request, session)
+    return accept_friend_request(request, session)
 
 
 @app.route('/remove_friend', methods=['POST'])
 def remove_friend_route():
-	return remove_friend(request, session)
+    return remove_friend(request, session)
 
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+    app.run(debug=True)

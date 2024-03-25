@@ -211,7 +211,11 @@ def get_user_profile_image(request, ssh_manager):
 		# 		image_data = file.read()
 		# 		return send_file(io.BytesIO(image_data), mimetype='image/png')
 		ssh_manager.open()
-		return ssh_manager.get_profile_image(user.profile_img)
+		img, status_code = ssh_manager.get_profile_image(user.profile_img)
+		if img:
+			return img, status_code
+		else:
+			return "error in server", 500
 	
 	except Exception as e:
 		print(str(e))
@@ -234,16 +238,10 @@ def set_profile_image(request, session, ssh_manager):
 			
 			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
 			
-			# ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-			#
-			# with ssh_client.open_sftp() as sftp:
-			# 	sftp.put(local_image_path, remote_image_path)
 			ssh_manager.open()
 			ssh_manager.save_file(local_image_path, remote_image_path)
 			
 			os.remove(local_image_path)
-			
-			# ssh_client.close()
 			
 			user.profile_img = remote_image_path
 			db.session.commit()

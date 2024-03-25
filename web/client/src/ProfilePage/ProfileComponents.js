@@ -63,11 +63,16 @@ export async function getProfileImage(username) {
             },
             body: JSON.stringify({username: username}),
         });
-        if (response.ok) {
-            if (response.status === 200) {
-                const blob = await response.blob();
-                return URL.createObjectURL(blob);
-            }
+        if (!response.ok) {
+            console.log("Error getting profile image:", response);
+            return 'profile.png';
+        }
+        const imageData = await response.text();
+        if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+            // const blob = await response.blob();
+            // return URL.createObjectURL(blob);
+            // console.log(response.body);
+            return imageData;
         } else if (response.status === 404) { // no image set; use default image
             return 'profile.png';
         } else {
@@ -233,9 +238,9 @@ export function ProfileButtons({ isClicked, setIsClicked }) {
                 <div className='profile-button'>change password</div>
             </Link>
 
-            <Link to={'/login'} onClick={handleLogoutClick} className='profile-link'>
+            <div onClick={handleLogoutClick} className='profile-link'>
                 <div className='profile-button'>log out</div>
-            </Link>
+            </div>
 
             <div className='profile-button delete-button' onClick={handleDeleteAccountClick}>delete my account</div>
         </div>

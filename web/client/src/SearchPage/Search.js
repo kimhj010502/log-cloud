@@ -4,7 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { SearchBox } from './SearchComponents'
 import './Search.css'
 
-function SearchPage() {
+function SearchPage({imgSrc}) {
     return (
         <div className="search-page">
 
@@ -23,7 +23,7 @@ function SearchPage() {
                 </motion.div>
             </AnimatePresence>
             
-            <Navigation />
+            <Navigation imgSrc={imgSrc} />
         </div>
     )
 }

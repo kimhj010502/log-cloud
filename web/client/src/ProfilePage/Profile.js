@@ -19,7 +19,7 @@ function ProfilePage({ imgSrc }) {
 
                 <h1>my profile</h1>
 
-                <ProfileImg img_src={imgSrc}/>
+                <ProfileImg imgSrc={imgSrc}/>
 
                 <ProfileButtons isClicked={isClicked} setIsClicked={setIsClicked} />
 
@@ -30,7 +30,7 @@ function ProfilePage({ imgSrc }) {
                 </motion.div>
             </AnimatePresence>
 
-            <Navigation />
+            <Navigation imgSrc={imgSrc} />
         </div>
     )
 }

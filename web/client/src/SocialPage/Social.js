@@ -6,7 +6,25 @@ import Loading from '../Routing/Loading'
 import { Social } from './SocialComponents'
 import './Social.css';
 
-function SocialPage() {
+function SocialPage({imgSrc}) {
+    const [friendsProfileImg, setFriendsProfileImg] = useState({});
+
+    useEffect(() => {
+    const friendList = JSON.parse(sessionStorage.getItem('friendList')) || [];
+
+    const fetchDataFromSessionStorage = () => {
+      const friendData = {};
+      friendList.forEach(username => {
+        const profileImg = sessionStorage.getItem(username);
+        friendData[username] = profileImg;
+      });
+      setFriendsProfileImg(friendData);
+    };
+
+    fetchDataFromSessionStorage();
+    }, []);
+
+
     const [loading, setLoading] = useState(false);
 
     const [data, setData] = useState([{}])
@@ -59,7 +77,7 @@ function SocialPage() {
                 )
             )}
         
-            <Navigation />
+            <Navigation imgSrc={imgSrc}/>
         </div>
 
     );

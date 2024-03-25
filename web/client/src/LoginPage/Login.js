@@ -96,18 +96,21 @@ function LoginPage() {
                     console.log("successful login");
                     setLoading(false);
 
-                    console.log("홈으로 이동")
+                    console.log("홈으로 이동");
                     window.location.reload();
-                    console.log("이동 완료")
+                    console.log("이동 완료");
                 }
             } else if (response.status === 401) {
+                setLoading(false);
                 alert('Invalid username or password :(');
                 setLoading(false);
             } else {
+                setLoading(false);
                 alert('Log in failed :(');
                 setLoading(false);
             }
         } catch (error) {
+            setLoading(false);
             console.error('Error logging in:', error);
         }
     };
@@ -122,7 +125,9 @@ function LoginPage() {
         <div className="login-page">
             {loading ? <Loading /> : null}
 
-            <h1>log your memory</h1>
+            <Link to={'/'} style={{ textDecoration: 'none' }}>
+                <h1>log your memory</h1>
+            </Link>
 
             { isVisible && prevURL === '/signup' && (
             <AnimatePresence mode='wait'>
