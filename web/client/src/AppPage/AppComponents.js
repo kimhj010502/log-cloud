@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import Loading from '../Routing/Loading'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
 import { getProfileImage } from "../ProfilePage/ProfileComponents";
@@ -24,6 +25,8 @@ export async function getUserInfo() {
 
 //이번 달 달력
 export function Calendar() {
+    const [loading, setLoading] = useState(false);
+
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
@@ -48,6 +51,9 @@ export function Calendar() {
 
         // POST request to get cover images
         try {
+            setVideos([]);
+            setLoading(true);
+
             const user = await getUserInfo();
             const userCreatedAt = new Date(user.createdAt);
             userCreatedMonth = userCreatedAt.getMonth();
@@ -69,13 +75,16 @@ export function Calendar() {
                         setVideos(data);
                         // console.log("VIDEO ID:", entry.videoId);
                     });
+                    setLoading(false);
                 }
             } else if (response.status === 404){
                 console.log("no video found for this month");
                 // black image set for all months
                 setVideos([]);
+                setLoading(false);
             } else {
                 console.log("month-overview api response not ok");
+                setLoading(false);
             }
         } catch (error) {
             console.error('Error fetching month-overview api:', error);
@@ -130,6 +139,8 @@ export function Calendar() {
 
     return (
         <div className="calendarBox">
+            {loading ? <Loading /> : null}
+            
             <YearMonth year={currentYear} month={currentMonth}/>
 
             <CalendarDate />
@@ -196,7 +207,7 @@ export function CameraButton() {
 }
 
 //내비게이션 바
-export function Navigation() {
+export function Navigation({ imgSrc }) {
     const location = useLocation();
     const page = location.pathname
 
@@ -215,13 +226,11 @@ export function Navigation() {
         sessionStorage.setItem('username', username);
     }
 
-    const [profileImgSrc, setProfileImgSrc] = useState(sessionStorage.getItem('myProfileImg'));
-
-    if (!profileImgSrc) {
-        const userProfileImage = getProfileImage(username);
-        setProfileImgSrc(userProfileImage);
-        sessionStorage.setItem('myProfileImg', userProfileImage);
-    }
+    // if (!profileImgSrc) {
+    //     const userProfileImage = getProfileImage(username);
+    //     setProfileImgSrc(userProfileImage);
+    //     sessionStorage.setItem('myProfileImg', userProfileImage);
+    // }
 
     return (
         <div className="navigation">
@@ -265,12 +274,12 @@ export function Navigation() {
             <Link to={'/profile'}>
             {isProfile && (
                 <div className="profile-select">
-                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
+                <img className="profile-img" src={imgSrc} alt="profile img"/>
             </div>
             )}
             {!isProfile && (
                 <div className="profile">
-                <img className="profile-img" src={profileImgSrc} alt="profile img"/>
+                <img className="profile-img" src={imgSrc} alt="profile img"/>
             </div>
             )}
             </Link>
