@@ -90,6 +90,16 @@
 
 
 /* 검색 결과 피드 */
+.search-result-page .no-feed {
+    color: white;
+    font-weight: 100;
+    margin-left: auto;
+	margin-right: auto;
+    margin-top: 300px;
+    text-align: center;
+    color: white;
+}
+
 .search-result-page .results-box {
     display: inline-block;
     width: 390px;

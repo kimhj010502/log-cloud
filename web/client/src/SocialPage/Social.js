@@ -9,16 +9,19 @@ import './Social.css';
 function SocialPage({imgSrc}) {
     const [friendsProfileImg, setFriendsProfileImg] = useState({});
 
+    console.log(sessionStorage.getItem('username'))
+    console.log(sessionStorage.getItem('test'))
+
     useEffect(() => {
     const friendList = JSON.parse(sessionStorage.getItem('friendList')) || [];
 
     const fetchDataFromSessionStorage = () => {
-      const friendData = {};
-      friendList.forEach(username => {
-        const profileImg = sessionStorage.getItem(username);
-        friendData[username] = profileImg;
-      });
-      setFriendsProfileImg(friendData);
+        const friendData = {};
+        friendList.forEach(username => {
+            const profileImg = sessionStorage.getItem(username);
+            friendData[username] = profileImg;
+        });
+        setFriendsProfileImg(friendData);
     };
 
     fetchDataFromSessionStorage();
@@ -28,20 +31,27 @@ function SocialPage({imgSrc}) {
     const [loading, setLoading] = useState(false);
 
     const [data, setData] = useState([{}])
+    const [isFeed, setIsFeed] = useState(false)
+    
     useEffect(() => {
         setLoading(true)
         fetch("/social").then(
             res => res.json()
         ).then(
             data => {
-                setData(data)
-                console.log(data)
+                if (data !== "No one has shared their memories.") {
+                    setData(data)
+                    console.log(data)
+                    setIsFeed(true)
+                }
                 setLoading(false)
             })
         .catch(error => {
             console.error('Error fetching data', error);
         });
     }, []);
+    console.log(data)
+    console.log('데이터 개수',Object.keys(data).length)
 
     return (
         <div className="social-page">
@@ -52,8 +62,8 @@ function SocialPage({imgSrc}) {
             {loading ? (
                 <Loading />
             ) : (
-                Object.keys(data).length === 0 ? ( // Check if data is empty
-                    <h2>Loading...</h2>
+                !isFeed ? ( // Check if data is empty
+                    <h3 className='no-feed'>No one has shared their memories.</h3>
                 ) : (
                     <AnimatePresence mode='wait'>
                         <motion.div
@@ -63,13 +73,13 @@ function SocialPage({imgSrc}) {
                         transition={{ duration: 0.5 }}
                         >
                             <div className='socials-box'>
-                            {data && data.map((cont) => (
-                            <Social date={cont? cont.date: null} 
-                                id={cont.profileUsername? cont.profileUsername: null}
-                                profile_img_src={sessionStorage.getItem(cont.ProfileUsername)? sessionStorage.getItem(cont.ProfileUsername): null}
-                                cover_img_src={cont.coverImg? cont.coverImg: null}  /> 
-                            ))
-                            }
+                                {data && data.map((cont) => (
+                                    <Social date={cont? cont.date: null} 
+                                        id={cont.profileUsername? cont.profileUsername: null}
+                                        profile_img_src={sessionStorage.getItem(cont.profileUsername)} //{sessionStorage.getItem(cont.ProfileUsername)? sessionStorage.getItem(cont.ProfileUsername): null}
+                                        cover_img_src={cont.coverImg? cont.coverImg: null}  /> 
+                                ))
+                                }
                             </div>
                             
                         </motion.div>

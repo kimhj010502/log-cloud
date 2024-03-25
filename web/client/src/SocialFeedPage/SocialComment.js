@@ -93,7 +93,19 @@ export function SocialComment({ data, heartdata, date, username, profile, setPag
 
                         <div className='comments-box'>
                             {prevComment && prevComment.map((cont) => (
-                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                cont.id === sessionStorage.getItem('username') ? (
+                                    <Comment 
+                                        img_src={sessionStorage.getItem('myProfileImg') ? sessionStorage.getItem('myProfileImg') : null} 
+                                        id={cont.id ? cont.id : null} 
+                                        value={cont.comments ? cont.comments : null} 
+                                    />
+                                ) : (
+                                    <Comment 
+                                        img_src={sessionStorage.getItem(cont.id) ? sessionStorage.getItem(cont.id) : null} 
+                                        id={cont.id ? cont.id : null} 
+                                        value={cont.comments ? cont.comments : null} 
+                                    />
+                                )
                             ))
                             }
                         </div>
@@ -121,7 +133,19 @@ export function SocialComment({ data, heartdata, date, username, profile, setPag
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
                             {prevComment && prevComment.map((cont) => (
-                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} value={cont.comments? cont.comments: null} />
+                                cont.id === sessionStorage.getItem('username') ? (
+                                    <Comment 
+                                        img_src={sessionStorage.getItem('myProfileImg') ? sessionStorage.getItem('myProfileImg') : null} 
+                                        id={cont.id ? cont.id : null} 
+                                        value={cont.comments ? cont.comments : null} 
+                                    />
+                                ) : (
+                                    <Comment 
+                                        img_src={sessionStorage.getItem(cont.id) ? sessionStorage.getItem(cont.id) : null} 
+                                        id={cont.id ? cont.id : null} 
+                                        value={cont.comments ? cont.comments : null} 
+                                    />
+                                )
                             ))
                             }
                         </div>
@@ -134,8 +158,6 @@ export function SocialComment({ data, heartdata, date, username, profile, setPag
                 )}
                 
             </AnimatePresence>
-
-            <Navigation/>
         </div>
 
     );

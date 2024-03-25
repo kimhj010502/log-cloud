@@ -13,6 +13,16 @@
 
 
 /* 친구 피드 */
+.social-page .no-feed {
+    color: white;
+    font-weight: 100;
+    margin-left: auto;
+	margin-right: auto;
+    margin-top: 300px;
+    text-align: center;
+    color: white;
+}
+
 .social-page .socials-box {
     display: inline-block;
     width: 390px;

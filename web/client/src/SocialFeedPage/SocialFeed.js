@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'
+import { Navigation } from '../AppPage/AppComponents'
 import { SocialDetail } from './SocialDetail'
 import { SocialComment } from './SocialComment'
 import { SocialLike } from './SocialLike'
@@ -41,7 +42,7 @@ async function fetchHeart(date, id) {
     }
 }
 
-function SocialFeedPage() {
+function SocialFeedPage({imgSrc}) {
     const [loading, setLoading] = useState(false);
 
     const [page, setPage] = useState('social-detail');
@@ -101,6 +102,7 @@ function SocialFeedPage() {
             )}
             </>
         )}
+        <Navigation imgSrc={imgSrc}/>
         </>
     );
 
