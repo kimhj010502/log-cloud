@@ -4,14 +4,14 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, VideoPlay, HeartComment, HashTag, Summary } from './SocialDetailComponents'
 import './SocialDetail.css';
 
-export function SocialDetail({ data, date, username, profile, setPage, setPrevPage, setLike }) {
+export function SocialDetail({ data, heartdata, date, username, profile, setPage, setPrevPage, setLike }) {
 
     // Send whether user likes or not
     const sendHeartStatus = (liked) => {
         const heart_data = { videoId: data.videoId, liked: liked };
         setLike(liked);
 
-        fetch('/hearts', {
+        fetch('/sendHearts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -47,7 +47,7 @@ export function SocialDetail({ data, date, username, profile, setPage, setPrevPa
                     >
                         <VideoPlay url={data.video? data.video: null}/>
 
-                        <HeartComment isPublic={true} isLiked={data.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId} sendHeartStatus={sendHeartStatus} />
+                        <HeartComment isPublic={true} isLiked={heartdata.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId} sendHeartStatus={sendHeartStatus} />
 
                         <div className="hashtag-container">
                             {data.hashtags && data.hashtags.map((tag, index) => (

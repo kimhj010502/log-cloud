@@ -23,33 +23,65 @@ async function fetchData(date, id) {
     }
 }
 
+async function fetchHeart(date, id) {
+    try {
+        const response = await fetch('/hearts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ date, id }),
+        });
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Sending data', error);
+        throw error;
+    }
+}
+
 function SocialFeedPage() {
     const [loading, setLoading] = useState(false);
+
+    const [page, setPage] = useState('social-detail');
+    const [prevPage, setPrevPage] = useState('social-feed');
 
     const location = useLocation();
     const { date, id, profile_img_src, cover_img_src} = location.state;
     console.log(location.state);
 
-    const [data, setData] = useState([{}])
+    const [data, setData] = useState([{}]);
+    const [heartData, setheartData] = useState([{}]);
+    const[like, setLike] = useState([{}]);
 
     useEffect(() => {
         setLoading(true);
         fetchData(date, id)
             .then(data => {
-                console.log(data);
+                console.log("Data", data);
                 setData(data);
                 setLoading(false);
-                console.log('받아온 데이터', data)
             })
             .catch(error => {
                 console.error('Error fetching data', error);
             });
     }, []);
 
-    console.log("0321",data);
-    const[like, setLike] = "True"; /* data.isLike */
-    const [page, setPage] = useState('social-detail')
-    const [prevPage, setPrevPage] = useState('social-feed')
+    useEffect(() => {
+        fetchHeart(date, id)
+            .then(heartData => {
+                console.log("Heart data", heartData);
+                setheartData(heartData);
+            })
+            .catch(error => {
+                console.error('Error fetching data', error);
+            });
+        setLike(heartData.is_liked);
+    }, [prevPage]);
+
+
+    
 
     return (
         <>
@@ -58,14 +90,14 @@ function SocialFeedPage() {
         ) : (
             <>
             { page === 'social-detail' && (
-                <SocialDetail data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} setLike={setLike} />
+                <SocialDetail data={data} heartdata={heartData} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} setLike={setLike} />
             )}
             
             { page === 'social-comment' && (
-                <SocialComment data={data} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
+                <SocialComment data={data} heartdata={heartData} date={date} username={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
             { page === 'social-like' && (
-                <SocialLike data={data} id={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
+                <SocialLike data={data} heartdata={heartData} id={id} profile={profile_img_src} setPage={setPage} prevPage={prevPage} setPrevPage={setPrevPage} />
             )}
             </>
         )}
