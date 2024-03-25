@@ -39,7 +39,7 @@ function SearchResultPage({imgSrc}) {
         fetchData(selectedValue)
             .then(data => {
                 setData(data);
-                console.log(data);
+                console.log("Data", data);
                 setLoading(false)
             })
             .catch(error => {
@@ -68,6 +68,7 @@ function SearchResultPage({imgSrc}) {
                 <div className='results-box'>
                     {data && data.map((cont) => (
                         <Result date={cont? cont.date: null} 
+                        videoId={cont? cont.videoId: null} 
                         cover_img_src={cont.coverImg? cont.coverImg: null}  />
                     ))
                     }

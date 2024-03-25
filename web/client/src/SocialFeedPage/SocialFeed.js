@@ -77,7 +77,7 @@ function SocialFeedPage() {
             .catch(error => {
                 console.error('Error fetching data', error);
             });
-        setLike(heartData.is_liked);
+        setLike(heartData.is_like);
     }, [prevPage]);
 
 

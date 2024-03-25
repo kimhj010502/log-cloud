@@ -184,7 +184,7 @@ def save_log_route():
     return save_log(request, session, ssh_manager)
 
 
-from server_jjh import analysisReport, searchResult, social, socialDetail, comments, get_log_overview_of_month, log_detail, sendComments, hearts, sendHearts
+from server_jjh import analysisReport, searchResult, social, socialDetail, comments, get_log_overview_of_month, log_hearts, logDetail, sendComments, hearts, sendHearts
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
@@ -231,9 +231,14 @@ def get_log_overview_of_month_route():
     return get_log_overview_of_month(request, ssh_manager)
 
 
+@app.route("/log_hearts", methods=['POST','GET'])
+def log_hearts_route():
+   return log_hearts(request, session)
+
+
 @app.route("/logdetail", methods=['POST','GET'])
 def log_detail_route():
-    return log_detail(request, session, ssh_manager)
+    return logDetail(request, session, ssh_manager)
 
 
 

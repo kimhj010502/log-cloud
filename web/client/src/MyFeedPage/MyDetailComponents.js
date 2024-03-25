@@ -39,7 +39,7 @@ export function DatePublic({ date, isPublic }) {
     )
 }
 
-export function HeartComment({ isPublic, isLiked, setPage, setPrevPage, videoId }) {
+export function HeartComment({ isPublic, isLiked, setPage, setPrevPage, sendHeartStatus }) {
     const [liked, setLiked] = useState(isLiked);
 
     const handleHeart = () => {
@@ -54,29 +54,6 @@ export function HeartComment({ isPublic, isLiked, setPage, setPrevPage, videoId 
         setPage('comment')
         setPrevPage('detail')
     };
-
-    // Send whether user likes or not
-    const sendHeartStatus = (liked) => {
-        const heart_data = { videoId: videoId, liked: liked };
-
-        fetch('/hearts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(heart_data)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to send heart status');
-            }
-            console.log(liked, 'Heart status sent successfully');
-        })
-        .catch(error => {
-            console.error('Error sending heart status:', error);
-        });
-    };
-
 
     return (
         <div className="heart-comment-box">
