@@ -151,9 +151,9 @@ class SSHManager:
          
       return images
    
-   def get_profile_image(self, user):
+   def get_profile_image(self, profile_img):
       try:
-         with self.sftp.file(user.profile_img, 'rb') as file:
+         with self.sftp.file(profile_img, 'rb') as file:
             image_data = file.read()
             return image_data
       except Exception as e:
@@ -286,7 +286,7 @@ def get_current_user_route():
 
 @app.route("/get_profile_image", methods=['POST'])
 def get_user_profile_image_route():
-	return get_user_profile_image(request)
+	return get_user_profile_image(request, ssh_manager)
 
 
 @app.route("/set_profile_image", methods=['POST'])
