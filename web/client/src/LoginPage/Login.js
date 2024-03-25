@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
+import Loading from '../Routing/Loading'
 import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
-function LoginPage({ updateIsAuthorized }) {
+function LoginPage() {
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
@@ -44,6 +47,8 @@ function LoginPage({ updateIsAuthorized }) {
         }
 
         try {
+            setLoading(true);
+
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -89,16 +94,23 @@ function LoginPage({ updateIsAuthorized }) {
                     }
 
                     console.log("successful login");
-                    updateIsAuthorized(true);
+                    setLoading(false);
 
-                    navigate("/", { replace: true });
+                    console.log("홈으로 이동");
+                    window.location.reload();
+                    console.log("이동 완료");
                 }
             } else if (response.status === 401) {
+                setLoading(false);
                 alert('Invalid username or password :(');
+                setLoading(false);
             } else {
+                setLoading(false);
                 alert('Log in failed :(');
+                setLoading(false);
             }
         } catch (error) {
+            setLoading(false);
             console.error('Error logging in:', error);
         }
     };
@@ -111,7 +123,11 @@ function LoginPage({ updateIsAuthorized }) {
 
     return (
         <div className="login-page">
-            <h1>log your memory</h1>
+            {loading ? <Loading /> : null}
+
+            <Link to={'/'} style={{ textDecoration: 'none' }}>
+                <h1>log your memory</h1>
+            </Link>
 
             { isVisible && prevURL === '/signup' && (
             <AnimatePresence mode='wait'>

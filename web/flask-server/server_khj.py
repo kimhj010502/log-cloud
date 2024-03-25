@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 
 import cv2
 import re
+import random
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
@@ -308,6 +309,7 @@ def get_local_image(img_path, image_type):
 		return image_data
 	
 def get_local_video(video_path):
+	video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
 	with open(video_path, 'rb') as file:
 		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
 		return video_file
@@ -450,9 +452,16 @@ def make_tag(text, emotion):
 	return hashtag_list
 
 
+
+
 #BGM 추가 함수
-def add_bgm(video_path, result_path):
-	audio_path = "web/client/public/sample_bgm.mp3"
+def add_bgm(video_path, result_path, emotion):
+	folder_path = f"web/flask-server/bgm/{emotion}"
+	files = os.listdir(folder_path)
+	random_num = random.randint(0, len(files)-1)
+
+	audio_path = f"web/flask-server/bgm/{emotion}/{files[random_num]}"
+	print('오디오 파일 path',audio_path)
 
 	# 비디오와 음악을 합치는 FFmpeg 명령어 생성
 	command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
@@ -470,20 +479,21 @@ def select_option(request, session, ssh_manager):
 		emotion = int(request.json['emotion'])
 		session['emotion'] = emotion
 		switches = request.json['switches']
-		summary = 'init'
+		summary = ''
 		hashtags = []
 
 		local_path = session.get("local_path")
 		local_file_name = session.get('local_file_name')
 
 		session["emotion"] = emotion
+		print("emotion값!!!!", emotion)
 		# session["switches"] = switches
 
 		if switches["bgm"]:
 			print('bgm 함수 실행')
 			local_video_path = local_path[1]
 			local_result_path = f'web/temp/temp/{local_file_name}_bgm.mp4' #bgm 추가한 영상
-			add_bgm(local_video_path, local_result_path)
+			add_bgm(local_video_path, local_result_path, emotion)
 			session['local_path'] = [local_path[0], local_result_path, local_path[2], local_path[1]] #세선 업데이트
 			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}_bgm.mp4')
 			video_info['video_file_path'] = video_file_path
@@ -510,17 +520,14 @@ def select_option(request, session, ssh_manager):
 		session['original_text'] = text
 		print('text: ', text)
 
-		if switches["summary"]:
+		if switches["summary"] | switches["hashtag"]:
 			# 요약 모델
 			summary = diary_summary(text)
 			print('summary: ', summary)
 			
 		if switches["hashtag"]:
 			# 해시태그 모델
-			if summary == 'init':
-				hashtags = make_tag(diary_summary(text), emotion)
-
-			elif summary == '':
+			if summary == '':
 				hashtags = [emotion_list[emotion]]
 
 			else:

@@ -31,6 +31,7 @@ function Routing() {
 
     // authorization check
     useEffect(() => {
+        console.log('username', sessionStorage.getItem('username'))
         // add authorization
         async function checkAuthentication() {
             try {
@@ -43,39 +44,39 @@ function Routing() {
             }
         }
         checkAuthentication();
-    }, []);
+    }, [sessionStorage.getItem('username')]);
 
-    const updateIsAuthorized = (value) => {
-        setIsAuthorized(value);
-    };
+    // const updateIsAuthorized = (value) => {
+    //     setIsAuthorized(value);
+    // };
 
     return (
         <div className="body">
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={isAuthorized ? <App /> : <Navigate to="/login" replace />} />
+                    <Route path='/' element={sessionStorage.getItem('username')  ? <App imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='feed' element={isAuthorized ? <Feed /> : <Navigate to="/login" replace />} />
+                    <Route path='feed' element={sessionStorage.getItem('username')  ? <Feed imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='social' element={isAuthorized ? <Social /> : <Navigate to="/login" replace />} />
-                    <Route path='social-feed' element={isAuthorized ? <SocialFeed /> : <Navigate to="/login" replace />} />
+                    <Route path='social' element={sessionStorage.getItem('username') ? <Social imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='social-feed' element={sessionStorage.getItem('username') ? <SocialFeed imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='search' element={isAuthorized ? <Search /> : <Navigate to="/login" replace />} />
-                    <Route path='search-result' element={isAuthorized ? <SearchResult /> : <Navigate to="/login" replace />} />
+                    <Route path='search' element={sessionStorage.getItem('username') ? <Search imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='search-result' element={sessionStorage.getItem('username') ? <SearchResult imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='analysis' element={isAuthorized ? <Analysis /> : <Navigate to="/login" replace />} />
+                    <Route path='analysis' element={sessionStorage.getItem('username') ? <Analysis imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='profile' element={isAuthorized ? <Profile updateIsAuthorized={updateIsAuthorized} /> : <Navigate to="/login" replace />} />
-                    <Route path='manage-friends' element={isAuthorized ? <ManageFriends /> : <Navigate to="/login" replace />} />
-                    <Route path='change-password' element={isAuthorized ? <ChangePassword /> : <Navigate to="/login" replace />} />
+                    <Route path='profile' element={sessionStorage.getItem('username') ? <Profile imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='manage-friends' element={sessionStorage.getItem('username') ? <ManageFriends imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
+                    <Route path='change-password' element={sessionStorage.getItem('username') ? <ChangePassword imgSrc={sessionStorage.getItem('myProfileImg')} /> : <Navigate to="/login" replace />} />
 
-                    <Route path='login' element={isAuthorized ? <Navigate to="/" replace /> : <Login updateIsAuthorized={updateIsAuthorized} /> } />
-                    <Route path='signup' element={isAuthorized ? <Navigate to="/" replace /> : <Signup /> } />
+                    <Route path='login' element={sessionStorage.getItem('username') ? <Navigate to="/" replace /> : <Login /> } />
+                    <Route path='signup' element={sessionStorage.getItem('username') ? <Navigate to="/" replace /> : <Signup /> } />
 
-                    <Route path='record' element={isAuthorized ? <Record /> : <Navigate to="/login" replace />} />
-                    <Route path='upload' element={isAuthorized ? <Upload /> : <Navigate to="/login" replace />} />
-                    <Route path='save' element={isAuthorized ? <Save /> : <Navigate to="/login" replace />} />
-                    <Route path='edit' element={isAuthorized ? <Edit /> : <Navigate to="/login" replace />} />
+                    <Route path='record' element={sessionStorage.getItem('username') ? <Record /> : <Navigate to="/login" replace />} />
+                    <Route path='upload' element={sessionStorage.getItem('username') ? <Upload /> : <Navigate to="/login" replace />} />
+                    <Route path='save' element={sessionStorage.getItem('username') ? <Save /> : <Navigate to="/login" replace />} />
+                    <Route path='edit' element={sessionStorage.getItem('username') ? <Edit /> : <Navigate to="/login" replace />} />
                 </Routes>
             </BrowserRouter>
         </div>

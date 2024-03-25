@@ -6,7 +6,7 @@ import { ManageFriendsHeader, PendingRequests, MyFriends, SearchingMyFriends, Se
 import './ManageFriends.css'
 import {getProfileImage} from "../ProfilePage/ProfileComponents";
 
-function ManageFriendsPage() {
+function ManageFriendsPage({imgSrc}) {
     const [friendUsername, setFriendUsername] = useState("");
     const [isSearching, setIsSearching] = useState(false);
 
@@ -138,7 +138,7 @@ function ManageFriendsPage() {
                 </motion.div>
             </AnimatePresence>
 
-            <Navigation />
+            <Navigation imgSrc={imgSrc}/>
         </div>
     )
 }

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 //날짜별 이미지
 export function CalendarImg({url}) {
     return (
-        <img className="calendar-img" src={url} alt="calendar img"/>
+        <div className='calendar-img-box'>
+            <img className="calendar-img" src={url} alt="calendar img"/>
+        </div>
     )
 }
 

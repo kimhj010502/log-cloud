@@ -380,7 +380,12 @@ def sendHearts(request, session):
 	
 	return ""
 
-
+def get_local_video(video_path):
+   video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
+   print('video_path', video_path)
+   with open(video_path, 'rb') as file:
+      video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
+      return video_file
 
 def log_detail(request, session, ssh_manager):
 	user_id = session.get("user_id")

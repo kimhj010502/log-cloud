@@ -63,11 +63,16 @@ export async function getProfileImage(username) {
             },
             body: JSON.stringify({username: username}),
         });
-        if (response.ok) {
-            if (response.status === 200) {
-                const blob = await response.blob();
-                return URL.createObjectURL(blob);
-            }
+        if (!response.ok) {
+            console.log("Error getting profile image:", response);
+            return 'profile.png';
+        }
+        const imageData = await response.text();
+        if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+            // const blob = await response.blob();
+            // return URL.createObjectURL(blob);
+            // console.log(response.body);
+            return imageData;
         } else if (response.status === 404) { // no image set; use default image
             return 'profile.png';
         } else {
@@ -186,7 +191,7 @@ export function ProfileImg() {
     );
 }
 
-async function handleLogout(updateIsAuthorized) {
+async function handleLogout() {
     try {
         const response = await fetch('/logout', {
             method: 'GET',
@@ -199,7 +204,11 @@ async function handleLogout(updateIsAuthorized) {
             const data = await response.json();
             console.log(data);
             sessionStorage.clear();
-            console.log(updateIsAuthorized);
+
+            console.log("로그인으로 이동")
+            window.location.reload();
+            console.log("이동 완료")
+
             // return {username: data.username, createdAt: data.createdAt};
         }
 
@@ -209,15 +218,14 @@ async function handleLogout(updateIsAuthorized) {
 }
 
 
-export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) {
+export function ProfileButtons({ isClicked, setIsClicked }) {
+    
     const handleDeleteAccountClick = () => {
         setIsClicked(true)
     };
 
-    function handleLogoutClick(updateIsAuthorized) {
-        handleLogout(updateIsAuthorized)
-        updateIsAuthorized(false);
-
+    function handleLogoutClick() {
+        handleLogout()
     }
 
     return (
@@ -230,9 +238,9 @@ export function ProfileButtons({ isClicked, setIsClicked, updateIsAuthorized }) 
                 <div className='profile-button'>change password</div>
             </Link>
 
-            <Link to={'/login'} onClick={handleLogoutClick} className='profile-link'>
+            <div onClick={handleLogoutClick} className='profile-link'>
                 <div className='profile-button'>log out</div>
-            </Link>
+            </div>
 
             <div className='profile-button delete-button' onClick={handleDeleteAccountClick}>delete my account</div>
         </div>

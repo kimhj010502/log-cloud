@@ -17,7 +17,6 @@ from models import db, User, videoInfo, videoLog, socialNetwork
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD
 
-
 # SCP 연결 설정
 ssh_client = paramiko.SSHClient()
 ssh_client.load_system_host_keys()
@@ -193,7 +192,7 @@ def get_current_user(request, session):
 	})
 
 
-def get_user_profile_image(request):
+def get_user_profile_image(request, ssh_manager):
 	try:
 		username = request.json['username']
 		
@@ -206,18 +205,24 @@ def get_user_profile_image(request):
 		if not user or not user.profile_img:
 			return jsonify({"error": "Image not found"}), 404
 		
-		ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-		with ssh_client.open_sftp() as sftp:
-			with sftp.file(user.profile_img, 'rb') as file:
-				image_data = file.read()
-				return send_file(io.BytesIO(image_data), mimetype='image/png')
+		# ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+		# with ssh_client.open_sftp() as sftp:
+		# 	with sftp.file(user.profile_img, 'rb') as file:
+		# 		image_data = file.read()
+		# 		return send_file(io.BytesIO(image_data), mimetype='image/png')
+		ssh_manager.open()
+		img, status_code = ssh_manager.get_profile_image(user.profile_img)
+		if img:
+			return img, status_code
+		else:
+			return "error in server", 500
 	
 	except Exception as e:
 		print(str(e))
 		return jsonify({"error": "Internal server error"}), 500
 
 
-def set_profile_image(request, session):
+def set_profile_image(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	# fetch user data by username(from session) from user_info_db : user_account table
@@ -233,14 +238,10 @@ def set_profile_image(request, session):
 			
 			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
 			
-			ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-			
-			with ssh_client.open_sftp() as sftp:
-				sftp.put(local_image_path, remote_image_path)
+			ssh_manager.open()
+			ssh_manager.save_file(local_image_path, remote_image_path)
 			
 			os.remove(local_image_path)
-			
-			ssh_client.close()
 			
 			user.profile_img = remote_image_path
 			db.session.commit()
@@ -287,8 +288,10 @@ def get_friend_list(request, session):
 	return jsonify({"friends": friend_list,
 					"pending_received_requests": pending_received_request_list,
 					"pending_sent_requests": pending_sent_request_list}), 200
-	# else:
-	# 	return jsonify("Nothing to send"), 404
+
+
+# else:
+# 	return jsonify("Nothing to send"), 404
 
 
 def search_user(request, session):
@@ -438,4 +441,3 @@ def remove_friend(request, session):
 	db.session.commit()
 	
 	return jsonify({"message": "Successfully removed friend"}), 200
-
