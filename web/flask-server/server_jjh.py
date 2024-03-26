@@ -423,6 +423,21 @@ def log_hearts(request, session):
 	return data
 
 
+def delete_post(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	videoId = request.json['videoId']
+	video = videoInfo.query.filter(videoInfo.video_id == videoId).one()
+
+	db.session.delete(video)
+	db.session.commit()
+	
+	return ""
+
+
 
 def get_log_overview_of_month(request, ssh_manager):
 	username = request.json['username']

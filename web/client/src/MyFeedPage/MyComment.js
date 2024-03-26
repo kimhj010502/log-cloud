@@ -100,7 +100,7 @@ export function MyComment({ data, heartdata, setPage, prevPage, setPrevPage }) {
                             }
                         </div>
 
-                        <AddComment videoId={data.videoId}/>
+                        <AddComment setNewComment={handlePostComment}/>
                     </div>
 
                     

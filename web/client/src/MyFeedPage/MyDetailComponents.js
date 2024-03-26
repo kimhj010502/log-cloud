@@ -21,7 +21,31 @@ export function LogHeader() {
 }
 
 
-export function DatePublic({ date, isPublic }) {
+export function DatePublic({ date, isPublic, videoId }) {
+    console.log(videoId)
+
+    const handleDelete = () => {
+
+        // POST 요청을 보내고 서버로 데이터 전송
+        fetch('/deletePost', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({videoId})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete post');
+            }
+            // 성공적으로 댓글을 게시한 후에 수행할 작업
+            console.log('Post deleted successfully');
+        })
+        .catch(error => {
+            console.error('Error deleting post:', error);
+        });
+    };
+
     return (
         <div className="date-box">
             <h2 className="detail-date">{ date }</h2>
@@ -34,7 +58,8 @@ export function DatePublic({ date, isPublic }) {
                 <LockOutlined className="detail-icon" />
             )}
 
-            <DeleteOutlined className="detail-icon" />
+            <DeleteOutlined className="detail-icon" onClick={handleDelete} />
+
         </div>
     )
 }
