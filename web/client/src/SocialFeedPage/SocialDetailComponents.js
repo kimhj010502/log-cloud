@@ -34,7 +34,7 @@ export function ProfileDate({ date, id, profile_img_src }) {
     )
 }
 
-export function HeartComment({ isPublic, isLiked, setPage, setPrevPage, videoId, sendHeartStatus }) {
+export function HeartComment({ isPublic, isLiked, setPage, setPrevPage, sendHeartStatus }) {
     const [liked, setLiked] = useState(isLiked);
 
     const handleHeart = () => {

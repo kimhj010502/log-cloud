@@ -39,6 +39,8 @@ function SearchResultPage({imgSrc}) {
         setLoading(true)
         fetchData(selectedValue)
             .then(data => {
+                setData(data);
+                console.log("Data", data);
                 if (data !== "No records meet the conditions.") {
                     setIsFeed(true)
                     setData(data);
@@ -73,17 +75,19 @@ function SearchResultPage({imgSrc}) {
                         
                         <SelectedValue selectedValue={selectedValue} />
 
-                        <div className='results-box'>
-                            {data && data.map((cont) => (
-                                <Result date={cont? cont.date: null} 
-                                cover_img_src={cont.coverImg? cont.coverImg: null}  />
-                            ))
-                            }
-                        </div>
-                        </motion.div>
-                    </AnimatePresence>
+                <div className='results-box'>
+                    {data && data.map((cont) => (
+                        <Result date={cont? cont.date: null} 
+                        videoId={cont? cont.videoId: null} 
+                        cover_img_src={cont.coverImg? cont.coverImg: null}  />
+                    ))
+                    }
+                </div>
+                </motion.div>
+            </AnimatePresence>
                 )
             )}
+            
 
             <Navigation imgSrc={imgSrc}/>
         </div>

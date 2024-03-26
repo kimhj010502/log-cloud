@@ -4,7 +4,7 @@ import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, DatePublic, Like } from './MyLikeComponents'
 import './MyLike.css';
 
-export function MyLike({ data, setPage, setPrevPage }) {
+export function MyLike({ data, heartdata, setPage, setPrevPage }) {
     return (
         <div className="like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
@@ -24,8 +24,8 @@ export function MyLike({ data, setPage, setPrevPage }) {
 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
-                        {data.likeList.map((cont) => (
-                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont.id: null} />
+                        {heartdata.likeList.map((cont) => (
+                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
                         ))
                         }
                     </div>

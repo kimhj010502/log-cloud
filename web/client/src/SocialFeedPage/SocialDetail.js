@@ -46,7 +46,7 @@ export function SocialDetail({ data, heartdata, date, username, profile, setPage
                     >
                         <VideoPlay url={data.video? data.video: null}/>
 
-                        <HeartComment isPublic={true} isLiked={heartdata.isLike} setPage={setPage} setPrevPage={setPrevPage} videoId={data.videoId} sendHeartStatus={sendHeartStatus} />
+                        <HeartComment isPublic={true} isLiked={heartdata.isLike} setPage={setPage} setPrevPage={setPrevPage} sendHeartStatus={sendHeartStatus} />
 
                         <div className="hashtag-container">
                             {data.hashtags && data.hashtags.map((tag, index) => (

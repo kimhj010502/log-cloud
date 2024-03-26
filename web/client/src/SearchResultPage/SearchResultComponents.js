@@ -34,10 +34,10 @@ export function SelectedValue({ selectedValue }) {
 
 
 /* 검색 결과 피드 */
-export function Result({ date, cover_img_src }) {
+export function Result({ date, videoId, cover_img_src }) {
     return (
         <div className='result-box'>
-            <Link to={'/feed'} style={{ textDecoration: 'none' }}>
+            <Link to={'/feed'} state={{ videoId: videoId}} style={{ textDecoration: 'none' }}>
                 <div className='result-date'>
                     {date}
                 </div>

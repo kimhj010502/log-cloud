@@ -82,9 +82,7 @@ def get_local_video(video_path):
 
 
 def get_likes(videoId):
-	print('get_likes 실행', videoId)
 	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
-	print('like-ids', like_ids)
 	likes_list = []
 	for i in like_ids:
 		likes_list.append(i[0])
@@ -223,19 +221,19 @@ def searchResult(request, session, ssh_manager):
 	
 	date_list = get_list(posts.with_entities(videoInfo.date).all())
 	coverImg_list = get_list(posts.with_entities(videoInfo.cover_image).all())
+	videoId_list = get_list(posts.with_entities(videoInfo.video_id).all())
 	
 	if not user_id or len(coverImg_list) == 0:
 		return jsonify({"error": "Image not found"}), 404
 	
 	image_data_list = get_local_images(coverImg_list, 'png')
 	
-	data = [{'date': date, 'coverImg': coverImg} for date, coverImg in zip(date_list, image_data_list)]
+	data = [{'date': date, 'videoId': videoId, 'coverImg': coverImg} for date, videoId, coverImg in zip(date_list, videoId_list, image_data_list)]
 	
 	return jsonify(data)
 
 
 def social(request, session, ssh_manager):
-	print(ssh_manager)
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -343,19 +341,14 @@ def hearts(request, session):
 
 	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
 	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
-	print("Heart------------")
-	print(video_id)
 
 	likeList = get_likes(video_id)
-	print("---------------------------")
 	is_like = did_u_like(user_id, likeList)
 	
 
 	data = {"likeList": likeList,
 			"isLike": is_like}
 	
-	print(data)
-
 	return data
 
 
@@ -380,6 +373,8 @@ def sendHearts(request, session):
 	
 	return ""
 
+
+
 def get_local_video(video_path):
    video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
    print('video_path', video_path)
@@ -387,7 +382,9 @@ def get_local_video(video_path):
       video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
       return video_file
 
-def log_detail(request, session, ssh_manager):
+
+
+def logDetail(request, session, ssh_manager):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -405,6 +402,25 @@ def log_detail(request, session, ssh_manager):
 			"privacy": video_detail.share,
 			"emotion": video_detail.emotion,
 			"videoId": video_id}
+
+
+def log_hearts(request, session):
+	user_id = session.get("user_id")
+	
+	if not user_id:
+		return jsonify({"error": "Unauthorized"}), 401
+	
+	videoId = request.json['videoId']
+
+	video_id = videoInfo.query.filter(videoInfo.video_id == videoId).with_entities(videoInfo.video_id).all()[0][0]
+
+	likeList = get_likes(video_id)
+	is_like = did_u_like(user_id, likeList)
+	
+	data = {"likeList": likeList,
+			"isLike": is_like}
+	
+	return data
 
 
 

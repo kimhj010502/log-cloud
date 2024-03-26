@@ -81,7 +81,7 @@ export function CalendarYearMonth({year, month, videos}) {
                         <td key={colIndex}>
                             {logEntry ? (
                                 <Link to={{ pathname: '/feed'}}
-                                    state={{ videoId: logEntry.videoId }}
+                                    state={{ videoId: logEntry.videoId}}
                                       preventScrollReset={true} >
                                     <CalendarImg url={logEntry.coverImage} />
                                 </Link>
