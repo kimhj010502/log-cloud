@@ -7,7 +7,7 @@ function App({ imgSrc }) {
 
     return (
         <div className="app-page">
-            <Link to={'/'}>
+            <Link to={'/'} className="home-link">
                 <h1>log your memory</h1>
             </Link>
 

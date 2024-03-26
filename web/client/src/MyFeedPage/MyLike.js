@@ -25,7 +25,11 @@ export function MyLike({ data, heartdata, setPage, setPrevPage }) {
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
                         {heartdata.likeList.map((cont) => (
-                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
+                            cont === sessionStorage.getItem('username') ? (
+                                <Like img_src={sessionStorage.getItem('myProfileImg')? sessionStorage.getItem('myProfileImg'): null} id={cont? cont: null} />
+                            ) : (
+                                <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
+                            )
                         ))
                         }
                     </div>

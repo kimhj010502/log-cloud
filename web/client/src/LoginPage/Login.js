@@ -3,11 +3,7 @@ import {Link, useLocation, useNavigate} from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
 import Loading from '../Routing/Loading'
-import Loading from '../Routing/Loading'
 import {getProfileImage} from "../ProfilePage/ProfileComponents";
-
-function LoginPage() {
-    const [loading, setLoading] = useState(false);
 
 function LoginPage() {
     const [loading, setLoading] = useState(false);
