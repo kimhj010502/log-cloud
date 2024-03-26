@@ -33,6 +33,7 @@ function SearchResultPage({imgSrc}) {
     const selectedValue = location.state;
     
     const [data, setData] = useState([{}])
+    const [isFeed, setIsFeed] = useState(false)
 
     useEffect(() => {
         setLoading(true)
@@ -40,6 +41,11 @@ function SearchResultPage({imgSrc}) {
             .then(data => {
                 setData(data);
                 console.log("Data", data);
+                if (data !== "No records meet the conditions.") {
+                    setIsFeed(true)
+                    setData(data);
+                    console.log(data);
+                }
                 setLoading(false)
             })
             .catch(error => {
@@ -53,17 +59,21 @@ function SearchResultPage({imgSrc}) {
 
             <SearchHeader />
             
-            {loading ? (<Loading />) :
-            (
-            <AnimatePresence mode='wait'>
-                <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, when: "afterChildren" }}
-                transition={{ duration: 0.5 }}
-                >
-                
-                <SelectedValue selectedValue={selectedValue} />
+            {loading ? (
+                <Loading />
+            ) : (
+                !isFeed ? ( // Check if data is empty
+                    <h3 className='no-feed'>No records meet the conditions.</h3>
+                ) : (
+                    <AnimatePresence mode='wait'>
+                        <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, when: "afterChildren" }}
+                        transition={{ duration: 0.5 }}
+                        >
+                        
+                        <SelectedValue selectedValue={selectedValue} />
 
                 <div className='results-box'>
                     {data && data.map((cont) => (
@@ -75,7 +85,9 @@ function SearchResultPage({imgSrc}) {
                 </div>
                 </motion.div>
             </AnimatePresence>
+                )
             )}
+            
 
             <Navigation imgSrc={imgSrc}/>
         </div>

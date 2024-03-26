@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
-import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, VideoPlay, HeartComment, HashTag, Summary } from './SocialDetailComponents'
 import './SocialDetail.css';
 
@@ -59,8 +58,6 @@ export function SocialDetail({ data, heartdata, date, username, profile, setPage
                     </motion.div>
                 </AnimatePresence>
             )}
-
-            <Navigation />
         </div>
 
     );

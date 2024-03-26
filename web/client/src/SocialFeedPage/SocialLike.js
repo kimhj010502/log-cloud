@@ -5,6 +5,7 @@ import { LogHeader, ProfileDate, Like } from './SocialLikeComponents'
 import './SocialLike.css';
 
 export function SocialLike({ data, heartdata, id, profile, setPage, setPrevPage }) {
+    console.log(sessionStorage.getItem(sessionStorage.getItem('username')))
     return (
         <div className="social-like-page">
             <LogHeader setPage={setPage} setPrevPage={setPrevPage} />
@@ -25,7 +26,11 @@ export function SocialLike({ data, heartdata, id, profile, setPage, setPrevPage 
                     {/* 좋아요 개수만큼 */}
                     <div className='likes-box'>
                         {heartdata.likeList.map((cont) => (
-                            <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
+                            cont === sessionStorage.getItem('username') ? (
+                                <Like img_src={sessionStorage.getItem('myProfileImg')? sessionStorage.getItem('myProfileImg'): null} id={cont? cont: null} />
+                            ) : (
+                                <Like img_src={sessionStorage.getItem(cont)? sessionStorage.getItem(cont): null} id={cont? cont: null} />
+                            )
                         ))
                         }
                     </div>
@@ -33,8 +38,6 @@ export function SocialLike({ data, heartdata, id, profile, setPage, setPrevPage 
 
                 </motion.div>   
             </AnimatePresence>
-
-            <Navigation />
         </div>
 
     );
