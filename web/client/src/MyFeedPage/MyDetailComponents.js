@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Link, useNavigate  } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeftOutlined, TeamOutlined, LockOutlined, DeleteOutlined, HeartOutlined, HeartFilled, MessageFilled, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons'
 
 export function LogHeader() {
@@ -21,7 +21,37 @@ export function LogHeader() {
 }
 
 
-export function DatePublic({ date, isPublic }) {
+export function DatePublic({ date, isPublic, videoId }) {
+    console.log(videoId)
+
+    const handleDelete = () => {
+
+        const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+
+        if (confirmDelete) {
+            // POST 요청을 보내고 서버로 데이터 전송
+            fetch('/deletePost', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({videoId})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete post');
+                }
+                // 성공적으로 게시물을 삭제한 후에 수행할 작업
+                console.log('Post deleted successfully');
+                // 성공적으로 삭제되면 메인 페이지로 이동
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error deleting post:', error);
+            });
+        }
+    };
+
     return (
         <div className="date-box">
             <h2 className="detail-date">{ date }</h2>
@@ -34,7 +64,8 @@ export function DatePublic({ date, isPublic }) {
                 <LockOutlined className="detail-icon" />
             )}
 
-            <DeleteOutlined className="detail-icon" />
+            <DeleteOutlined className="detail-icon" onClick={handleDelete} />
+
         </div>
     )
 }

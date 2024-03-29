@@ -43,7 +43,7 @@ export function MyDetail({ data, heartdata, setPage, setPrevPage, setLike }) {
                     exit={{ opacity: 0, when: "afterChildren" }}
                     transition={{ duration: 0.5 }}
                     >
-                        <DatePublic date={data.date} isPublic={data.privacy} />
+                        <DatePublic date={data.date} isPublic={data.privacy} videoId={data.videoId}/>
 
                         <VideoPlay url={data.video}/>
 

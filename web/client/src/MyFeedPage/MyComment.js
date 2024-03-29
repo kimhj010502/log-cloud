@@ -88,19 +88,23 @@ export function MyComment({ data, heartdata, setPage, prevPage, setPrevPage }) {
                     >
 
                     <div className='comments-like-box'>
-                        console.log("-----", heartdata)
+                        {/* console.log("-----", heartdata) */}
 
                         <LikeList like_id_list={ heartdata.likeList? heartdata.likeList: [] } setPage={setPage} setPrevPage={setPrevPage} />
 
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
                             {prevComment && prevComment.map((cont) => (
-                                <Comment img_src={sessionStorage.getItem(cont.id)? sessionStorage.getItem(cont.id): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                cont.id === sessionStorage.getItem('username') ? (
+                                    <Comment img_src={sessionStorage.getItem('myProfileImg')? sessionStorage.getItem('myProfileImg'): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                ) : (
+                                    <Comment img_src={sessionStorage.getItem(cont.id)? sessionStorage.getItem(cont.id): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                )
                             ))
                             }
                         </div>
 
-                        <AddComment videoId={data.videoId}/>
+                        <AddComment setNewComment={handlePostComment}/>
                     </div>
 
                     
@@ -123,7 +127,11 @@ export function MyComment({ data, heartdata, setPage, prevPage, setPrevPage }) {
                         {/* 댓글 개수만큼 */}
                         <div className='comments-box'>
                             {prevComment && prevComment.map((cont) => (
-                                <Comment img_src={cont.profile? cont.profile: null} id={cont.id? cont.id: null} value={cont.comments? cont.comments: null} />
+                                cont.id === sessionStorage.getItem('username') ? (
+                                    <Comment img_src={sessionStorage.getItem('myProfileImg')? sessionStorage.getItem('myProfileImg'): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                ) : (
+                                    <Comment img_src={sessionStorage.getItem(cont.id)? sessionStorage.getItem(cont.id): null} id={cont.id? cont.id: []} value={cont.comments? cont.comments: null} />
+                                )
                             ))
                             }
                         </div>
