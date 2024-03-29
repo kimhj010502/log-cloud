@@ -22,6 +22,8 @@ body {
 	width: 70px;
 	height: 50px;
 	z-index: 100;
-	left: 45%;
+	left: 50%;
 	top: 335px;
+	margin-left: -20px; 
+	/* transform: translate(-50%, -50%); */
 }
