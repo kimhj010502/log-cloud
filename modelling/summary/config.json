@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "jjae/summary",
+  "_name_or_path": "gogamza/kobart-summarization",
   "activation_dropout": 0.0,
   "activation_function": "gelu",
   "add_bias_logits": false,
@@ -47,7 +47,7 @@
   "scale_embedding": false,
   "static_position_embeddings": false,
   "torch_dtype": "float32",
-  "transformers_version": "4.37.2",
+  "transformers_version": "4.39.3",
   "use_cache": true,
   "vocab_size": 30000
 }
