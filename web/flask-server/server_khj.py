@@ -321,13 +321,34 @@ def get_date():
 	return [remote_video_date, local_video_date]
 
 
-def mp4_to_mp3(local_video_path, local_audio_path):
+# def change_codec(video_origin_path, local_video_path):
+# 	try:
+# 		# FFmpeg 명령어 생성
+# 		command = f'ffmpeg -i "{video_origin_path}" -c:v libx264 -c:a aac "{local_video_path}"'
+
+# 		# FFmpeg 명령어 실행
+# 		subprocess.run(command, shell=True)
+# 		print("코덱 변경이 완료되었습니다.")
+# 	except subprocess.CalledProcessError as e:
+# 		print("오류 발생:", e)
+
+
+# def mp4_to_mp3(local_video_path, local_audio_path):
+# 	try:
+# 		ff = FFmpeg()
+# 		ff.convert(local_video_path, local_audio_path)
+# 	except Exception:
+# 		pass
+# 		#mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
+
+def mp4_to_wav(local_video_path, local_audio_path):
 	try:
-		ff = FFmpeg()
-		ff.convert(local_video_path, local_audio_path)
+		command = f'ffmpeg -i "{local_video_path}" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
+		subprocess.run(command, shell=True)
 	except Exception:
 		pass
 		#mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
+
 
 
 def record_video(request, session, ssh_manager):
@@ -358,10 +379,15 @@ def record_video(request, session, ssh_manager):
 			remote_video_path = f'D:/log/{user_id}/{remote_file_name}.mp4'
 
 			# 파일 저장
+			# video_origin_path = f'web/temp/temp/origin_{local_file_name}.mp4'
 			video_file.save(local_video_path)
+			# change_codec(video_origin_path, local_video_path)
 
 			# 음원 추출
-			mp4_to_mp3(local_video_path, local_audio_path)
+			# mp4_to_mp3(local_video_path, local_audio_path)
+			mp4_to_wav(local_video_path, local_audio_path)
+
+			
 
 			# 세션값 추가
 			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}.mp4')
