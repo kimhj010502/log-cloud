@@ -6,13 +6,7 @@
     "rstrip": false,
     "single_word": false
   },
-  "cls_token": {
-    "content": "<s>",
-    "lstrip": false,
-    "normalized": false,
-    "rstrip": false,
-    "single_word": false
-  },
+  "cls_token": "<s>",
   "eos_token": {
     "content": "</s>",
     "lstrip": false,
@@ -34,13 +28,7 @@
     "rstrip": false,
     "single_word": false
   },
-  "sep_token": {
-    "content": "</s>",
-    "lstrip": false,
-    "normalized": false,
-    "rstrip": false,
-    "single_word": false
-  },
+  "sep_token": "</s>",
   "unk_token": {
     "content": "<unk>",
     "lstrip": false,

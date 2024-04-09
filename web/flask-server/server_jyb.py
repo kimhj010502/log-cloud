@@ -233,10 +233,10 @@ def set_profile_image(request, session, ssh_manager):
 		try:
 			image_file = request.files['image']
 			# Save image locally (temporarily)
-			local_image_path = 'temp/image.jpg'
+			local_image_path = f'web/temp/temp/{user_id}.jpg'
+			remote_image_path = f'D:/log/user/{user_id}.jpg'
+		
 			image_file.save(local_image_path)
-			
-			remote_image_path = 'D:/log/user/' + user_id + '.jpg'
 			
 			ssh_manager.open()
 			ssh_manager.save_file(local_image_path, remote_image_path)
