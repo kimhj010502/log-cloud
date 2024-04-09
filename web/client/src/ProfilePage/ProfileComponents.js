@@ -131,10 +131,12 @@ export function ProfileImg() {
     async function setProfileImage(imageFile) {
         try {
             const formData = new FormData();
+            console.log("resizing image");
 
             const resizedImageFile = await resizeAndCropImage(imageFile, 500, 500);
-
+            console.log("resizing image done");
             formData.append('image', resizedImageFile);
+            console.log("before sending request");
 
             const response = await fetch('/set_profile_image', {
                 method: 'POST',
@@ -143,10 +145,10 @@ export function ProfileImg() {
             });
 
             if (response.ok) {
-                const newImage = URL.createObjectURL(resizedImageFile)
+                const newImage = URL.createObjectURL(resizedImageFile);
                 setProfileImgSrc(newImage);
                 sessionStorage.setItem('myProfileImg', newImage);
-                alert("Successfully uploaded!");
+                // alert("Successfully uploaded!");
                 window.location.reload();
             }
             if (response.status === 500) {
