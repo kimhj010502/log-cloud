@@ -445,6 +445,12 @@ def make_tag(text, emotion):
 
 	hashtag_list = list(map(reduce_repeated_word, hashtag_list))
 
+	for i in range(len(hashtag_list)):
+		if '.' in hashtag_list[i]:
+			hashtag_list[i] = hashtag_list[i].replace('.', '')
+		if ' ' in hashtag_list[i]:
+			hashtag_list[i] = hashtag_list[i].replace(' ', '') 
+
 	if '' in hashtag_list:
 		hashtag_list.remove('')
 
@@ -522,13 +528,21 @@ def select_option(request, session, ssh_manager):
 
 		if switches["summary"] | switches["hashtag"]:
 			# 요약 모델
-			summary = diary_summary(text)
+			if len(text) <= 20:
+				summary = text
+
+			else:
+				summary = diary_summary(text)
 			print('summary: ', summary)
 			
 		if switches["hashtag"]:
 			# 해시태그 모델
 			if summary == '':
 				hashtags = [emotion_list[emotion]]
+
+			#원본 텍스트가 너무 짧을 경우
+			elif len(text) <= 50:
+				hashtags = make_tag(text, emotion)
 
 			else:
 				hashtags = make_tag(summary, emotion)
