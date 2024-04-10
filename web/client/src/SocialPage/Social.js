@@ -48,6 +48,7 @@ function SocialPage({imgSrc}) {
             })
         .catch(error => {
             console.error('Error fetching data', error);
+            window.location.reload();
         });
     }, []);
     console.log(data)
@@ -80,10 +81,14 @@ function SocialPage({imgSrc}) {
                                         cover_img_src={cont.coverImg? cont.coverImg: null}  /> 
                                 ))
                                 }
+
+                                <div className='blank-box'></div>
                             </div>
                             
                         </motion.div>
+                        
                     </AnimatePresence>
+                    
                 )
             )}
         

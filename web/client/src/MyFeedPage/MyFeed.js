@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Navigation } from '../AppPage/AppComponents'
 import { MyDetail } from './MyDetail'
 import { MyComment } from './MyComment'
 import { MyLike } from './MyLike'
@@ -104,6 +105,8 @@ function FeedPage() {
                 )}
                 </>
             )}
+            
+            <Navigation imgSrc={sessionStorage.getItem('myProfileImg')} />
             </>
         );
     
