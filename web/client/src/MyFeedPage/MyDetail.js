@@ -59,7 +59,6 @@ export function MyDetail({ data, heartdata, setPage, setPrevPage, setLike }) {
                     </motion.div>
                 </AnimatePresence>
             )}
-            <Navigation imgSrc={sessionStorage.getItem('myProfileImg')} />
         </div>
 
     );

@@ -84,15 +84,19 @@ export function CalendarYearMonth({year, month, videos}) {
                                     state={{ videoId: logEntry.videoId}}
                                       preventScrollReset={true} >
                                     <CalendarImg url={logEntry.coverImage} />
+                                    <div className={`calendar-date-box ${isToday ? 'today' : 'day'}`}>
+                                        <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
+                                    </div>
                                 </Link>
                             ) : (
                                 <Link to={'/'}>
                                     <img className="calendar-img" src="black.png" alt="calendar img"/>
+                                    <div className={`calendar-date-box ${isToday ? 'today' : 'day'}`}>
+                                        <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
+                                    </div>
                                 </Link>
                             )}
-                            <div className={`calendar-date-box ${isToday ? 'today' : 'day'}`}>
-                                <p className="calendar-date">{isOutOfRange ? '\u00a0' : day}</p>
-                            </div>
+                            
                         </td>
                     );
                     })}

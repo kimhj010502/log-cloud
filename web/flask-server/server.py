@@ -62,7 +62,7 @@ class SSHManager:
       self.sftp = None
       
    def open(self):
-      self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
+      self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
       self.sftp = self.ssh_client.open_sftp()
       
    def close(self):

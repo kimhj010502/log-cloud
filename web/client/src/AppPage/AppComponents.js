@@ -58,6 +58,8 @@ export function Calendar() {
             const userCreatedAt = new Date(user.createdAt);
             userCreatedMonth = userCreatedAt.getMonth();
             userCreatedYear = userCreatedAt.getFullYear();
+            sessionStorage.setItem('userCreatedMonth', userCreatedMonth);
+            sessionStorage.setItem('userCreatedYear', userCreatedYear);
 
             const response = await fetch('/month-overview', {
                 method: 'POST',

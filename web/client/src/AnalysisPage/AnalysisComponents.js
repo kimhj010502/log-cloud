@@ -2,19 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { ResponsiveLine } from '@nivo/line'
 import Loading from '../Routing/Loading'
+import {getUserInfo} from "../AppPage/AppComponents";
 
 export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrentMonth, num, hashtag, loved, excited, good, neutral, unhappy, angry, tired, loading, setLoading }) {
-    
+
+    let date = new Date();
+    const todayYear = date.getFullYear();
+    const todayMonth = date.getMonth();
+
+    let userCreatedMonth = sessionStorage.getItem('userCreatedMonth');
+    let userCreatedYear = sessionStorage.getItem('userCreatedYear');
+
     const handleClickLeft = () => {
-        const newMonth = currentMonth - 1
-        setCurrentMonth(newMonth < 0 ? 11 : newMonth)
-        setCurrentYear(newMonth < 0 ? currentYear - 1 : currentYear)
+        if ((currentYear > userCreatedYear) || (currentMonth > userCreatedMonth)){
+            const newMonth = currentMonth - 1
+            setCurrentMonth(newMonth < 0 ? 11 : newMonth)
+            setCurrentYear(newMonth < 0 ? currentYear - 1 : currentYear)
+        };
+
     };
 
     const handleClickRight = () => {
-        const newMonth = currentMonth + 1
-        setCurrentMonth(newMonth > 11 ? 0 : newMonth)
-        setCurrentYear(newMonth > 11 ? currentYear + 1 : currentYear)
+        if ((currentYear < todayYear) || (currentMonth < todayMonth)) {
+            const newMonth = currentMonth + 1
+            setCurrentMonth(newMonth > 11 ? 0 : newMonth)
+            setCurrentYear(newMonth > 11 ? currentYear + 1 : currentYear)
+        };
     };
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
