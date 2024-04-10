@@ -9,7 +9,7 @@ export function LogDate(handleButtonClick, videoInfo) {
     let nowD = upload_date[2]
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    let currentMonthName = monthNames[nowM]
+    let currentMonthName = monthNames[nowM - 1]
 
     return (
         <div className="date-box">
@@ -97,6 +97,7 @@ export function Scope({ isPublic }) {
 }
 
 export function EditButton({ videoInfo, summary, hashtags, switches }) {
+    console.log('edit 버튼 클릭', JSON.stringify(videoInfo))
     return (
         <div className="edit-button">
             <Link to={'/edit'} state={{ prevURL: '/save', videoInfo: JSON.stringify(videoInfo), switches: switches, summary: summary, hashtags: hashtags } } className="edit-link">
