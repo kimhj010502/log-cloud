@@ -189,7 +189,7 @@ def searchResult(request, session, ssh_manager):
 	selectedScope = data['selectedScope']
 	dateRange = data['dateRange']
 	keyword = data['keyword']
-	
+
 	start_date = datetime.strptime(dateRange[0], '%Y-%m-%dT%H:%M:%S.%fZ') + timedelta(hours=9)
 	end_date = datetime.strptime(dateRange[1], '%Y-%m-%dT%H:%M:%S.%fZ') + timedelta(hours=9) + timedelta(days=1)
 	
@@ -228,7 +228,7 @@ def searchResult(request, session, ssh_manager):
 	
 	image_data_list = get_local_images(coverImg_list, 'png')
 	
-	data = [{'date': date, 'videoId': videoId, 'coverImg': coverImg} for date, videoId, coverImg in zip(date_list, videoId_list, image_data_list)]
+	data = [{'date': datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'), 'videoId': videoId, 'coverImg': coverImg} for date, videoId, coverImg in zip(date_list, videoId_list, image_data_list)]
 	
 	return jsonify(data)
 
@@ -265,8 +265,8 @@ def social(request, session, ssh_manager):
 	
 	ssh_manager.open()
 	cover_image = ssh_manager.get_images(coverImg_list, 'png')
-	
-	data = [{'date': date, 'coverImg': coverImg, 'profileUsername': username} for
+
+	data = [{'date': datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'), 'coverImg': coverImg, 'profileUsername': username} for
 			date, coverImg, username in zip(date_list, cover_image, profileusername_list)]
 	
 	return jsonify(data)
@@ -279,10 +279,10 @@ def socialDetail(request, session):
 		return jsonify({"error": "Unauthorized"}), 401
 	
 	date = request.json['date']
-	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+	date = datetime.strptime(date, '%A, %B %d, %Y').strftime('%Y-%m-%d')
 	post_user = request.json['id']
-	
-	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
+
+	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.video_date == date)
 	summary = video_detail.with_entities(videoInfo.summary).all()[0][0]
 	hashtags = video_detail.with_entities(videoInfo.hashtag).all()[0][0]
 	emotion = video_detail.with_entities(videoInfo.emotion).all()[0][0]
@@ -336,10 +336,10 @@ def hearts(request, session):
 		return jsonify({"error": "Unauthorized"}), 401
 	
 	date = request.json['date']
-	date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+	date = datetime.strptime(date, '%A, %B %d, %Y').strftime('%Y-%m-%d')
 	post_user = request.json['id']
 
-	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.date == date)
+	video_detail = videoInfo.query.filter(videoInfo.username == post_user, videoInfo.video_date == date)
 	video_id = video_detail.with_entities(videoInfo.video_id).all()[0][0]
 
 	likeList = get_likes(video_id)
@@ -394,7 +394,7 @@ def logDetail(request, session, ssh_manager):
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
 	video_file = get_local_video(video_detail.video_url)
-	
+
 	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
 			"video": video_file,
 			"hashtags": video_detail.hashtag,
