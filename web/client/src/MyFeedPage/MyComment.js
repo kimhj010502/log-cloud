@@ -144,8 +144,6 @@ export function MyComment({ data, heartdata, setPage, prevPage, setPrevPage }) {
                 )}
                 
             </AnimatePresence>
-
-            <Navigation/>
         </div>
 
     );

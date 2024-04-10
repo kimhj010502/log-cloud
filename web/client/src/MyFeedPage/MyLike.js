@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
-import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, DatePublic, Like } from './MyLikeComponents'
 import './MyLike.css';
 
@@ -37,8 +36,6 @@ export function MyLike({ data, heartdata, setPage, setPrevPage }) {
 
                 </motion.div>   
             </AnimatePresence>
-
-            <Navigation />
         </div>
 
     );

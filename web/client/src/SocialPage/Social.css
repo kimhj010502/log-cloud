@@ -26,9 +26,8 @@
 .social-page .socials-box {
     display: inline-block;
     width: 390px;
-    height: 1200px;
+    height: 800px;
     overflow-x: auto;
-    overflow-y: hidden;
     white-space: nowrap;
 }
 
@@ -105,4 +104,8 @@
     margin-left: 20px;
     margin-top: 5px;
     z-index: 1;
+}
+
+.social-page .blank-box {
+    height: 30px;
 }
