@@ -9,15 +9,9 @@ export function Analysis({ currentYear, setCurrentYear, currentMonth, setCurrent
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
-    let userCreatedMonth;
-    let userCreatedYear;
 
-    async function getUserCreated(){
-        const user = await getUserInfo();
-        const userCreatedAt = new Date(user.createdAt);
-        userCreatedMonth = userCreatedAt.getMonth();
-        userCreatedYear = userCreatedAt.getFullYear();
-    }
+    let userCreatedMonth = sessionStorage.getItem('userCreatedMonth');
+    let userCreatedYear = sessionStorage.getItem('userCreatedYear');
 
     const handleClickLeft = () => {
         if ((currentYear > userCreatedYear) || (currentMonth > userCreatedMonth)){
