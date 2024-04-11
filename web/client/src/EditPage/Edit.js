@@ -6,7 +6,7 @@ import './Edit.css';
 
 function Edit() {
     const location = useLocation();
-    console.log(location.state?.videoInfo)
+    // console.log(location.state?.videoInfo)
     const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
     const videoInfo = JSON.parse(location.state?.videoInfo);
     const summary = location.state?.summary
@@ -78,7 +78,7 @@ function Edit() {
             transition={{ duration: 0.5 }}
             className="edit-page"
             >
-                {LogDate(handleButtonClick, videoInfo)}
+                {LogDate(handleButtonClick, videoInfo, summary, hashtags, switches)}
 
                 <div className="hashtag-container">
                     {prevHashtags && prevHashtags.map((tag, index) => (

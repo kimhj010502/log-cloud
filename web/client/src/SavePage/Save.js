@@ -15,7 +15,7 @@ function Save() {
     const hashtags = location.state?.hashtags
     const switches = location.state?.switches
 
-    console.log("save 페이지", videoInfo)
+    console.log("save 페이지 swithces", switches)
 
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)
@@ -79,7 +79,7 @@ function Save() {
 
                 <VideoPreview url={videoInfo.video_file_path} />
 
-                {switches.hashtag && (
+                {(
                     <div className="hashtag-container">
                         {hashtags && hashtags.map((tag, index) => (
                             <HashTag key={index} value={ tag } />
@@ -87,7 +87,7 @@ function Save() {
                     </div>
                 )}
 
-                {switches.summary && (
+                {summary !== "" && (
                     <Summary value={summary} />
                 )}
                 
@@ -112,7 +112,7 @@ function Save() {
 
                 <VideoPreview url={videoInfo.video_file_path} />
 
-                {switches.hashtag && (
+                {(
                     <div className="hashtag-container">
                         {hashtags && hashtags.map((tag, index) => (
                             <HashTag key={index} value={ tag } />
@@ -120,7 +120,7 @@ function Save() {
                     </div>
                 )}
 
-                {switches.summary && (
+                {summary !== "" && (
                     <Summary value={summary} />
                 )}
                 

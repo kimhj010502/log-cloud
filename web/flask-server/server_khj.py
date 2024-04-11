@@ -558,7 +558,10 @@ def select_option(request, session, ssh_manager):
 
 			else:
 				hashtags = make_tag(summary, emotion)
-			print('hashtag: ', hashtags)
+		else:
+			hashtags = [emotion_list[emotion]]
+
+		print('hashtag: ', hashtags)
 			
 
 		# return jsonify(return_data)

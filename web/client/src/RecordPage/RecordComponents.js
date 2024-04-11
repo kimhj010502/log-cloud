@@ -13,7 +13,7 @@ export function LogDate(handleButtonClick, upload_date) {
     // let nowD = upload_date[2]
 
     let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    let currentMonthName = monthNames[nowM]
+    let currentMonthName = monthNames[nowM - 1]
 
     return (
         <div className="date-box">
