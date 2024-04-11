@@ -640,12 +640,7 @@ def save_log(request, session, ssh_manager):
 
 		print('저장 끝')
 
-		#임시 파일 삭제
-		print('임시 파일 패스')
-		for path in session['local_path']:
-			print(path)
-		print('임시 파일 패스 출력 끝')
-		
+		#임시 파일 삭제	
 		for path in session['local_path']:
 			print(path, '삭제')
 			if os.path.isfile(path):

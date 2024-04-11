@@ -48,7 +48,8 @@ ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
 
-
+import time
+import socket
 
 class SSHManager:
    def __init__(self):
@@ -62,8 +63,26 @@ class SSHManager:
       self.sftp = None
       
    def open(self):
-      self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
-      self.sftp = self.ssh_client.open_sftp()
+    #   self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
+    #   self.sftp = self.ssh_client.open_sftp()
+
+      max_retries = 3
+      retry_count = 0
+
+      while retry_count < max_retries:
+          try:
+              self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
+              self.sftp = self.ssh_client.open_sftp()
+              break
+          except (paramiko.ssh_exception.SSHException, socket.error) as e:
+              print(f"소켓 예외 발생: {e}")
+              retry_count += 1
+              if retry_count < max_retries:
+                  print(f"재시도 {retry_count}/{max_retries}...")
+                  time.sleep(1)  # 재시도 전 잠시 대기
+              else:
+                  print("재시도 횟수를 초과하여 연결을 종료합니다.")
+                  break
       
    def close(self):
       if self.sftp:
