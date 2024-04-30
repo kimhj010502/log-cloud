@@ -195,6 +195,7 @@ def get_current_user(request, session):
 def get_user_profile_image(request, ssh_manager):
 	try:
 		username = request.json['username']
+		print(username)
 		
 		if not username:
 			return jsonify({"error": "Username not provided"}), 400

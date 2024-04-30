@@ -204,14 +204,9 @@ async function handleLogout() {
         }
         else {
             const data = await response.json();
-            console.log(data);
+            // console.log(data);
             sessionStorage.clear();
-
-            console.log("로그인으로 이동")
             window.location.reload();
-            console.log("이동 완료")
-
-            // return {username: data.username, createdAt: data.createdAt};
         }
 
     } catch (error) {
@@ -264,8 +259,9 @@ export function DeleteAccount({ isClicked, setIsClicked }) {
                 credentials: 'include',
             });
             if (response.ok) {
-                alert("Account deleted successfully");
-                navigate("/");
+                sessionStorage.clear();
+                // alert("Account deleted successfully");
+                window.location.reload();
             } else {
                 alert("Failed to delete account");
             }
