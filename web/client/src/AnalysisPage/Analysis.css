@@ -56,6 +56,12 @@
 }
 
 /* 해시태그 */
+.bg-color-0 { background-color: #b2ffbd; }
+.bg-color-1 { background-color: #81ef99; }
+.bg-color-2 { background-color: #53da73; }
+.bg-color-3 { background-color: #2eb04a; }
+.bg-color-4 { background-color: #149b46; }
+
 .analysis-page .top5-hashtag-box {
     width: 360px;
     height: 230px;
@@ -76,7 +82,11 @@
 
 .analysis-page .hashtag-box {
     height: 220px;
-    margin-top: 10px;
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .analysis-page .hashtag-container {
@@ -99,14 +109,14 @@
     display: inline-block;
     height: 20px;
     width: auto;
-    background-color: white;
+    /*background-color: white;*/
     border-radius: 15px;
     color: black;
     padding: 3px 8px;
     margin-left: 0px;
     margin-top: 8px;
     margin-bottom: 8px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     margin: auto;
 }
 
