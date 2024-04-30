@@ -1,11 +1,46 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navigation } from '../AppPage/AppComponents'
-import { ProfileImg, ProfileButtons, DeleteAccount } from './ProfileComponents'
+import {ProfileImg, ProfileButtons, DeleteAccount, getProfileImage} from './ProfileComponents'
 import './Profile.css'
+import {getFriendList} from "../LoginPage/Login";
 
 function ProfilePage({ imgSrc }) {
     const [isClicked, setIsClicked] = useState(false);
+
+    useEffect(() => {
+        const checkFriendUpdates = async () => {
+            try {
+                // get friend's profile images
+                const friendInfo = await getFriendList();
+
+                sessionStorage.setItem('friendList', JSON.stringify(friendInfo.friendList));
+                sessionStorage.setItem('pendingReceivedRequests', JSON.stringify(friendInfo.pendingReceivedRequests));
+                sessionStorage.setItem('pendingSentRequests', JSON.stringify(friendInfo.pendingSentRequests));
+
+                if (friendInfo.friendList) {
+                    for (const user of friendInfo.friendList) {
+                        if (!sessionStorage[user]) {
+                            sessionStorage.setItem(user, await getProfileImage(user));
+                            console.log("got " + user + "'s profile image");
+                        }
+                    }
+                }
+
+                if (friendInfo.pendingReceivedRequests) {
+                    for (const user of friendInfo.pendingReceivedRequests) {
+                        if (!sessionStorage[user]) {
+                            sessionStorage.setItem(user, await getProfileImage(user));
+                            console.log("got " + user + "'s profile image");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for friend updates:', error);
+            }
+        };
+        checkFriendUpdates()
+    }, []);
 
     return (
         <div className="profile-page">
