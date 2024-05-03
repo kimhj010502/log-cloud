@@ -23,9 +23,3 @@ web/flask-server/ssh_test.py
 web/flask-server/ssh_test_copy.py
 
 web/temp
-
-web/flask-server/datasets
-web/flask-server/hash_tag
-web/flask-server/summary
-web/flask-server/summary2
-web/flask-server/sentimentdataset.mat
