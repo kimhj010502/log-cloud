@@ -187,7 +187,18 @@ export function CameraButton() {
                 console.log(response)
                 if (response.status === 200) {
                     const data = await response.json();
-                    navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
+                    console.log("received data");
+                    console.log(data);
+                    if (data.video_exists) {
+                        console.log("EXISTS");
+                        const confirmRecord = window.confirm('You have already uploaded a video today. Do you want to overwrite?');
+                        if (confirmRecord) {
+                            navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
+                        }
+                    } else {
+                        navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
+                    }
+                    // navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
                 }
                 if (response.status === 400) {
                     console.log('Error during adding log: 400');
