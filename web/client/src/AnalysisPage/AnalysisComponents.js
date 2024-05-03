@@ -106,23 +106,30 @@ function Top5Hashtag({ hashtag }) {
 
     return(
         <div className='top5-hashtag-box'>
-            <div className='hashtag-label'>TOP 5 해시태그</div>
+            <div className='hashtag-label'>TOP 해시태그</div>
 
             <div className='hashtag-box'>
-                <HashTag key='0' value={hashtag? hashtag[0] : null} />
-                <HashTag key='1' value={hashtag? hashtag[1] : null} />
-                <HashTag key='2' value={hashtag? hashtag[2] : null} />
-                <HashTag key='3' value={hashtag? hashtag[3] : null} />
-                <HashTag key='4' value={hashtag? hashtag[4] : null} />
+                {hashtag && hashtag.length > 0 ? (
+                    hashtag.map((tag, index) => tag ? (
+                        <HashTag key={index} value={tag} bgColor={`bg-color-${index}`} />
+                    ) : null)
+                ) : (
+                    <div className="no-hashtags">nothing here yet</div>
+                )}
+                {/*<HashTag key='0' value={hashtag? hashtag[0] : null} bgColor="bg-color-0" />*/}
+                {/*<HashTag key='1' value={hashtag? hashtag[1] : null} bgColor="bg-color-1" />*/}
+                {/*<HashTag key='2' value={hashtag? hashtag[2] : null} bgColor="bg-color-2" />*/}
+                {/*<HashTag key='3' value={hashtag? hashtag[3] : null} bgColor="bg-color-3" />*/}
+                {/*<HashTag key='4' value={hashtag? hashtag[4] : null} bgColor="bg-color-4" />*/}
             </div>
         </div>
     )
 }
 
-function HashTag({ value }) {
+function HashTag({ value, key, bgColor }) {
     return (
         <div className="hashtag-container">
-            <div className="hashtag">#{value}</div>
+            <div className="hashtag" className={`hashtag ${bgColor}`}>#{value}</div>
         </div>
     )
 }

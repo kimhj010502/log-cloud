@@ -64,7 +64,7 @@ function SocialPage({imgSrc}) {
                 <Loading />
             ) : (
                 !isFeed ? ( // Check if data is empty
-                    <h3 className='no-feed'>No one has shared their memories.</h3>
+                    <h3 className='no-feed'>no one has shared their memories</h3>
                 ) : (
                     <AnimatePresence mode='wait'>
                         <motion.div

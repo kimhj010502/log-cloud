@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import { CameraFilled } from '@ant-design/icons'
 import { getUserInfo } from '../AppPage/AppComponents'
+import heic2any from "heic2any";
+import Loading from '../Routing/Loading'
 
 
 function resizeAndCropImage(file, width, height) {
@@ -88,6 +90,7 @@ export async function getProfileImage(username) {
 
 
 export function ProfileImg() {
+    const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState(sessionStorage.getItem('username'));
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = React.useRef(null);
@@ -118,8 +121,29 @@ export function ProfileImg() {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        setSelectedImage(file);
-        setProfileImage(file);
+        console.log(file);
+        let fileName = file.name.toLowerCase();
+        setLoading(true);
+        if (fileName.endsWith("heic")) {
+            file.arrayBuffer().then(buffer => {
+                const blob = new Blob([buffer], { type: file.type });
+                heic2any({
+                    blob: blob,
+                    toType: "image/jpg",
+                })
+                    .then(function (resultBlob) {
+                        setSelectedImage(resultBlob);
+                        setProfileImage(resultBlob);
+                    })
+                    .catch(function (e) {
+                        console.log(e.code);
+                        console.log(e.message);
+                    });
+            })
+        } else {
+            setSelectedImage(file);
+            setProfileImage(file);
+        }
     };
 
     const handleFileIconClick = React.useCallback(() => {
@@ -131,8 +155,8 @@ export function ProfileImg() {
     async function setProfileImage(imageFile) {
         try {
             const formData = new FormData();
-            console.log("resizing image");
 
+            console.log("resizing image");
             const resizedImageFile = await resizeAndCropImage(imageFile, 500, 500);
             console.log("resizing image done");
             formData.append('image', resizedImageFile);
@@ -148,19 +172,23 @@ export function ProfileImg() {
                 const newImage = URL.createObjectURL(resizedImageFile);
                 setProfileImgSrc(newImage);
                 sessionStorage.setItem('myProfileImg', newImage);
-                // alert("Successfully uploaded!");
+                setLoading(false);
+                alert("Successfully uploaded!");
                 window.location.reload();
             }
             if (response.status === 500) {
+                setLoading(false);
                 console.log('Error during photo upload');
                 alert("Network error. Please try again later");
             }
             if (response.status === 401) {
+                setLoading(false);
                 console.log('No image or user found');
                 alert("Unable to process image");
             }
         }
         catch (error) {
+            setLoading(false);
             console.error('Error during photo upload:', error);
             alert("Error during photo upload");
         }
@@ -169,6 +197,7 @@ export function ProfileImg() {
 
     return (
         <div className='profile-box'>
+            {loading ? <Loading /> : null}
             {username ? (
                 <>
                     <div className="profile-img-box">

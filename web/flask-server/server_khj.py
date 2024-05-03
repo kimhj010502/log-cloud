@@ -295,8 +295,15 @@ def add_log(request, session, ssh_manager):
 	try:
 		upload_date = request.json['upload_date']
 		session["upload_date"] = upload_date
+		
+		user_id = session.get("user_id")
+		now = datetime.now()
+		today = str(now.strftime("%Y-%m-%d"))
+		print("===================")
+		print(today)
+		video_exists = bool(videoInfo.query.filter(videoInfo.username == user_id, videoInfo.video_date == today).first())
 
-		return_data = { 'upload_date': upload_date }
+		return_data = { 'upload_date': upload_date, 'video_exists': video_exists}
 		return jsonify(return_data)
 
 	except Exception as e:
@@ -496,8 +503,8 @@ def add_bgm(video_path, result_path, emotion):
 	print('오디오 파일 path',audio_path)
 
 	# 비디오와 음악을 합치는 FFmpeg 명령어 생성
-	command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
-
+	command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo,volume=0.3[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
+	
 	# FFmpeg 명령어 실행
 	subprocess.run(command, shell=True)
 
