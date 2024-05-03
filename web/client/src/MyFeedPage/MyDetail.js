@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
-import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, DatePublic, VideoPlay, HeartComment, HashTag, Summary } from './MyDetailComponents'
 import './MyDetail.css';
 

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Loading from '../Routing/Loading'
 import { HomeOutlined, TeamOutlined, SearchOutlined, LineChartOutlined } from '@ant-design/icons'
 import { YearMonth, CalendarDate, CalendarYearMonth } from './Calendar'
-import { getProfileImage } from "../ProfilePage/ProfileComponents";
 
 export async function getUserInfo() {
     try {

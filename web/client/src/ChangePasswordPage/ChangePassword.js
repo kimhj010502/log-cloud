@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import React, { useState } from 'react';
-import {  } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Navigation } from '../AppPage/AppComponents'

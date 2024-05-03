@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
-import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, DatePublic, LikeList, Comment, AddComment } from './MyCommentComponents'
 import './MyComment.css';
 

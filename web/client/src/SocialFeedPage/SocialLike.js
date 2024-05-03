@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
-import { Navigation } from '../AppPage/AppComponents'
 import { LogHeader, ProfileDate, Like } from './SocialLikeComponents'
 import './SocialLike.css';
 

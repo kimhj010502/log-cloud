@@ -1,6 +1,5 @@
 import { Calendar, CameraButton, Navigation } from './AppComponents';
 import './App.css'
-import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 
 function App({ imgSrc }) {
