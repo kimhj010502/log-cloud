@@ -129,7 +129,7 @@ function Top5Hashtag({ hashtag }) {
 function HashTag({ value, key, bgColor }) {
     return (
         <div className="hashtag-container">
-            <div className="hashtag" className={`hashtag ${bgColor}`}>#{value}</div>
+            <div className={`hashtag ${bgColor}`}>#{value}</div>
         </div>
     )
 }
