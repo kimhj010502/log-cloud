@@ -1,48 +1,39 @@
 import os
-
-from flask import session, jsonify
-
-import base64
-
-from sqlalchemy.exc import IntegrityError
-
 import cv2
 import random
-
-from models import db, User, videoInfo, videoLog, socialNetwork
-
 from datetime import datetime
-import cv2
 import subprocess
 import speech_recognition as sr
 
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
+from flask import session, jsonify
 
-# SCP 연결 설정
-ssh_client = paramiko.SSHClient()
-ssh_client.load_system_host_keys()
-ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+from sqlalchemy.exc import IntegrityError
+from models import db, User, videoInfo, videoLog, socialNetwork
+from functions import create_folder, delete_folder, get_video
 
-# SSH 서버 정보
-ssh_host = SSH_HOST
-ssh_port = SSH_PORT
-ssh_username = SSH_USERNAME
-ssh_password = SSH_PASSWORD
+import torch
+from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
+
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+print('device:', device)
+
+# 요약 모델
+SUMMARY_DIR_PATH = 'log/modelling/summary'
+summary_model = BartForConditionalGeneration.from_pretrained(SUMMARY_DIR_PATH)
+summary_tokenizer = PreTrainedTokenizerFast.from_pretrained(SUMMARY_DIR_PATH)
+summary_model = summary_model.to(device)
+
+# 해시태그 모델
+HASHTAG_DIR_PATH = 'log/modelling/hashtag'
+hashtag_model = BartForConditionalGeneration.from_pretrained(HASHTAG_DIR_PATH)
+hashtag_tokenizer = PreTrainedTokenizerFast.from_pretrained(HASHTAG_DIR_PATH)
+hashtag_model = hashtag_model.to(device)
+
+emotion_list = ['🥰', '😆', '🙂', '😐', '🙁', '😠', '😵']
 
 
-import shutil
-
-def delete_local_folder(folder_path):
-    try:
-        shutil.rmtree(folder_path)
-    except Exception as e:
-        print(f"Error deleting folder {folder_path}: {e}")
-
-
-'''server.jyb 수정 시작'''
 #회원가입 - 개인 폴더 생성
-def register_user(request, bcrypt, ssh_manager):
+def register_user(request, bcrypt):
 	try:
 		username = request.json['username']
 		email = request.json['email']
@@ -61,15 +52,8 @@ def register_user(request, bcrypt, ssh_manager):
 		db.session.add(new_user)
 		db.session.commit()
 
-		ssh_manager.open()
-
-		# 원격 서버에 폴더 생성
-		remote_folder_path = f'D:/log/{username}'
-		ssh_manager.create_remote_folder(remote_folder_path)
-		ssh_manager.save_file('web/client/public/bin.txt', f'D:/log/{username}/bin.txt')
-
-		# SFTP 세션 닫기
-		ssh_manager.close()
+		# 사용자 개인 폴더 생성
+		create_folder(username)
 		
 		return jsonify({
 			'username': new_user.username,
@@ -78,8 +62,9 @@ def register_user(request, bcrypt, ssh_manager):
 	except Exception as e:
 		print(f"Error in signup: {str(e)}")
 
+
 #탈퇴 - 개인 폴더 삭제
-def remove_registered_user(request, session, ssh_manager):
+def remove_registered_user(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -110,22 +95,9 @@ def remove_registered_user(request, session, ssh_manager):
 		
 		db.session.commit()
 		
-
-
-		# 로컬 폴더 경로
-		local_folder_path = f'web/temp/{user_id}'
-
-		delete_local_folder(local_folder_path)
-		print('로컬 폴더 삭제 완료')
-
-		# 삭제할 폴더 경로
-		remote_folder_path = f'D:/log/{user_id}'
-		ssh_manager.delete_folder(remote_folder_path)
-
-		# SFTP 세션 닫기
-		ssh_manager.close()
-
-		session.clear()
+		# 사용자 개인 폴더 삭제
+		delete_folder(user_id)
+		print(f'{user_id} 탈퇴 완료')
 
 		return jsonify({"message": "Account deleted successfully"}), 200
 	
@@ -133,8 +105,9 @@ def remove_registered_user(request, session, ssh_manager):
 		db.session.rollback()  # Rollback in case of an error
 		return jsonify({"error": "Database error"}), 500
 
-#로그인 - 임시 개인 폴더 생성
-def login_user(request, bcrypt, ssh_manager):
+
+#로그인
+def login_user(request, bcrypt):
 	username = request.json['username']
 	password = request.json['password']
 	
@@ -151,39 +124,20 @@ def login_user(request, bcrypt, ssh_manager):
 	session["user_id"] = username
 	print("session id:", session["user_id"])
 
-	# 개인 폴더 복사하기
-	ssh_manager.open()
-
-	# 복사할 원격 폴더 경로
-	remote_folder_path = f'D:/log/{username}'
-
-	# 로컬 폴더 경로
-	local_folder_path = f'web/temp/{username}'
-
-	# 원격 폴더 내용을 로컬로 복사
-	ssh_manager.get_remote_folder(remote_folder_path, local_folder_path)
-	
 	return jsonify({'username': user.username, 'email': user.email, 'createdAt': user.created_at})
 
 
-#로그아웃 - 임시 개인 폴더 삭제
-def logout_user(request, session, ssh_manager):
+#로그아웃
+def logout_user(request, session):
 	user_id = session.get("user_id")
 	if user_id:
 		session.clear()
-
-		# 로컬 폴더 경로
-		local_folder_path = f'web/temp/{user_id}'
-
-		delete_local_folder(local_folder_path)
-		print('로컬 폴더 삭제 완료')
-		
 		return jsonify({"msg": "Successful user logout"}), 200
 	else:
 		return jsonify({"error": "Unauthorized"}), 401
 
 
-def add_log(request, session, ssh_manager):
+def add_log(request, session):
 	try:
 		upload_date = request.json['upload_date']
 		session["upload_date"] = upload_date
@@ -201,17 +155,6 @@ def add_log(request, session, ssh_manager):
 	except Exception as e:
 		print(f"Error in add log: {str(e)}")
 
-def get_local_image(img_path, image_type):
-	with open(img_path, 'rb') as file:
-		image_data = base64.b64encode(file.read()).decode('utf-8')
-		image_data = 'data:image/' + image_type + ';base64,' + image_data
-		return image_data
-	
-def get_local_video(video_path):
-	video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
-	with open(video_path, 'rb') as file:
-		video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
-		return video_file
 
 def get_date():
 	now = datetime.now()
@@ -228,7 +171,7 @@ def mp4_to_wav(local_video_path, local_audio_path):
 		pass
 
 
-def record_video(request, session, ssh_manager):
+def record_video(request, session):
 	print('동영상 저장')
 	user_id = session.get("user_id")
 	try:
@@ -244,16 +187,16 @@ def record_video(request, session, ssh_manager):
 			remote_file_name = user_id + remote_video_date
 
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경) -> 배포 시 임시 저장 안함
-			local_image_path = f'web/temp/temp/{local_file_name}.png'
-			local_video_path = f'web/temp/temp/{local_file_name}.mp4'
-			local_audio_path = f'web/temp/temp/{local_file_name}.wav'
+			local_image_path = f'log/web/temp/{local_file_name}.png'
+			local_video_path = f'log/web/temp/{local_file_name}.mp4'
+			local_audio_path = f'log/web/temp/{local_file_name}.wav'
 			
 			session['local_path'] = [local_image_path, local_video_path, local_audio_path]
 			session['local_file_name'] = local_file_name
 
 			# 최종 저장 경로 (원하는 경로와 파일명으로 변경)
-			remote_image_path = f'D:/log/{user_id}/{remote_file_name}.png'
-			remote_video_path = f'D:/log/{user_id}/{remote_file_name}.mp4'
+			remote_image_path = f'data/{user_id}/{remote_file_name}.png'
+			remote_video_path = f'data/{user_id}/{remote_file_name}.mp4'
 
 			# 파일 저장
 			video_file.save(local_video_path)
@@ -261,10 +204,8 @@ def record_video(request, session, ssh_manager):
 			# 음원 추출
 			mp4_to_wav(local_video_path, local_audio_path)
 
-			
-
 			# 세션값 추가
-			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}.mp4')
+			video_file_path = get_video(f'log/web/temp/{local_file_name}.mp4')
 			response_data = {'username':user_id, 'date': remote_video_date, 'video_id': remote_file_name, 'video_url': remote_video_path, 'cover_image': remote_image_path}
 			session["video_info"] = response_data
 
@@ -278,19 +219,6 @@ def record_video(request, session, ssh_manager):
 	except Exception as e:
 		print(f"Error in record: {str(e)}")
 
-
-
-import torch
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-print('device:', device)
-
-from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
-
-# 요약 모델
-SUMMARY_DIR_PATH = 'modelling/summary'
-summary_model = BartForConditionalGeneration.from_pretrained(SUMMARY_DIR_PATH)
-summary_tokenizer = PreTrainedTokenizerFast.from_pretrained(SUMMARY_DIR_PATH)
-summary_model = summary_model.to(device)
 
 def diary_summary(text):
 	try:
@@ -309,14 +237,6 @@ def diary_summary(text):
 		print(f"Error during Summary: {e}")
 		return ''
 
-
-# 해시태그 모델
-HASHTAG_DIR_PATH = 'modelling/hashtag'
-hashtag_model = BartForConditionalGeneration.from_pretrained(HASHTAG_DIR_PATH)
-hashtag_tokenizer = PreTrainedTokenizerFast.from_pretrained(HASHTAG_DIR_PATH)
-hashtag_model = hashtag_model.to(device)
-
-emotion_list = ['🥰', '😆', '🙂', '😐', '🙁', '😠', '😵']
 
 def reduce_repeated_word(input_word):
     return ''.join(sorted(set(input_word), key=input_word.index))
@@ -356,15 +276,13 @@ def make_tag(text, emotion):
 
 
 
-
 #BGM 추가 함수
 def add_bgm(video_path, result_path, emotion):
-	folder_path = f"web/flask-server/bgm/{emotion}"
+	folder_path = f"log/web/flask-server/bgm/{emotion}"
 	files = os.listdir(folder_path)
 	random_num = random.randint(0, len(files)-1)
 
-	audio_path = f"web/flask-server/bgm/{emotion}/{files[random_num]}"
-	print('오디오 파일 path',audio_path)
+	audio_path = f"log/web/flask-server/bgm/{emotion}/{files[random_num]}"
 
 	# 비디오와 음악을 합치는 FFmpeg 명령어 생성
 	command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo,volume=0.3[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
@@ -373,10 +291,7 @@ def add_bgm(video_path, result_path, emotion):
 	subprocess.run(command, shell=True)
 
 
-def select_option(request, session, ssh_manager):
-	user_id = session.get("user_id")
-	#print('request', request.json)
-
+def select_option(request, session):
 	try:
 		video_info = request.json['video_info']
 		emotion = int(request.json['emotion'])
@@ -390,15 +305,15 @@ def select_option(request, session, ssh_manager):
 
 		session["emotion"] = emotion
 		print("emotion값!!!!", emotion)
-		# session["switches"] = switches
 
 		if switches["bgm"]:
 			print('bgm 함수 실행')
 			local_video_path = local_path[1]
-			local_result_path = f'web/temp/temp/{local_file_name}_bgm.mp4' #bgm 추가한 영상
+			local_result_path = f'log/web/temp/{local_file_name}_bgm.mp4' #bgm 추가한 영상
 			add_bgm(local_video_path, local_result_path, emotion)
+
 			session['local_path'] = [local_path[0], local_result_path, local_path[2], local_path[1]] #세선 업데이트
-			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}_bgm.mp4')
+			video_file_path = get_video(f'log/web/temp/{local_file_name}_bgm.mp4')
 			video_info['video_file_path'] = video_file_path
 
 		# 텍스트 추출 (STT)
@@ -455,7 +370,7 @@ def select_option(request, session, ssh_manager):
 		print(f"Error in record: {str(e)}")
 
 
-def save_log(request, session, ssh_manager):
+def save_log(request, session):
 	user_id = session.get("user_id")
 
 	try:
@@ -468,30 +383,19 @@ def save_log(request, session, ssh_manager):
 		local_path = session.get('local_path')
 
 		#이미지 캡처
-		print('----------', local_path)
 		cap = cv2.VideoCapture(local_path[1])
 		ret, frame = cap.read()
 
 		if ret:
 			cv2.imwrite(local_path[0], frame)
-			print('썸네일 저장')
 		cap.release()
 
-		ssh_manager.open()
-		print('ssh_manager',ssh_manager)
+		# 이미지 및 동영상 저장
+		image_file = local_path[0]
+		video_file = local_path[1]
+		image_file.save(video_info['cover_image'])
+		video_file.save(video_info['video_url'])
 
-		#파일을 SCP로 원격 서버에 업로드
-		print('원격 서버에 업로드',local_path[0], video_info['cover_image'])
-		ssh_manager.save_file(local_path[0], video_info['cover_image'])
-		ssh_manager.save_file(local_path[1], video_info['video_url'])
-
-		print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
-
-		local_file_path = [f"web/temp/{user_id}/{video_info['video_id']}.png", f"web/temp/{user_id}/{video_info['video_id']}.mp4"]
-
-		shutil.move(local_path[0], local_file_path[0])
-		shutil.move(local_path[1], local_file_path[1])
-		
 		#SQL 저장
 		prev_log = videoInfo.query.filter_by(video_id=video_info['video_id']).first()
 	

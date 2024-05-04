@@ -1,44 +1,15 @@
+import pandas as pd
 import calendar
-from uuid import uuid4
+from datetime import datetime, timedelta
 
 from flask import Flask, jsonify
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
-from datetime import datetime, timedelta
-import pandas as pd
-import base64
 
 from sqlalchemy import asc, or_, desc
-
-from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork, likeLog, commentLog
-
-app = Flask(__name__)
-app.config.from_object(ApplicationConfig)
-
-CORS(app, supports_credentials=True)
-bcrypt = Bcrypt(app)
-server_session = Session(app)
-db.init_app(app)
-
-with app.app_context():
-	db.create_all()
-
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD
-
-# SCP 연결 설정
-ssh_client = paramiko.SSHClient()
-ssh_client.load_system_host_keys()
-ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-# SSH 서버 정보
-ssh_host = SSH_HOST
-ssh_port = SSH_PORT
-ssh_username = SSH_USERNAME
-ssh_password = SSH_PASSWORD
-
+from functions import get_images, get_video
 
 # API
 def get_list(db_data):
@@ -48,42 +19,13 @@ def get_list(db_data):
 	return list_tmp
 
 
-def get_local_images(image_list, image_type):
-   images = []
-
-   for img in image_list:
-      img = 'web/temp/' + "/".join(img.split('/')[-2:])
-      with open(img, 'rb') as file:
-         image_data = base64.b64encode(file.read()).decode('utf-8')
-         image_data = 'data:image/' + image_type + ';base64,' + image_data
-         images.append(image_data)
-         
-   return images
-
-
-def get_video(video_url):
-	ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-	with ssh_client.open_sftp() as sftp:
-		with sftp.file(video_url, 'rb') as file:
-			video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
-	sftp.close()
-	ssh_client.close()
-	return video_file
-
-
-def get_local_video(video_path):
-   video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
-   with open(video_path, 'rb') as file:
-      video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
-      return video_file
-
-
 def get_likes(videoId):
 	like_ids = likeLog.query.filter(likeLog.video_id == videoId).with_entities(likeLog.username).all()
 	likes_list = []
+
 	for i in like_ids:
 		likes_list.append(i[0])
-	
+
 	return likes_list
 
 
@@ -100,7 +42,6 @@ def get_comments(videoId):
 	
 	return data
 
-
 def did_u_like(username, likeList):
 	if username in likeList:
 		return True
@@ -109,7 +50,7 @@ def did_u_like(username, likeList):
 
 
 # PAGE FUNCTION
-def analysisReport(request, session, ssh_manager):
+def analysisReport(request, session):
 	user_id = session.get('user_id')
 	if not user_id:
 		return jsonify({"error": "Unauthorized"}), 401
@@ -174,7 +115,7 @@ def analysisReport(request, session, ssh_manager):
 	return jsonify(data)
 
 
-def searchResult(request, session, ssh_manager):
+def searchResult(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -223,14 +164,15 @@ def searchResult(request, session, ssh_manager):
 	if not user_id or len(coverImg_list) == 0:
 		return jsonify({"error": "Image not found"}), 404
 	
-	image_data_list = get_local_images(coverImg_list, 'png')
+	image_data_list = get_images(coverImg_list, 'png')
 	
 	data = [{'date': datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'), 'videoId': videoId, 'coverImg': coverImg} for date, videoId, coverImg in zip(date_list, videoId_list, image_data_list)]
 	
 	return jsonify(data)
 
 
-def social(request, session, ssh_manager):
+
+def social(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -260,8 +202,7 @@ def social(request, session, ssh_manager):
 		videoInfo.username.in_(friends_list), videoInfo.date >= start_date, videoInfo.date <= end_date).order_by(
 		desc(videoInfo.date))
 	
-	ssh_manager.open()
-	cover_image = ssh_manager.get_images(coverImg_list, 'png')
+	cover_image = get_images(coverImg_list, 'png')
 
 	data = [{'date': datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'), 'coverImg': coverImg, 'profileUsername': username} for
 			date, coverImg, username in zip(date_list, cover_image, profileusername_list)]
@@ -371,17 +312,7 @@ def sendHearts(request, session):
 	return ""
 
 
-
-def get_local_video(video_path):
-   video_path = 'web/temp/' + "/".join(video_path.split('/')[-2:])
-   print('video_path', video_path)
-   with open(video_path, 'rb') as file:
-      video_file = 'data:video/mp4;base64,' + base64.b64encode(file.read()).decode('utf-8')
-      return video_file
-
-
-
-def logDetail(request, session, ssh_manager):
+def logDetail(request, session):
 	user_id = session.get("user_id")
 	
 	if not user_id:
@@ -390,7 +321,7 @@ def logDetail(request, session, ssh_manager):
 	video_id = request.json['videoId']
 	
 	video_detail = videoInfo.query.filter(videoInfo.video_id == video_id).first()
-	video_file = get_local_video(video_detail.video_url)
+	video_file = get_video(video_detail.video_url)
 
 	return {"date": datetime.strptime(str(video_detail.date), '%Y-%m-%d %H:%M:%S').strftime('%A, %B %d, %Y'),
 			"video": video_file,
@@ -436,7 +367,7 @@ def delete_post(request, session):
 
 
 
-def get_log_overview_of_month(request, ssh_manager):
+def get_log_overview_of_month(request):
 	username = request.json['username']
 	month = request.json['month']
 	year = request.json['year']
@@ -462,7 +393,7 @@ def get_log_overview_of_month(request, ssh_manager):
 			coverImg_list.append(video.cover_image)
 			videoId_list.append(video.video_id)
 
-		coverImage = get_local_images(coverImg_list, 'png')
+		coverImage = get_images(coverImg_list, 'png')
 
 		video_info_list = [{ 'date': date, 'coverImage': img, 'videoId': videoId } for date, img, videoId in zip(date_list, coverImage, videoId_list)]
 
@@ -473,4 +404,3 @@ def get_log_overview_of_month(request, ssh_manager):
 
 
 
-	

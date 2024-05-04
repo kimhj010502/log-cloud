@@ -15,17 +15,6 @@ function Edit() {
 
     console.log('Edit 페이지', videoInfo)
 
-    const [data, setData] = useState([{}])
-    useEffect(() => {
-        fetch("/generateDetails").then(
-            res => res.json()
-        ).then(
-            data => {
-                setData(data)
-                console.log(data)
-            })
-    }, []);
-
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)
 
@@ -47,7 +36,7 @@ function Edit() {
     
     useEffect(() => {
         setPrevHashtags(hashtags)
-    }, [data]);
+    }, []);
     
     const onRemove = (index) => {
         const newHashtags = [...prevHashtags.slice(0, index), ...prevHashtags.slice(index + 1)]

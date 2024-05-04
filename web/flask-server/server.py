@@ -1,19 +1,10 @@
-import os
-from uuid import uuid4
-import stat
-
 from flask import Flask, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 
-import base64
-
 from config import ApplicationConfig
 from models import db
-
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -27,184 +18,41 @@ with app.app_context():
     db.create_all()
 
 
-# SCP 연결 설정
-ssh_client = paramiko.SSHClient()
-ssh_client.load_system_host_keys()
-ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-# SSH 서버 정보
-ssh_host = SSH_HOST
-ssh_port = SSH_PORT
-ssh_username = SSH_USERNAME
-ssh_password = SSH_PASSWORD
-
-
-import time
-import socket
-
-class SSHManager:
-   def __init__(self):
-      self.host = SSH_HOST
-      self.port = SSH_PORT
-      self.username = SSH_USERNAME
-      self.password = SSH_PASSWORD
-      self.ssh_client = paramiko.SSHClient()
-      self.ssh_client.load_system_host_keys()
-      self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-      self.sftp = None
-      
-   def open(self):
-      max_retries = 3
-      retry_count = 0
-
-      while retry_count < max_retries:
-          try:
-              self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
-              self.sftp = self.ssh_client.open_sftp()
-              break
-          except (paramiko.ssh_exception.SSHException, socket.error) as e:
-              print(f"소켓 예외 발생: {e}")
-              retry_count += 1
-              if retry_count < max_retries:
-                  print(f"재시도 {retry_count}/{max_retries}...")
-                  time.sleep(1)  # 재시도 전 잠시 대기
-              else:
-                  print("재시도 횟수를 초과하여 연결을 종료합니다.")
-                  break
-      
-   def close(self):
-      if self.sftp:
-         self.sftp.close()
-      self.ssh_client.close()
-      
-   def create_remote_folder(self, folder_path):
-      if self.sftp:
-         self.sftp.mkdir(folder_path)
-
-   def remove_folder_contents(self, folder_path):
-      if self.sftp:
-         # 원격 폴더 내의 파일 및 폴더 목록 가져오기
-         remote_items = self.sftp.listdir(folder_path)
-
-         # 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
-         for item in remote_items:
-            remote_item_path = os.path.join(folder_path, item)
-            
-                # 원격 항목의 속성 가져오기
-            remote_item_attr = self.sftp.stat(remote_item_path)
-            
-            if stat.S_ISDIR(remote_item_attr.st_mode):
-               self.remove_folder_contents(remote_item_path)
-            else:
-               self.sftp.remove(remote_item_path)
-
-
-   def delete_folder(self, folder_path):
-      if self.sftp:
-         self.remove_folder_contents(folder_path)
-         self.sftp.rmdir(folder_path)
-         
-   def get_remote_folder(self, remote_folder_path, local_folder_path):
-      if self.sftp:
-         # 원격 폴더 내의 파일 및 폴더 목록 가져오기
-         remote_items = self.sftp.listdir(remote_folder_path)
-
-         # 로컬 폴더가 없으면 생성
-         if not os.path.exists(local_folder_path):
-            os.makedirs(local_folder_path)
-
-         # 각 항목을 반복하면서 처리
-         for item in remote_items:
-            remote_item_path = os.path.join(remote_folder_path, item)
-            local_item_path = os.path.join(local_folder_path, item)
-
-            # 원격 항목의 속성 가져오기
-            remote_item_attr = self.sftp.stat(remote_item_path)
-
-            # 만약 폴더라면 재귀적으로 다시 호출
-            if stat.S_ISDIR(remote_item_attr.st_mode):
-               self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
-            else:
-               # 파일이라면 복사
-               self.sftp.get(remote_item_path, local_item_path)
-               
-   def save_file(self, local_path, remote_path):
-      if self.sftp:
-         print('저장완')
-         self.sftp.put(local_path, remote_path)
-
-   def get_remote_file(self, remote_file_path, local_file_path):
-      if self.sftp:
-         # 로컬 폴더가 없으면 생성
-         local_folder_path = os.path.dirname(local_file_path)
-         if not os.path.exists(local_folder_path):
-            os.makedirs(local_folder_path)
-
-            # 파일 복사
-         self.sftp.get(remote_file_path, local_file_path)
-
-   def get_images(self, image_list, image_type):
-      images = []
-      
-      try:
-         for img in image_list:
-            with self.sftp.file(img, 'rb') as file:
-               image_data = base64.b64encode(file.read()).decode('utf-8')
-               image_data = 'data:image/' + image_type + ';base64,' + image_data
-               images.append(image_data)
-      except Exception as e:
-         print(f"Error getting images: {e}")
-         
-      return images
-   
-   def get_profile_image(self, profile_img):
-      try:
-         with self.sftp.file(profile_img, 'rb') as file:
-            image_data = base64.b64encode(file.read()).decode('utf-8')
-            image_data = 'data:image/jpg;base64,' + image_data
-            return image_data, 200
-      except Exception as e:
-         print(f"Error getting profile image: {e}")
-         return 'Error setting profile image', 500
-
-ssh_manager = SSHManager()
-
-
 from server_khj import record_video, select_option, add_log, save_log, \
     register_user, remove_registered_user, login_user, logout_user
 
 @app.route('/add_log', methods=['POST'])
 def add_log_route():
-    return add_log(request, session, ssh_manager)
+    return add_log(request, session)
 
 @app.route('/record', methods=['POST'])
 def record_video_route():
-    return record_video(request, session, ssh_manager)
+    return record_video(request, session)
 
 @app.route('/upload', methods=['POST'])
 def select_option_route():
-    return select_option(request, session, ssh_manager)
+    return select_option(request, session)
 
 @app.route('/save', methods=['POST'])
 def save_log_route():
-    return save_log(request, session, ssh_manager)
+    return save_log(request, session)
 
 
 from server_jjh import analysisReport, searchResult, social, socialDetail, comments, get_log_overview_of_month, log_hearts, logDetail, sendComments, hearts, sendHearts, delete_post
 
 @app.route("/analysisReport", methods=['POST', 'GET'])
 def analysisReport_route():
-   return analysisReport(request, session, ssh_manager)
+   return analysisReport(request, session)
 
 
 @app.route('/searchresult', methods=['POST','GET'])
 def searchResult_route():
-   return searchResult(request, session, ssh_manager)
+   return searchResult(request, session)
 
 
 @app.route("/social")
 def social_route():
-    return social(request, session, ssh_manager)
+    return social(request, session)
 
 
 @app.route("/socialdetail", methods=['POST','GET'])
@@ -234,7 +82,7 @@ def send_hearts_route():
 
 @app.route("/month-overview", methods=['POST'])
 def get_log_overview_of_month_route():
-    return get_log_overview_of_month(request, ssh_manager)
+    return get_log_overview_of_month(request)
 
 
 @app.route("/log_hearts", methods=['POST','GET'])
@@ -244,7 +92,7 @@ def log_hearts_route():
 
 @app.route("/logdetail", methods=['POST','GET'])
 def log_detail_route():
-    return logDetail(request, session, ssh_manager)
+    return logDetail(request, session)
 
 
 @app.route("/deletePost", methods=['POST','GET'])
@@ -254,21 +102,10 @@ def delete_post_route():
 
 
 
-
 from server_jyb import check_authentication, check_username_availability, change_user_password, \
     get_current_user, get_user_profile_image, set_profile_image, \
     send_friend_request, search_user, get_friend_list, unsend_friend_request, \
     reject_friend_request, accept_friend_request, remove_friend
-
-@app.route("/generateDetails")
-def generate_details():
-    return {"date": "Friday, December 9, 2023",
-            "coverImg": "/route/to/image",
-            "hashtags": ["😍", "이탈리아이탈리아이탈리아이탈리아", "여행", "해변", "수영"],
-            "summary": "이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 이탈리아 가족 여행으로 시칠리아에 왔어요. 여름의 이탈리아는 매우 더워요. 해변에서 하루종일 수영했어요.",
-            "privacy": "전체 공개",
-            "location": "Sicily, Italy",
-            "emotion": "happy"}
 
 
 @app.route('/authentication', methods=['GET'])
@@ -283,7 +120,7 @@ def check_username_availability_route():
 
 @app.route('/registration', methods=['POST'])
 def register_user_route():
-    return register_user(request, bcrypt, ssh_manager)
+    return register_user(request, bcrypt)
 
 
 @app.route('/change_password', methods=['POST'])
@@ -293,17 +130,17 @@ def change_user_password_route():
 
 @app.route('/delete_account', methods=['POST'])
 def remove_registered_user_route():
-    return remove_registered_user(request, session, ssh_manager)
+    return remove_registered_user(request, session)
 
 
 @app.route('/login', methods=['POST'])
 def login_user_route():
-    return login_user(request, bcrypt, ssh_manager)
+    return login_user(request, bcrypt)
 
 
 @app.route('/logout', methods=['GET'])
 def logout_user_route():
-    return logout_user(request, session, ssh_manager)
+    return logout_user(request, session)
     
 
 @app.route("/@me")
@@ -313,12 +150,12 @@ def get_current_user_route():
 
 @app.route("/get_profile_image", methods=['POST'])
 def get_user_profile_image_route():
-    return get_user_profile_image(request, ssh_manager)
+    return get_user_profile_image(request)
 
 
 @app.route("/set_profile_image", methods=['POST'])
 def set_profile_image_route():
-    return set_profile_image(request, session, ssh_manager)
+    return set_profile_image(request, session)
 
 
 @app.route('/get_friend_list', methods=['POST'])

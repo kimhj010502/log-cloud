@@ -1,23 +1,8 @@
-import os
-
 from flask import jsonify
 
 from sqlalchemy import not_, and_
 from models import db, User, socialNetwork
-
-import paramiko
-from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD
-
-# SCP 연결 설정
-ssh_client = paramiko.SSHClient()
-ssh_client.load_system_host_keys()
-ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-# SSH 서버 정보
-ssh_host = SSH_HOST
-ssh_port = SSH_PORT
-ssh_username = SSH_USERNAME
-ssh_password = SSH_PASSWORD
+from functions import get_profile_image
 
 
 def check_authentication(request, session):
@@ -85,7 +70,7 @@ def get_current_user(request, session):
 	})
 
 
-def get_user_profile_image(request, ssh_manager):
+def get_user_profile_image(request):
 	try:
 		username = request.json['username']
 		print(username)
@@ -99,8 +84,7 @@ def get_user_profile_image(request, ssh_manager):
 		if not user or not user.profile_img:
 			return jsonify({"error": "Image not found"}), 404
 		
-		ssh_manager.open()
-		img, status_code = ssh_manager.get_profile_image(user.profile_img)
+		img, status_code = get_profile_image(user.profile_img)
 		if img:
 			return img, status_code
 		else:
@@ -111,7 +95,7 @@ def get_user_profile_image(request, ssh_manager):
 		return jsonify({"error": "Internal server error"}), 500
 
 
-def set_profile_image(request, session, ssh_manager):
+def set_profile_image(request, session):
 	user_id = session.get("user_id")
 	
 	# fetch user data by username(from session) from user_info_db : user_account table
@@ -121,18 +105,11 @@ def set_profile_image(request, session, ssh_manager):
 	if (user and ('image' in request.files)):
 		try:
 			image_file = request.files['image']
-			# Save image locally (temporarily)
-			local_image_path = f'web/temp/temp/{user_id}.jpg'
-			remote_image_path = f'D:/log/user/{user_id}.jpg'
-		
-			image_file.save(local_image_path)
-			
-			ssh_manager.open()
-			ssh_manager.save_file(local_image_path, remote_image_path)
-			
-			os.remove(local_image_path)
-			
-			user.profile_img = remote_image_path
+
+			image_path = f'data/user/{user_id}.jpg'
+			image_file.save(image_path)
+
+			user.profile_img = image_path
 			db.session.commit()
 			
 			return 'Successfully added profile image!', 200
