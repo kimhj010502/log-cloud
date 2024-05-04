@@ -1,31 +1,18 @@
-import calendar
 import os
-import stat
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
-from flask_bcrypt import Bcrypt
-from flask_cors import CORS
-from flask_session import Session
-import pymysql
+from flask import session, jsonify
 
-from PIL import Image
-import io
 import base64
 
-from sqlalchemy import extract, asc, or_
 from sqlalchemy.exc import IntegrityError
 
 import cv2
-import re
 import random
 
-from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import cv2
-# import moviepy.editor as mp
-from pyffmpeg import FFmpeg
 import subprocess
 import speech_recognition as sr
 
@@ -43,92 +30,6 @@ ssh_port = SSH_PORT
 ssh_username = SSH_USERNAME
 ssh_password = SSH_PASSWORD
 
-
-# class SSHManager:
-# 	def __init__(self):
-# 		self.host = SSH_HOST
-# 		self.port = SSH_PORT
-# 		self.username = SSH_USERNAME
-# 		self.password = SSH_PASSWORD
-# 		self.ssh_client = paramiko.SSHClient()
-# 		self.ssh_client.load_system_host_keys()
-# 		self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-# 		self.sftp = None
-		
-# 	def open(self):
-# 		self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password)
-# 		self.sftp = self.ssh_client.open_sftp()
-		
-# 	def close(self):
-# 		if self.sftp:
-# 			self.sftp.close()
-# 		self.ssh_client.close()
-		
-# 	def create_remote_folder(self, folder_path):
-# 		if self.sftp:
-# 			self.sftp.mkdir(folder_path)
-
-# 	def remove_folder_contents(self, folder_path):
-# 		if self.sftp:
-# 			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-# 			remote_items = self.sftp.listdir(folder_path)
-
-# 			# 각 항목을 반복하면서 삭제 또는 재귀적으로 다시 호출
-# 			for item in remote_items:
-# 				remote_item_path = os.path.join(folder_path, item)
-				
-#                 # 원격 항목의 속성 가져오기
-# 				remote_item_attr = self.sftp.stat(remote_item_path)
-				
-# 				if stat.S_ISDIR(remote_item_attr.st_mode):
-# 					self.remove_folder_contents(remote_item_path)
-# 				else:
-# 					self.sftp.remove(remote_item_path)
-
-
-# 	def delete_folder(self, folder_path):
-# 		if self.sftp:
-# 			self.remove_folder_contents(folder_path)
-# 			self.sftp.rmdir(folder_path)
-			
-# 	def get_remote_folder(self, remote_folder_path, local_folder_path):
-# 		if self.sftp:
-#             # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
-# 			# 원격 폴더 내의 파일 및 폴더 목록 가져오기
-# 			remote_items = self.sftp.listdir(remote_folder_path)
-
-# 			# 로컬 폴더가 없으면 생성
-# 			if not os.path.exists(local_folder_path):
-# 				os.makedirs(local_folder_path)
-
-# 			# 각 항목을 반복하면서 처리
-# 			for item in remote_items:
-# 				remote_item_path = os.path.join(remote_folder_path, item)
-# 				local_item_path = os.path.join(local_folder_path, item)
-
-# 				# 원격 항목의 속성 가져오기
-# 				remote_item_attr = self.sftp.stat(remote_item_path)
-
-# 				# 만약 폴더라면 재귀적으로 다시 호출
-# 				if stat.S_ISDIR(remote_item_attr.st_mode):
-# 					self.get_remote_folder(self.sftp, remote_item_path, local_item_path)
-# 				else:
-# 					# 파일이라면 복사
-# 					self.sftp.get(remote_item_path, local_item_path)
-					
-# 	def save_file(self, local_path, remote_path):
-# 		if self.sftp:
-# 			self.sftp.put(local_path, remote_path)
-
-# 	def get_remote_file(self, remote_file_path, local_file_path):
-# 		if self.sftp:
-# 			# 로컬 폴더가 없으면 생성
-# 			local_folder_path = os.path.dirname(local_file_path)
-# 			if not os.path.exists(local_folder_path):
-# 				os.makedirs(local_folder_path)
-
-#             # 파일 복사
-# 			self.sftp.get(remote_file_path, local_file_path)
 
 import shutil
 
@@ -237,11 +138,6 @@ def login_user(request, bcrypt, ssh_manager):
 	username = request.json['username']
 	password = request.json['password']
 	
-	# if not username:
-	# 	return jsonify({"msg": "Missing username parameter"}), 400
-	# if not password:
-	# 	return jsonify({"msg": "Missing password parameter"}), 400
-	
 	# fetch user data by username from user_info_db : user_account table
 	user = User.query.filter_by(username=username).first()
 	
@@ -287,10 +183,6 @@ def logout_user(request, session, ssh_manager):
 		return jsonify({"error": "Unauthorized"}), 401
 
 
-
-'''server.jyb 수정 끝'''
-
-
 def add_log(request, session, ssh_manager):
 	try:
 		upload_date = request.json['upload_date']
@@ -328,34 +220,12 @@ def get_date():
 	return [remote_video_date, local_video_date]
 
 
-# def change_codec(video_origin_path, local_video_path):
-# 	try:
-# 		# FFmpeg 명령어 생성
-# 		command = f'ffmpeg -i "{video_origin_path}" -c:v libx264 -c:a aac "{local_video_path}"'
-
-# 		# FFmpeg 명령어 실행
-# 		subprocess.run(command, shell=True)
-# 		print("코덱 변경이 완료되었습니다.")
-# 	except subprocess.CalledProcessError as e:
-# 		print("오류 발생:", e)
-
-
-# def mp4_to_mp3(local_video_path, local_audio_path):
-# 	try:
-# 		ff = FFmpeg()
-# 		ff.convert(local_video_path, local_audio_path)
-# 	except Exception:
-# 		pass
-# 		#mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
-
 def mp4_to_wav(local_video_path, local_audio_path):
 	try:
 		command = f'ffmpeg -i "{local_video_path}" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
 		subprocess.run(command, shell=True)
 	except Exception:
 		pass
-		#mp.ffmpeg_tools.ffmpeg_extract_audio(local_video_path, local_audio_path)
-
 
 
 def record_video(request, session, ssh_manager):
@@ -386,12 +256,9 @@ def record_video(request, session, ssh_manager):
 			remote_video_path = f'D:/log/{user_id}/{remote_file_name}.mp4'
 
 			# 파일 저장
-			# video_origin_path = f'web/temp/temp/origin_{local_file_name}.mp4'
 			video_file.save(local_video_path)
-			# change_codec(video_origin_path, local_video_path)
 
 			# 음원 추출
-			# mp4_to_mp3(local_video_path, local_audio_path)
 			mp4_to_wav(local_video_path, local_audio_path)
 
 			
@@ -400,11 +267,8 @@ def record_video(request, session, ssh_manager):
 			video_file_path = get_local_video(f'web/temp/temp/{local_file_name}.mp4')
 			response_data = {'username':user_id, 'date': remote_video_date, 'video_id': remote_file_name, 'video_url': remote_video_path, 'cover_image': remote_image_path}
 			session["video_info"] = response_data
-			#session["local_audio_path"] = local_audio_path
-
 
 			return_data = {'video_info': {'upload_date': upload_date, 'video_file_path': video_file_path }}
-			# print("반환 데이터", return_data)
 			return jsonify(return_data)
 		
 		else:
@@ -584,10 +448,7 @@ def select_option(request, session, ssh_manager):
 
 		print('hashtag: ', hashtags)
 			
-
-		# return jsonify(return_data)
 		return_data = {'video_info': video_info, 'switches': switches, 'summary': summary, 'hashtags': hashtags } # 'video_file_path': video_file_path, 
-		#print('반환 데이터: ', return_data)
 		return jsonify(return_data)
 
 	except Exception as e:
@@ -596,7 +457,6 @@ def select_option(request, session, ssh_manager):
 
 def save_log(request, session, ssh_manager):
 	user_id = session.get("user_id")
-	#print('request', request.json)
 
 	try:
 		print('저장 시작')
@@ -625,21 +485,6 @@ def save_log(request, session, ssh_manager):
 		ssh_manager.save_file(local_path[0], video_info['cover_image'])
 		ssh_manager.save_file(local_path[1], video_info['video_url'])
 
-		# # SCP 연결
-		# ssh_client.connect(ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
-
-		# print("로컬 저장 경로", local_path)
-		# print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
-
-		# # 파일을 SCP로 원격 서버에 업로드
-		# with ssh_client.open_sftp() as sftp:
-		# 	sftp.put(local_path[0], video_info['cover_image'])
-		# 	sftp.put(local_path[1], video_info['video_url'])
-
-		# # SSH 연결 종료
-		# ssh_client.close()
-		# print('SSH 연결 종료')
-
 		print("원격 저장 경로", video_info['cover_image'], video_info['video_url'])
 
 		local_file_path = [f"web/temp/{user_id}/{video_info['video_id']}.png", f"web/temp/{user_id}/{video_info['video_id']}.mp4"]
@@ -666,7 +511,6 @@ def save_log(request, session, ssh_manager):
 			print(path, '삭제')
 			if os.path.isfile(path):
 				os.remove(path)
-		# os.remove(f'web/temp/{file_name}.mp4')
 
 		return jsonify({'Finish': 'SAVE'})
 

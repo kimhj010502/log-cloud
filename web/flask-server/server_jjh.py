@@ -1,9 +1,7 @@
 import calendar
-import os
 from uuid import uuid4
-import io
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
+from flask import Flask, jsonify
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
@@ -11,8 +9,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import base64
 
-from sqlalchemy import extract, asc, or_, desc
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import asc, or_, desc
 
 from config import ApplicationConfig
 from models import db, User, videoInfo, videoLog, socialNetwork, likeLog, commentLog

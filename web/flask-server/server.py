@@ -1,25 +1,16 @@
-import calendar
 import os
 from uuid import uuid4
 import stat
 
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, Blueprint, abort, send_file
+from flask import Flask, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
-import pymysql
 
-import io
 import base64
 
-from sqlalchemy import extract, asc, or_, desc
-from sqlalchemy.exc import IntegrityError
-
 from config import ApplicationConfig
-from models import db, User, videoInfo, videoLog, socialNetwork
-
-from datetime import datetime, timedelta
-# import pandas as pd
+from models import db
 
 import paramiko
 from config import SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD 
@@ -63,9 +54,6 @@ class SSHManager:
       self.sftp = None
       
    def open(self):
-    #   self.ssh_client.connect(self.host, port=self.port, username=self.username, password=self.password, banner_timeout=200)
-    #   self.sftp = self.ssh_client.open_sftp()
-
       max_retries = 3
       retry_count = 0
 
@@ -118,7 +106,6 @@ class SSHManager:
          
    def get_remote_folder(self, remote_folder_path, local_folder_path):
       if self.sftp:
-            # self.sftp.get(remotepath=remote_folder_path, localpath=local_folder_path)
          # 원격 폴더 내의 파일 및 폴더 목록 가져오기
          remote_items = self.sftp.listdir(remote_folder_path)
 
