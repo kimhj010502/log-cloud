@@ -27,14 +27,6 @@ class videoInfo(db.Model):
 	share = db.Column(db.Integer, nullable=False)
 
 
-class videoLog(db.Model):
-	__tablename__ = "video_log"
-	username = db.Column(db.String(32), nullable=False)
-	video_id = db.Column(db.String(45), nullable=False, unique=True, primary_key=True)
-	like_list = db.Column(db.JSON, nullable=True)
-	comment_list = db.Column(db.JSON, nullable=True)
-
-
 class socialNetwork(db.Model):
 	__tablename__ = "social_network"
 	username1 = db.Column(db.String(32), nullable=False, primary_key = True)
