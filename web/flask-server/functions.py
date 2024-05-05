@@ -8,7 +8,7 @@ def create_folder(username):
 	
 	bin_file = 'log/web/client/public/bin.txt'
 	bin_file_path = f'data/{username}/bin.txt'
-	bin_file.save(bin_file_path)
+	save_file(bin_file, bin_file_path)
 
 
 def delete_folder(username):
