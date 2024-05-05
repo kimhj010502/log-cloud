@@ -8,7 +8,7 @@ from flask_cors import CORS
 from flask_session import Session
 
 from sqlalchemy import asc, or_, desc
-from models import db, User, videoInfo, videoLog, socialNetwork, likeLog, commentLog
+from models import db, User, videoInfo, socialNetwork, likeLog, commentLog
 from functions import get_images, get_video
 
 # API
