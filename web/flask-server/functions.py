@@ -62,3 +62,10 @@ def get_images(image_list, image_type):
 		print(f"Error getting images: {e}")
 		 
 	return images
+
+
+def save_file(src_file, dst_file):
+	try:
+		shutil.move(src_file, dst_file)
+	except Exception as e:
+		print(f"Error saving file: {e}")

@@ -9,7 +9,7 @@ from flask import session, jsonify
 
 from sqlalchemy.exc import IntegrityError
 from models import db, User, videoInfo, videoLog, socialNetwork
-from functions import create_folder, delete_folder, get_video
+from functions import create_folder, delete_folder, get_video, save_file
 
 import torch
 from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
@@ -391,10 +391,8 @@ def save_log(request, session):
 		cap.release()
 
 		# 이미지 및 동영상 저장
-		image_file = local_path[0]
-		video_file = local_path[1]
-		image_file.save(video_info['cover_image'])
-		video_file.save(video_info['video_url'])
+		save_file(local_path[0], video_info['cover_image'])
+		save_file(local_path[1], video_info['video_url'])
 
 		#SQL 저장
 		prev_log = videoInfo.query.filter_by(video_id=video_info['video_id']).first()
