@@ -67,9 +67,9 @@ def analysisReport(request, session):
 	
 	num = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
 								 videoInfo.date < end_date).count()
-	hashtag = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
+	hashtag = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
 									videoInfo.date < end_date).with_entities(videoInfo.hashtag).all()
-	emotion = videoLog.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
+	emotion = videoInfo.query.filter(videoInfo.username == user_id, videoInfo.date >= start_date,
 									videoInfo.date < end_date).with_entities(videoInfo.emotion).all()
 	
 	# Top5 Hashtag
