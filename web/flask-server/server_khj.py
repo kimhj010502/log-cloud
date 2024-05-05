@@ -77,19 +77,6 @@ def remove_registered_user(request, session):
 	
 	try:
 		with db.session.begin_nested():
-			# Delete user's videos from video_info table
-			video_info_to_delete = videoInfo.query.filter_by(username=user.username).delete()
-			
-			# Delete user's video logs from video_log table
-			video_logs_to_delete = videoLog.query.filter_by(username=user.username).delete()
-			
-			# Delete user from social_network table (both username1 and username2)
-			social_network_to_delete = socialNetwork.query.filter(
-				(socialNetwork.username1 == user.username) | (socialNetwork.username2 == user.username)).delete()
-			
-			# + additional deletion operation: remove all comments associated with the account
-			# + additional deletion operation: remove all likes associated with the account
-			
 			# Delete user from user_account table
 			db.session.delete(user)
 		
