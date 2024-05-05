@@ -8,7 +8,7 @@ import speech_recognition as sr
 from flask import session, jsonify
 
 from sqlalchemy.exc import IntegrityError
-from models import db, User, videoInfo, videoLog, socialNetwork
+from models import db, User, videoInfo
 from functions import create_folder, delete_folder, get_video, save_file
 
 import torch
