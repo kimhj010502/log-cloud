@@ -238,7 +238,7 @@ def make_tag(text, emotion):
 	# 디코딩된 출력을 토크나이저를 사용하여 텍스트로 변환
 	decoded_output = hashtag_tokenizer.decode(output[0], skip_special_tokens=True)
 
-	hashtag_list = list(decoded_output.split("#"))[:5]
+	hashtag_list = list(decoded_output.split("#"))[:6]
 	if '' in hashtag_list:
 		hashtag_list.remove('')
 
@@ -328,7 +328,7 @@ def select_option(request, session):
 
 		if switches["summary"] | switches["hashtag"]:
 			# 요약 모델
-			if len(text) <= 20:
+			if len(text) <= 30:
 				summary = text
 
 			else:
@@ -341,7 +341,7 @@ def select_option(request, session):
 				hashtags = [emotion_list[emotion]]
 
 			#원본 텍스트가 너무 짧을 경우
-			elif len(text) <= 50:
+			elif len(text) <= 100:
 				hashtags = make_tag(text, emotion)
 
 			else:
