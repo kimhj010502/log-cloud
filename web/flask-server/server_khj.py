@@ -18,6 +18,8 @@ from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
 device = torch.device("cpu")
 print('device:', device)
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 # 요약 모델
 SUMMARY_DIR_PATH = 'log/modelling/summary'
 summary_model = BartForConditionalGeneration.from_pretrained(SUMMARY_DIR_PATH)
@@ -153,7 +155,7 @@ def get_date():
 
 def mp4_to_wav(local_video_path, local_audio_path):
 	try:
-		command = f'ffmpeg -i "{local_video_path}" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
+		command = f'ffmpeg -i "{local_video_path}" -vcodec copy -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
 		subprocess.run(command, shell=True)
 	except Exception:
 		pass
@@ -273,7 +275,7 @@ def add_bgm(video_path, result_path, emotion):
 	audio_path = f"log/web/flask-server/bgm/{emotion}/{files[random_num]}"
 
 	# 비디오와 음악을 합치는 FFmpeg 명령어 생성
-	command = f'ffmpeg -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo,volume=0.3[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
+	command = f'ffmpeg -correct_ts_overflow 0 -i {video_path} -i {audio_path} -filter_complex "[0:a]aformat=fltp:44100:stereo,apad[aud1];[1:a]aformat=fltp:44100:stereo,volume=0.3[aud2];[aud1][aud2]amix=inputs=2:duration=first[out]" -c:v copy -map 0:v:0 -map "[out]" -shortest {result_path}'
 	
 	# FFmpeg 명령어 실행
 	subprocess.run(command, shell=True)
