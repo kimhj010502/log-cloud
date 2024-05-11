@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { PictureOutlined, PictureFilled, SyncOutlined } from '@ant-design/icons'
 import Webcam from 'react-webcam';
 import Loading from '../Routing/Loading'
@@ -55,10 +55,8 @@ export function CameraRecord() {
     }, [facingMode])
     
 
-    let [name, videoType] = ['', '']
-    useEffect(() => {
-        [name, videoType] = checkBrowser()
-    }, [])
+    let [name, videoType] = checkBrowser()
+    console.log('web환경', name, videoType)
 
     //영상 녹화
     const webcamRef = React.useRef(null);
@@ -68,8 +66,11 @@ export function CameraRecord() {
   
     const handleStartRecordClick = React.useCallback(() => {
         setRecording(true);
+        const codecs = videoType === 'webm' ? 'avc1' : '';
+
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-            mimeType: `video/${videoType}; codecs=avc1`,
+            //mimeType: `video/${videoType}; codecs=avc1`,
+            mimeType: `video/${videoType}${codecs ? `; codecs=${codecs}` : ''}`,
             audioBitsPerSecond: 1280000,
             videoBitsPerSecond: 2500000
         });
@@ -140,6 +141,9 @@ export function CameraRecord() {
             console.log("영상 있음")
             const formData = new FormData();
             formData.append('video', selectedVideo);
+            formData.append('web', name);
+            console.log(name);
+             
             console.log("파일 저장함")
             
             try {
@@ -172,6 +176,8 @@ export function CameraRecord() {
             const blob = new Blob(recordedChunks, { type: "video/mp4" });
             const formData = new FormData();
             formData.append('video', blob);
+            formData.append('web', name);
+            console.log(name);
 
             console.log('영상 녹화 완료')
 

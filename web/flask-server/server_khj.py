@@ -153,12 +153,26 @@ def get_date():
 	return [remote_video_date, local_video_date]
 
 
-def mp4_to_wav(local_video_path, local_audio_path):
+# Andriod
+def mp4_to_wav1(local_video_path, local_audio_path):
 	try:
 		command = f'ffmpeg -i "{local_video_path}" -vcodec copy -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
 		subprocess.run(command, shell=True)
 	except Exception:
 		pass
+
+# IOS
+def mp4_to_wav2(local_video_path, local_audio_path):
+    try:
+        # 재미덱싱 명령 추가
+        reindex_command = f'ffmpeg -i "{local_video_path}" -c copy -fflags +genpts "{local_video_path}_reindexed.mp4"'
+        subprocess.run(reindex_command, shell=True)
+        
+        # 영상을 재미덱싱한 후에 영상 파일을 오디오로 변환하는 명령 실행
+        convert_command = f'ffmpeg -i "{local_video_path}_reindexed.mp4" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
+        subprocess.run(convert_command, shell=True)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 def record_video(request, session):
@@ -169,6 +183,8 @@ def record_video(request, session):
 			print('video 받음')
 			# 파일 경로
 			video_file = request.files['video']
+			web_name = request.form['web']
+			print('web_name', web_name)
 
 			upload_date = session.get("upload_date")
 
@@ -192,7 +208,12 @@ def record_video(request, session):
 			video_file.save(local_video_path)
 
 			# 음원 추출
-			mp4_to_wav(local_video_path, local_audio_path)
+			if (web_name == 'android') | (web_name == 'chrome'):
+				print('Andriod')
+				mp4_to_wav1(local_video_path, local_audio_path)
+			else:
+				print('IOS')
+				mp4_to_wav2(local_video_path, local_audio_path)
 
 			# 세션값 추가
 			video_file_path = get_video(f'log/web/temp/{local_file_name}.mp4')
@@ -398,11 +419,22 @@ def save_log(request, session):
 
 		print('저장 끝')
 
-		#임시 파일 삭제	
+		#임시 파일 삭제
+		'''
 		for path in session['local_path']:
 			print(path, '삭제')
 			if os.path.isfile(path):
 				os.remove(path)
+		'''
+
+		temp_folder = 'log/web/temp'  # temp 폴더 이름
+
+		# temp 폴더 내 파일들을 확인하고 session['local_file_path']로 시작하는 파일을 삭제합니다.
+		for filename in os.listdir(temp_folder):
+			if filename.startswith(session['local_file_name']):
+				file_path = os.path.join(temp_folder, filename)
+				print(f"{file_path} 삭제")
+				os.remove(file_path)
 
 		return jsonify({'Finish': 'SAVE'})
 

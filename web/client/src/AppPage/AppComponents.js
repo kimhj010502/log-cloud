@@ -211,8 +211,9 @@ export function CameraButton() {
 
     return (
         // <Link to={'/record'} state={{ prevURL: '/', videoInfo: JSON.stringify(data.video_info) }}>
+        //<button className="camera-button" onClick={handleAddLog}></button>
             <div className="camera">
-                <button className="camera-button" onClick={handleAddLog}></button>
+                <img className="camera-button" src="logo.png" onClick={handleAddLog} alt="logo img"/>
             </div>
         // </Link>
     )
