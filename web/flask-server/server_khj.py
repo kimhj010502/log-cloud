@@ -1,4 +1,5 @@
 import os
+import shutil
 import cv2
 import random
 from datetime import datetime
@@ -153,26 +154,28 @@ def get_date():
 	return [remote_video_date, local_video_date]
 
 
-# Andriod
-def mp4_to_wav1(local_video_path, local_audio_path):
+def mp4_to_wav(local_video_init_path, local_video_path, local_audio_path, web_name):
 	try:
-		command = f'ffmpeg -i "{local_video_path}" -vcodec copy -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
-		subprocess.run(command, shell=True)
-	except Exception:
-		pass
-
-# IOS
-def mp4_to_wav2(local_video_path, local_audio_path):
-    try:
-        # 재미덱싱 명령 추가
-        reindex_command = f'ffmpeg -i "{local_video_path}" -c copy -fflags +genpts "{local_video_path}_reindexed.mp4"'
-        subprocess.run(reindex_command, shell=True)
+		# Andriod
+		if (web_name == 'android') | (web_name == 'chrome'):
+			print('Andriod')
+			shutil.copy(local_video_init_path, local_video_path)
+            
+			command = f'ffmpeg -i "{local_video_path}" -vcodec copy -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
+			subprocess.run(command, shell=True)
+		# IOS
+		else:
+			print('IOS')
+			# 재미덱싱 명령 추가
+			reindex_command = f'ffmpeg -i "{local_video_init_path}" -c copy -fflags +genpts "{local_video_path}"'
+			subprocess.run(reindex_command, shell=True)
         
-        # 영상을 재미덱싱한 후에 영상 파일을 오디오로 변환하는 명령 실행
-        convert_command = f'ffmpeg -i "{local_video_path}_reindexed.mp4" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
-        subprocess.run(convert_command, shell=True)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+			# 영상을 재미덱싱한 후에 영상 파일을 오디오로 변환하는 명령 실행
+			convert_command = f'ffmpeg -i "{local_video_path}" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
+			subprocess.run(convert_command, shell=True)
+
+	except Exception:
+		print(f"An error occurred: {e}")
 
 
 def record_video(request, session):
@@ -193,6 +196,7 @@ def record_video(request, session):
 			remote_file_name = user_id + remote_video_date
 
 			# 임시 저장 경로 (원하는 경로와 파일명으로 변경) -> 배포 시 임시 저장 안함
+			local_video_init_path = f'log/web/temp/{local_file_name}_init.mp4'
 			local_image_path = f'log/web/temp/{local_file_name}.png'
 			local_video_path = f'log/web/temp/{local_file_name}.mp4'
 			local_audio_path = f'log/web/temp/{local_file_name}.wav'
@@ -205,20 +209,16 @@ def record_video(request, session):
 			remote_video_path = f'data/{user_id}/{remote_file_name}.mp4'
 
 			# 파일 저장
-			video_file.save(local_video_path)
+			video_file.save(local_video_init_path)
 
 			# 음원 추출
-			if (web_name == 'android') | (web_name == 'chrome'):
-				print('Andriod')
-				mp4_to_wav1(local_video_path, local_audio_path)
-			else:
-				print('IOS')
-				mp4_to_wav2(local_video_path, local_audio_path)
+			mp4_to_wav(local_video_init_path, local_video_path, local_audio_path, web_name)
 
 			# 세션값 추가
 			video_file_path = get_video(f'log/web/temp/{local_file_name}.mp4')
 			response_data = {'username':user_id, 'date': remote_video_date, 'video_id': remote_file_name, 'video_url': remote_video_path, 'cover_image': remote_image_path}
 			session["video_info"] = response_data
+			session['web_name'] = web_name
 
 			return_data = {'video_info': {'upload_date': upload_date, 'video_file_path': video_file_path }}
 			return jsonify(return_data)
@@ -257,7 +257,7 @@ def make_tag(text, emotion):
 	input_ids = hashtag_tokenizer.encode(text, return_tensors="pt").to(device)
 	# 모델에 입력 전달하여 디코딩
 	output = hashtag_model.generate(input_ids = input_ids, bos_token_id = hashtag_model.config.bos_token_id,
-							eos_token_id = hashtag_model.config.eos_token_id, length_penalty = 2.0, max_length = 50, num_beams = 2)
+							eos_token_id = hashtag_model.config.eos_token_id, length_penalty = 2.0, max_length = min(50, len(text)), num_beams = 2)
 	# 디코딩된 출력을 토크나이저를 사용하여 텍스트로 변환
 	decoded_output = hashtag_tokenizer.decode(output[0], skip_special_tokens=True)
 
@@ -420,13 +420,6 @@ def save_log(request, session):
 		print('저장 끝')
 
 		#임시 파일 삭제
-		'''
-		for path in session['local_path']:
-			print(path, '삭제')
-			if os.path.isfile(path):
-				os.remove(path)
-		'''
-
 		temp_folder = 'log/web/temp'  # temp 폴더 이름
 
 		# temp 폴더 내 파일들을 확인하고 session['local_file_path']로 시작하는 파일을 삭제합니다.
