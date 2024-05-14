@@ -167,15 +167,14 @@ def mp4_to_wav(local_video_init_path, local_video_path, local_audio_path, web_na
 		else:
 			print('IOS')
 			# 재미덱싱 명령 추가
-			#reindex_command = f'ffmpeg -i "{local_video_init_path}" -c copy -fflags +genpts "{local_video_path}"'
-			reindex_command = f'MP4Box -add "{local_video_init_path}" "{local_video_path}"'
+			reindex_command = f'ffmpeg -i "{local_video_init_path}" -c copy -fflags +genpts "{local_video_path}"'
 			subprocess.run(reindex_command, shell=True)
         
 			# 영상을 재미덱싱한 후에 영상 파일을 오디오로 변환하는 명령 실행
 			convert_command = f'ffmpeg -i "{local_video_path}" -vn -acodec pcm_s16le -ar 44100 -ac 2 "{local_audio_path}"'
 			subprocess.run(convert_command, shell=True)
 
-	except Exception as e:
+	except Exception:
 		print(f"An error occurred: {e}")
 
 
@@ -216,12 +215,12 @@ def record_video(request, session):
 			mp4_to_wav(local_video_init_path, local_video_path, local_audio_path, web_name)
 
 			# 세션값 추가
-			video_file_path = get_video(f'log/web/temp/{local_file_name}.mp4')
+			video_file_path = get_video(local_video_path)
 			response_data = {'username':user_id, 'date': remote_video_date, 'video_id': remote_file_name, 'video_url': remote_video_path, 'cover_image': remote_image_path}
 			session["video_info"] = response_data
 			session['web_name'] = web_name
 
-			return_data = {'video_info': {'upload_date': upload_date, 'video_file_path': video_file_path }}
+			return_data = {'video_info': {'upload_date': upload_date, 'video_file_path': local_video_path }}
 			return jsonify(return_data)
 		
 		else:

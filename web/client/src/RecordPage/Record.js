@@ -38,13 +38,13 @@ function Record() {
     console.log("REcord 페이지 실행")
     console.log(uploadDate)
 
-    useEffect(() => {
+    //useEffect(() => {
         let [name, videoType] = checkBrowser()
         //ios에서 chrome 브라우저를 사용할 때 alert 메세지 띄우기
-        if (name === 'ios') {
-            alert('카메라 사용을 위해 Safari 브라우저를 이용해주시거나 갤러리에서 영상을 첨부해주세요.')
-        }
-    }, [])
+        //if (name === 'ios') {
+            //alert('카메라 사용을 위해 Safari 브라우저를 이용해주시거나 갤러리에서 영상을 첨부해주세요.')
+        //}
+    //}, [])
 
     return (
         <AnimatePresence>
