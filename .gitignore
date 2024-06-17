@@ -16,5 +16,3 @@ __pycache__/
 model.safetensors
 
 web/flask-server/config.py
-
-web/temp
