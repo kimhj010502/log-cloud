@@ -29,7 +29,6 @@ export function Calendar() {
     let date = new Date();
     const todayYear = date.getFullYear();
     const todayMonth = date.getMonth();
-    const todayDate = date.getDate();
 
     const [currentYear, setCurrentYear] = useState(date.getFullYear());
     const [currentMonth, setCurrentMonth] = useState(date.getMonth());

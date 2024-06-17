@@ -16,10 +16,5 @@ __pycache__/
 model.safetensors
 
 web/flask-server/config.py
-web/flask-server/generate_key.py
-web/flask-server/sql_test.py
-web/flask-server/sftp.py
-web/flask-server/ssh_test.py
-web/flask-server/ssh_test_copy.py
 
 web/temp
