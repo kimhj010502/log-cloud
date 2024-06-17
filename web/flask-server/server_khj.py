@@ -15,8 +15,8 @@ from functions import create_folder, delete_folder, get_video, save_file
 import torch
 from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
 
-#device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-device = torch.device("cpu")
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+#device = torch.device("cpu")
 print('device:', device)
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
