@@ -87,8 +87,6 @@ export function MyComment({ data, heartdata, setPage, prevPage, setPrevPage }) {
                     >
 
                     <div className='comments-like-box'>
-                        {/* console.log("-----", heartdata) */}
-
                         <LikeList like_id_list={ heartdata.likeList? heartdata.likeList: [] } setPage={setPage} setPrevPage={setPrevPage} />
 
                         {/* 댓글 개수만큼 */}

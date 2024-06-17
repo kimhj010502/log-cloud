@@ -20,10 +20,6 @@ function ManageFriendsPage({imgSrc}) {
         setFriendList(newFriendList);
     };
 
-    // console.log(friendList);
-    // console.log(pendingReceivedRequests);
-    // console.log(pendingSentRequests);
-
     useEffect(() => {
         //검색중인지 확인
         if (friendUsername !== "") {
@@ -48,7 +44,6 @@ function ManageFriendsPage({imgSrc}) {
                 });
                 if (response.status===200) {
                     const data = await response.json();
-                    // console.log(data);
                     setSearchResult(data.users);
                 } else if (response.status===202) {
                     setSearchResult([]);
@@ -89,8 +84,6 @@ function ManageFriendsPage({imgSrc}) {
 
     const handleSetFriendName = (e) => {
         setFriendUsername(e.target.value);
-        // console.log(friendUsername);
-
     };
 
     return (

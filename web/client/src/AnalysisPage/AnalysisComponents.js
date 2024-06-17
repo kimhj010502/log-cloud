@@ -115,11 +115,6 @@ function Top5Hashtag({ hashtag }) {
                 ) : (
                     <div className="no-hashtags">nothing here yet</div>
                 )}
-                {/*<HashTag key='0' value={hashtag? hashtag[0] : null} bgColor="bg-color-0" />*/}
-                {/*<HashTag key='1' value={hashtag? hashtag[1] : null} bgColor="bg-color-1" />*/}
-                {/*<HashTag key='2' value={hashtag? hashtag[2] : null} bgColor="bg-color-2" />*/}
-                {/*<HashTag key='3' value={hashtag? hashtag[3] : null} bgColor="bg-color-3" />*/}
-                {/*<HashTag key='4' value={hashtag? hashtag[4] : null} bgColor="bg-color-4" />*/}
             </div>
         </div>
     )
@@ -175,8 +170,8 @@ function EmotionGraph({ data, max_num }) {
                 orient: 'bottom',
                 tickSize: 0,
                 tickPadding: 15,
-                tickRotation: 0,  // x축 텍스트를 회전시켜줍니다. (세로)
-                legend: '',  // x 축 단위를 표시합니다.
+                tickRotation: 0,
+                legend: '',
                 legendOffset: 60,
                 legendPosition: 'middle',
             }}
@@ -186,7 +181,7 @@ function EmotionGraph({ data, max_num }) {
                 tickValues: max_num,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: '',  // y축 왼쪽에 표시될 단위입니다.
+                legend: '',
                 legendOffset: -55,
                 legendPosition: 'middle',
             }}

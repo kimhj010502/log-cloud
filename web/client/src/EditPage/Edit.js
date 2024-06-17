@@ -6,14 +6,10 @@ import './Edit.css';
 
 function Edit() {
     const location = useLocation();
-    // console.log(location.state?.videoInfo)
-    const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
     const videoInfo = JSON.parse(location.state?.videoInfo);
     const summary = location.state?.summary
     const hashtags = location.state?.hashtags
     const switches = location.state?.switches
-
-    console.log('Edit 페이지', videoInfo)
 
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)

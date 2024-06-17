@@ -71,9 +71,6 @@ export async function getProfileImage(username) {
         }
         const imageData = await response.text();
         if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
-            // const blob = await response.blob();
-            // return URL.createObjectURL(blob);
-            // console.log(response.body);
             return imageData;
         } else if (response.status === 404) { // no image set; use default image
             return 'profile.png';
@@ -233,7 +230,6 @@ async function handleLogout() {
         }
         else {
             const data = await response.json();
-            // console.log(data);
             sessionStorage.clear();
             window.location.reload();
         }
@@ -279,8 +275,6 @@ export function DeleteAccount({ isClicked, setIsClicked }) {
         setIsClicked(false)
     };
 
-    const navigate = useNavigate();
-
     async function deleteUser() {
         try {
             const response = await fetch('/delete_account', {
@@ -289,7 +283,6 @@ export function DeleteAccount({ isClicked, setIsClicked }) {
             });
             if (response.ok) {
                 sessionStorage.clear();
-                // alert("Account deleted successfully");
                 window.location.reload();
             } else {
                 alert("Failed to delete account");

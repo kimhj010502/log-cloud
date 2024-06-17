@@ -69,7 +69,6 @@ export function CameraRecord() {
         const codecs = videoType === 'webm' ? 'avc1' : '';
 
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-            //mimeType: `video/${videoType}; codecs=avc1`,
             mimeType: `video/${videoType}${codecs ? `; codecs=${codecs}` : ''}`,
             audioBitsPerSecond: 1280000,
             videoBitsPerSecond: 2500000
@@ -122,7 +121,6 @@ export function CameraRecord() {
         }
     }, [fileInputRef]);
 
-    const [videoInfo, setVideoInfo] = useState(null);
     const navigate = useNavigate();
 
     function wait(seconds) {
@@ -135,15 +133,12 @@ export function CameraRecord() {
     //영상 서버에 업로드
     const handleUpload = async (e) => {
         e.preventDefault();  // 이벤트의 기본 동작 막기
-        console.log("버튼 클릭")
 
         if (selectedVideo) {
             console.log("영상 있음")
             const formData = new FormData();
             formData.append('video', selectedVideo);
             formData.append('web', name);
-            console.log(name);
-             
             console.log("파일 저장함")
             
             try {
@@ -177,8 +172,6 @@ export function CameraRecord() {
             const formData = new FormData();
             formData.append('video', blob);
             formData.append('web', name);
-            console.log(name);
-
             console.log('영상 녹화 완료')
 
             try {
@@ -269,9 +262,7 @@ export function CameraRecord() {
         </div>
 
         <div className="upload-button">
-            {/* <Link to={'/upload'} state={{ prevURL: '/record', videoInfo: videoInfo }} className="upload-link"> */}
             <div onClick={handleUpload} className="upload-link">UPLOAD</div>
-            {/* </Link> */}
         </div>
         </>
     );

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './Login.css'
 import Loading from '../Routing/Loading'
-import {getProfileImage} from "../ProfilePage/ProfileComponents";
+import { getProfileImage } from "../ProfilePage/ProfileComponents";
 
 function LoginPage() {
     const [loading, setLoading] = useState(false);
-
-    const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -56,7 +54,6 @@ function LoginPage() {
                 },
                 body: JSON.stringify({ username: username, password: password }),
             });
-            // console.log(username, password);
 
             if (response.ok) {
                 // const data = await response.json();
@@ -201,7 +198,6 @@ export async function getFriendList() {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
-            // body: JSON.stringify({ username: sessionStorage.getItem('username') })
         });
         if (!response.ok) {
             console.log('Error fetching friend data');

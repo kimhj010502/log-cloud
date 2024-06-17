@@ -12,7 +12,6 @@ function Upload() {
     const location = useLocation();
     const prevURL = location.state?.prevURL;  // 이전 페이지의 URL
     const videoInfo = JSON.parse(location.state?.videoInfo); 
-    console.log("업로드페이지", videoInfo)
 
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(true)

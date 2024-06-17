@@ -46,10 +46,6 @@ function Routing() {
         checkAuthentication();
     }, [sessionStorage.getItem('username')]);
 
-    // const updateIsAuthorized = (value) => {
-    //     setIsAuthorized(value);
-    // };
-
     return (
         <div className="body">
             <BrowserRouter>

@@ -196,9 +196,7 @@ export function SelectEmotion({ emotion, setEmotion }) {
 export function NextButton({ handleUpload }) {
     return (
         <div className="next-button">
-            {/* <Link to={'/save'} state={{ prevURL: '/upload' }} > */}
             <div onClick={handleUpload} className="next-link">NEXT</div>
-            {/* </Link> */}
         </div>
     )
 }

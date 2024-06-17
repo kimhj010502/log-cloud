@@ -169,8 +169,6 @@ export function MyFriends({ friendList }) {
 
 function FriendProfile({ friendList, img_src, username, onRemove }) {
     function handleRemoveFriend(friend_username) {
-        // const friendList = JSON.parse(sessionStorage.getItem('friendList'));
-
         // remove friend_username from friendList
         if (friendList.includes(friend_username)) {
             const index = friendList.indexOf(friend_username);

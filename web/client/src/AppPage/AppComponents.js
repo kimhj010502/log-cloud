@@ -39,13 +39,6 @@ export function Calendar() {
     let userCreatedMonth;
     let userCreatedYear;
 
-    // const location = useLocation();
-    // const { year, month } = location.state;
-    // if (year !== undefined && month !== undefined) {
-    //     setCurrentYear(year);
-    //     setCurrentMonth(month);
-    // }
-
     async function loadCalendarView(currentMonth, currentYear) {
 
         // POST request to get cover images
@@ -197,7 +190,6 @@ export function CameraButton() {
                     } else {
                         navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
                     }
-                    // navigate('/record', { state: { prevURL: '/', uploadDate: JSON.stringify(data.upload_date) } });
                 }
                 if (response.status === 400) {
                     console.log('Error during adding log: 400');
@@ -210,12 +202,9 @@ export function CameraButton() {
     };
 
     return (
-        // <Link to={'/record'} state={{ prevURL: '/', videoInfo: JSON.stringify(data.video_info) }}>
-        //<button className="camera-button" onClick={handleAddLog}></button>
-            <div className="camera">
-                <img className="camera-button" src="logo.png" onClick={handleAddLog} alt="logo img"/>
-            </div>
-        // </Link>
+        <div className="camera">
+            <img className="camera-button" src="logo.png" onClick={handleAddLog} alt="logo img"/>
+        </div>
     )
 }
 
@@ -238,12 +227,6 @@ export function Navigation({ imgSrc }) {
         setUsername(user.username);
         sessionStorage.setItem('username', username);
     }
-
-    // if (!profileImgSrc) {
-    //     const userProfileImage = getProfileImage(username);
-    //     setProfileImgSrc(userProfileImage);
-    //     sessionStorage.setItem('myProfileImg', userProfileImage);
-    // }
 
     return (
         <div className="navigation">

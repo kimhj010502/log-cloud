@@ -77,7 +77,7 @@ function SocialPage({imgSrc}) {
                                 {data && data.map((cont) => (
                                     <Social date={cont? cont.date: null} 
                                         id={cont.profileUsername? cont.profileUsername: null}
-                                        profile_img_src={sessionStorage.getItem(cont.profileUsername)} //{sessionStorage.getItem(cont.ProfileUsername)? sessionStorage.getItem(cont.ProfileUsername): null}
+                                        profile_img_src={sessionStorage.getItem(cont.profileUsername)}
                                         cover_img_src={cont.coverImg? cont.coverImg: null}  /> 
                                 ))
                                 }
