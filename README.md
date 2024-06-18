@@ -6,7 +6,7 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     <a href='https://logyourmemory.xyz' target='_blank' style="display: flex; align-items: center;">
         <img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'>
     </a>
-    <p style="margin: 0 0 0 10px; font-size: 18px;">← 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기</p>
+    <p style="margin: 0 0 0 10px; font-size: 18px; display: inline-block;">← 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기</p>
 </div>
 
 <br>
