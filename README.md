@@ -2,12 +2,11 @@
 AI로 간단하게 기록하는 하루의 영상일기, 글보다도 쉽고 생생해요. <br>
 log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
-<div style="display: flex; align-items: center;">
-    <a href='https://logyourmemory.xyz' target='_blank' style="display: flex; align-items: center;">
-        <img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'>
-    </a>
-    <p style="margin: 0 0 0 10px; font-size: 18px;">↳ 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기</p>
-</div>
+
+<a href='https://logyourmemory.xyz' target='_blank' style="display: flex; align-items: center;">
+    <img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'>
+</a>
+　↳ 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기
 
 <br>
 
@@ -20,18 +19,33 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 <br>
 
-### 디렉토리 구조
+### 디렉토리 구조 및 소스코드 설명
     📦ubuntu
-    ┣ 📂data
-    ┃ ┗  📂user
+    ┣ 📂data: MySQL data 저장 폴더
+    ┃ ┗  📂user: 사용자 프로필 이미지 저장 폴더
     ┣ 📂log
-    ┃ ┣ 📂modelling
+    ┃ ┣ 📂modelling: 해시태그와 요약본 생성 모델 관련 파일
     ┃ ┃ ┣ 📂hashtag
     ┃ ┃ ┗ 📂summary
-    ┃ ┣ 📂web
-    ┃ ┃ ┣ 📂client
-    ┃ ┃ ┣ 📂flask-server
-    ┃ ┃ ┗ 📂temp
+    ┃ ┣ 📂web: 웹 서버와 클라이언트 관련 코드
+    ┃ ┃ ┣ 📂client: React 프론트엔드 코드
+    ┃ ┃ ┃ ┣ 📂public: 이미지 파일
+    ┃ ┃ ┃ ┗ 📂src
+    ┃ ┃ ┃ ┃ ┣ 📜 AppPage: 홈페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 LoginPage: 로그인 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 SignupPage: 회원가입 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 RecordPage, UploadPage, EditPage, SavePage: 일기 녹화 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 MyFeedPage: 내 일기 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 SocialFeedPage, SocialPage: 소셜 페이지 (친구 일기 확인)
+    ┃ ┃ ┃ ┃ ┣ 📜 SearchPage, SearchResultPage: 일기 검색 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 AnalysisPage: 통계 페이지
+    ┃ ┃ ┃ ┃ ┣ 📜 ProfilePage, ManageFriendsPage, ChangePasswordPage: 프로필, 친구 관리, 비밀번호 변경 페이지
+    ┃ ┃ ┃ ┃ ┗ 📜 Routing: 페이지별 라우팅
+    ┃ ┃ ┣ 📂flask-server: Flask 백엔드 코드
+    ┃ ┃ ┃ ┣ 📂bgm: 감정별 배경음악 파일
+    ┃ ┃ ┃ ┣ 📜 server.py, server_jjh.py, server_jyb.py, server_khj.py: 백엔드 서버 파일
+    ┃ ┃ ┣ 📂temp: 사용자 영상 일기 임시 저장 폴더
+    ┃ ┃ ┗ 📜 requirements.txt: Python 라이브러리 목록
 
 <br>
 
@@ -138,13 +152,15 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
     SUMMARY_DIR_PATH = "jjae/kobart-summarization-diary"
     summary_tokenizer = PreTrainedTokenizerFast.from_pretrained(SUMMARY_DIR_PATH)
-    summary_model = BartForConditionalGeneration.from_pretraine(SUMMARY_DIR_PATH)
+    summary_model = BartForConditionalGeneration.from_pretrained(SUMMARY_DIR_PATH)
+    summary_model = summary_model.to(device)
 
     # hashtag
     from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
     HASHTAG_DIR_PATH = "jjae/kobart-hashtag"
     hashtag_tokenizer = PreTrainedTokenizerFast.from_pretrained(HASHTAG_DIR_PATH)
     hashtag_model = BartForConditionalGeneration.from_pretrained(HASHTAG_DIR_PATH)
+    hashtag_model = hashtag_model.to(device)
     ```
 <br>
 
@@ -182,6 +198,8 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     성공적으로 켰다면, `Ready to accept connections tcp`가 출력된 것을 확인할 수 있다.
 
 위의 터미널 3개를 모두 실행하면, `http://{Public IP 주소}:3000`으로 웹 어플리케이션에 접속할 수 있다. HTTPS로 접속해야만 카메라 및 음성 녹화 권한을 얻을 수 있으므로 도메인을 발급받아 배포를 진행하였다.
+
+<br>
 
 ## HOW TO DEPLOY DOMAIN 
 먼저, 외부 네트워크에서 각 포트에 접근할 수 있도록 클라우드 서버 인스턴스의 Inbound Rule을 설정해야 한다.
