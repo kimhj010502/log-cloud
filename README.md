@@ -10,10 +10,10 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 ---
 
 ### 목차
-- [HOW TO BUILD](##HOW-TO-BUILD) <br>
-- [HOW TO INSTALL](##HOW-TO-INSTALL) <br>
-- [HOW TO TEST](##HOW-TO-TEST) <br>
-- [HOW TO DEPLOY DOMAIN](##HOW-TO-DEPLOY-DOMAIN ) <br>
+- [HOW TO BUILD](#how-to-build) <br>
+- [HOW TO INSTALL](#how-to-install) <br>
+- [HOW TO TEST](#how-to-test) <br>
+- [HOW TO DEPLOY DOMAIN](#how-to-deploy-domain) <br>
 
 ---
 
@@ -223,7 +223,7 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 <br>
 
-## HOW TO DEPLOY DOMAIN 
+## HOW TO DEPLOY DOMAIN
 먼저, 외부 네트워크에서 각 포트에 접근할 수 있도록 클라우드 서버 인스턴스의 Inbound Rule을 설정해야 한다.
 
 ![](https://velog.velcdn.com/images/kmeeziv/post/d856007a-7710-4f73-ad77-8eaa983a5702/image.png)
