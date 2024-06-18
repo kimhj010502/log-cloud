@@ -3,11 +3,17 @@ AI로 간단하게 기록하는 하루의 영상일기, 글보다도 쉽고 생�
 log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 
-<a href='https://logyourmemory.xyz' target='_blank'>
-    <img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'>
-</a>
-→ 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기
+<a href='https://logyourmemory.xyz' target='_blank'><img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'></a><br>
+&nbsp;&nbsp;↳ 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기
 <br>
+
+---
+
+### 목차
+- [HOW TO BUILD](##HOW-TO-BUILD) <br>
+- [HOW TO INSTALL](##HOW-TO-INSTALL) <br>
+- [HOW TO TEST](##HOW-TO-TEST) <br>
+- [HOW TO DEPLOY DOMAIN](##HOW-TO-DEPLOY-DOMAIN ) <br>
 
 ---
 
@@ -45,6 +51,10 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     ┃ ┃ ┃ ┣ 📜 server.py, server_jjh.py, server_jyb.py, server_khj.py: 백엔드 서버 파일
     ┃ ┃ ┣ 📂temp: 사용자 영상 일기 임시 저장 폴더
     ┃ ┃ ┗ 📜 requirements.txt: Python 라이브러리 목록
+
+<br>
+
+---
 
 <br>
 
@@ -161,6 +171,11 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     hashtag_model = BartForConditionalGeneration.from_pretrained(HASHTAG_DIR_PATH)
     hashtag_model = hashtag_model.to(device)
     ```
+    
+<br>
+
+---
+
 <br>
 
 ## HOW TO INSTALL
@@ -175,6 +190,10 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
     cd web/client #client 폴더로 이동
     npm install #필요한 npm 패키지 설치
     ````
+
+<br>
+
+---
 
 <br>
 
@@ -200,6 +219,10 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 <br>
 
+---
+
+<br>
+
 ## HOW TO DEPLOY DOMAIN 
 먼저, 외부 네트워크에서 각 포트에 접근할 수 있도록 클라우드 서버 인스턴스의 Inbound Rule을 설정해야 한다.
 
@@ -216,7 +239,6 @@ Cloud Virtual Machine 창에서 인스턴스 이름을 설정하고 Security gro
 
 HTTP 서버 (80번 포트), HTTPS 서버 (443번 포트)는 따로 설정하지 않아도 기본으로 열린 포트로 도메인 배포 시에 필요하다.
 
----
 ### 1. 클라우드 웹 서버 작동 확인
 도메인을 발급받기 전에 웹 서버가 정상적으로 작동되는지 확인해야 한다.
 
@@ -225,11 +247,12 @@ HTTP 서버 (80번 포트), HTTPS 서버 (443번 포트)는 따로 설정하지 
 
 이 과정에서 오류가 뜬다면 Inbound Rule 설정이 제대로 안된 것이거나, 프로젝트 폴더를 클라우드 서버에 업로드하는 과정에 문제가 생긴 것이므로 터미널에 뜨는 에러를 확인하며 수정하면 된다.
 
-![](https://velog.velcdn.com/images/kmeeziv/post/58a583b0-e919-4739-9c7e-d0a4b4b3f97a/image.png)
+<p align="center">
+	<img src="https://velog.velcdn.com/images/kmeeziv/post/58a583b0-e919-4739-9c7e-d0a4b4b3f97a/image.png" width="600" style="display: block; margin: 0 auto;">
+</p>
+
 
 로그인을 하지 않은 상태에서는 `/login` 페이지로 이동되도록 만들어주었기 때문에 login 페이지가 뜨는 것이고 Public IP 뒤에 `:3000`이 붙어있을 때 접속이 잘 되는지 확인하면 된다.
-
----
 
 ### 2. Nginx를 이용한 포트 포워딩
 Public IP 뒤에 `:3000`을 붙여야만 웹페이지가 정상적으로 작동되는 이유는 아무것도 붙이지 않았을 때 자동으로 HTTP 서버인 80번 포트로 로딩되기 때문이다. 즉, `http://{Public IP 주소}`는 `http://{Public IP 주소}:80`과 같은 상태이다.
@@ -306,11 +329,11 @@ cat /etc/nginx/sites-enabled/default.conf`
 sudo service nginx restart
 ```
 
-![](https://velog.velcdn.com/images/kmeeziv/post/aae119b3-c954-4e2a-8ec7-1f7881475ec6/image.png)
+<p align="center">
+	<img src="https://velog.velcdn.com/images/kmeeziv/post/aae119b3-c954-4e2a-8ec7-1f7881475ec6/image.png" width="600" style="display: block; margin: 0 auto;">
+</p>
 
 아까와 달리 웹사이트 주소 마지막에 `:3000`을 쓰지 않아도 연결되는 3000번 포트로 리디렉션되는 것을 볼 수 있다.
-
----
 
 ### 3. Domain 발급
 주소창에 Public IP 주소를 매번 입력해서 웹사이트에 접속할 수 없으니 비교적 기억하기 쉬운 Domain을 발급받아 연결해 줄 것이다.
@@ -331,11 +354,12 @@ Register Domain 버튼을 눌러 원하는 주소의 도메인을 발급받으�
 <br>
 도메인 연결에는 시간이 조금 소요될 수 있으며 개인적으로 30분 이내에 연결이 완료되는 것 같았다.
 
-![](https://velog.velcdn.com/images/kmeeziv/post/7ae03c54-3823-4486-93de-963e028723fa/image.png)
+<p align="center">
+	<img src="https://velog.velcdn.com/images/kmeeziv/post/7ae03c54-3823-4486-93de-963e028723fa/image.png" width="600" style="display: block; margin: 0 auto;">
+</p>
 
 도메인 연결이 완료되면 IP 주소가 아닌, 발급받은 도메인 주소로 웹사이트에 접근할 수 있다.
 
----
 ### 4. SSL 인증서 발급
 log 웹 어플리케이션은 영상 일기를 기록하기 위한 서비스이기 때문에, 영상을 녹화하는 과정에서 카메라와 마이크 권한을 허용해야 한다.
 ![](https://velog.velcdn.com/images/kmeeziv/post/109e1afe-6186-417e-a71e-6ba6dfcf616b/image.png)
@@ -414,6 +438,8 @@ cat /etc/nginx/sites-enabled/default.conf`
 sudo service nginx restart
 ```
 
-![](https://velog.velcdn.com/images/kmeeziv/post/294a6486-b07a-4004-919f-55fce625ee02/image.png)
+<p align="center">
+	<img src="https://velog.velcdn.com/images/kmeeziv/post/294a6486-b07a-4004-919f-55fce625ee02/image.png" width="600" style="display: block; margin: 0 auto;">
+</p>
 
 이 과정이 완료되면 `https://{도메인 주소}`로 프론트엔드 프로젝트에 접근할 수 있으며 아까와 달리 주의 요함 문구가 뜨지 않는 것을 확인할 수 있다.
