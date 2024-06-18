@@ -3,7 +3,7 @@ AI로 간단하게 기록하는 하루의 영상일기, 글보다도 쉽고 생�
 log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 
-<a href='https://logyourmemory.xyz' target='_blank' style="display: flex; align-items: center;">
+<a href='https://logyourmemory.xyz' target='_blank'>
     <img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'>
 </a>
 → 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기
