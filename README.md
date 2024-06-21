@@ -4,7 +4,7 @@ log가 일기 요약본, 해시태그, 배경음악을 만들어줍니다. <br>
 
 | 𝑙𝑜𝑔 𝑦𝑜𝑢𝑟 𝑚𝑒𝑚𝑜𝑟𝑦 바로가기 | DEMO 영상 바로가기 |
 | :-: | :-: |
-| <a href='https://logyourmemory.xyz' target='_blank'><img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'></a> | <a href='https://www.youtube.com/watch?v=qe_gl4sbFno' target='_blank'><img src='https://ifh.cc/g/of1xkL.png' border='0' width='100'></a> |
+| <a href='http://43.128.109.199' target='_blank'><img src='https://ifh.cc/g/BJFDwy.png' border='0' width='70'></a> | <a href='https://www.youtube.com/watch?v=qe_gl4sbFno' target='_blank'><img src='https://ifh.cc/g/of1xkL.png' border='0' width='100'></a> |
 
 ---
 
